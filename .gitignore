@@ -1,1 +1,7 @@
-﻿./Library/*
+﻿Library/*
+Logs/*
+obj/*
+UserSettings/*
+*.csproj
+BulletHell3D.sln
+Temp/*
