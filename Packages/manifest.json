@@ -1,6 +1,6 @@
 {
   "dependencies": {
-    "com.joe.commoncode": "file:C:/Users/joele/Development/JoeCommonCode",
+    "com.joe.commoncode": "file:../../JoeCommonCode",
     "com.unity.ai.navigation": "2.0.4",
     "com.unity.collab-proxy": "2.7.1",
     "com.unity.entities": "1.3.14",

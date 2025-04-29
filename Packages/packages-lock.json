@@ -1,7 +1,7 @@
 {
   "dependencies": {
     "com.joe.commoncode": {
-      "version": "file:C:/Users/joele/Development/JoeCommonCode",
+      "version": "file:../../JoeCommonCode",
       "depth": 0,
       "source": "local",
       "dependencies": {}
