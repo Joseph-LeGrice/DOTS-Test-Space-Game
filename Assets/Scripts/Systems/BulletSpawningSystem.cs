@@ -1,16 +1,6 @@
 using Unity.Burst;
 using Unity.Entities;
-using Unity.Mathematics;
 using Unity.Transforms;
-
-struct BulletSource : IComponentData
-{
-    public Entity Prefab;
-    public float SpawnRate;
-    public float3 SpawnPosition;
-    public float3 BulletFireDirection;
-    public float NextSpawnTime;
-}
 
 partial struct BulletSpawningSystem : ISystem
 {

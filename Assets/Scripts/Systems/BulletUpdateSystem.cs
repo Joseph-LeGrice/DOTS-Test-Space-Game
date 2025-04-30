@@ -7,20 +7,6 @@ using Unity.Mathematics;
 using Unity.Rendering;
 using Unity.Transforms;
 
-public struct Bullet : IComponentData
-{
-    public float3 CurrentVelocity;
-    public float Speed;
-    public float Lifetime;
-
-    public Bullet(float Speed, float Lifetime)
-    {
-        this.Speed = Speed;
-        this.Lifetime = Lifetime;
-        this.CurrentVelocity = 0.0f;
-    }
-}
-
 [BurstCompile]
 public partial struct BulletMoveJob : IJobEntity
 {
