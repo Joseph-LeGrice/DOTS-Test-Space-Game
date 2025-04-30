@@ -1,28 +1,14 @@
-using Unity.Burst;
 using Unity.Entities;
 using Unity.Physics;
-using Unity.Transforms;
 
-partial struct PlayerMovementSystem : ISystem
+partial class PlayerMovementSystem : SystemBase
 {
-    [BurstCompile]
-    public void OnCreate(ref SystemState state)
+    protected override void OnUpdate()
     {
-        
-    }
-
-    [BurstCompile]
-    public void OnUpdate(ref SystemState state)
-    {
-        foreach ((var playerData, var velocity) in SystemAPI.Query<RefRO<PlayerData>, RefRW<PhysicsVelocity>>())
+        foreach (var (playerData, velocity, entity) in SystemAPI.Query<RefRO<PlayerData>, RefRW<PhysicsVelocity>>().WithEntityAccess())
         {
-            
+            PlayerManagedAccess managedAccess = SystemAPI.ManagedAPI.GetComponent<PlayerManagedAccess>(entity);
+            velocity.ValueRW.Linear = playerData.ValueRO.MovementSpeed * managedAccess.PlayerInput.TargetDirection;
         }
-    }
-
-    [BurstCompile]
-    public void OnDestroy(ref SystemState state)
-    {
-        
     }
 }
