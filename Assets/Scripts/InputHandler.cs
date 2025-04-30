@@ -3,8 +3,14 @@ using UnityEngine.InputSystem;
 
 public class InputHandler : MonoBehaviour, InputSystem_Actions.IPlayerActions
 {
-    private InputSystem_Actions m_inputActions;
+    public Vector3 TargetDirection { get; private set; }
+    public bool IsAttacking { get; private set; }
+    public bool VelocityDampersActive { get; private set; } = true;
+    public bool IsBraking { get; private set; }
+    public bool IsBoosting { get; private set; }
 
+    private InputSystem_Actions m_inputActions;
+    
     private void Awake()
     {
         m_inputActions = new InputSystem_Actions();
@@ -14,31 +20,34 @@ public class InputHandler : MonoBehaviour, InputSystem_Actions.IPlayerActions
     
     public void OnMove(InputAction.CallbackContext context)
     {
-        throw new System.NotImplementedException();
+        TargetDirection = context.ReadValue<Vector3>();
     }
 
     public void OnLook(InputAction.CallbackContext context)
     {
-        throw new System.NotImplementedException();
+        
     }
 
     public void OnAttack(InputAction.CallbackContext context)
     {
-        throw new System.NotImplementedException();
+        IsAttacking = context.ReadValueAsButton();
     }
 
     public void OnBoost(InputAction.CallbackContext context)
     {
-        throw new System.NotImplementedException();
+        IsBoosting = context.ReadValueAsButton();
     }
 
     public void OnBrake(InputAction.CallbackContext context)
     {
-        throw new System.NotImplementedException();
+        IsBraking = context.ReadValueAsButton();
     }
 
     public void OnVelocityDampers(InputAction.CallbackContext context)
     {
-        throw new System.NotImplementedException();
+        if (context.action.WasPressedThisFrame())
+        {
+            VelocityDampersActive = !VelocityDampersActive;
+        }
     }
 }

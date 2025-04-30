@@ -9,4 +9,5 @@ public struct PlayerData : IComponentData
 public class PlayerManagedAccess : IComponentData
 {
     public GameObject CameraGameObject;
+    public InputHandler PlayerInput;
 }
