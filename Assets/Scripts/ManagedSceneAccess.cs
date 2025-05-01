@@ -2,20 +2,11 @@ using UnityEngine;
 
 public class ManagedSceneAccess : MonoSingleton<ManagedSceneAccess>
 {
-    // To support local multiplayer, have a class containing a camera / input handler per player 
-    
     [SerializeField]
-    private Camera m_mainCamera;
-    [SerializeField]
-    private InputHandler m_inputHandler;
+    private ManagedLocalPlayer m_mainLocalPlayer;
 
-    public InputHandler GetInputHandler()
+    public ManagedLocalPlayer GetPlayer()
     {
-        return m_inputHandler;
-    }
-    
-    public Camera GetMainCamera()
-    {
-        return m_mainCamera;
+        return m_mainLocalPlayer;
     }
 }

@@ -1,9 +1,11 @@
 using Unity.Entities;
 using UnityEngine;
+using UnityEngine.Serialization;
 
 class MonoPlayer : MonoBehaviour
 {
-    public float Speed;
+    public float ForwardSpeed;
+    public float TurnSpeedDegreesPerSecond;
 }
 
 class MonoPlayerBaker : Baker<MonoPlayer>
@@ -11,11 +13,14 @@ class MonoPlayerBaker : Baker<MonoPlayer>
     public override void Bake(MonoPlayer authoring)
     {
         Entity mainEntity = GetEntity(TransformUsageFlags.Dynamic);
-        AddComponent(mainEntity, new PlayerData() { MovementSpeed = authoring.Speed });
+        AddComponent(mainEntity, new PlayerData()
+        {
+            MovementSpeed = authoring.ForwardSpeed,
+            TurnSpeed = authoring.TurnSpeedDegreesPerSecond,
+        });
         AddComponentObject(mainEntity, new PlayerManagedAccess()
         {
-            PlayerInput = ManagedSceneAccess.Instance.GetInputHandler(),
-            CameraGameObject = ManagedSceneAccess.Instance.GetMainCamera().gameObject
+            ManagedLocalPlayer = ManagedSceneAccess.Instance.GetPlayer(),
         });
     }
 }

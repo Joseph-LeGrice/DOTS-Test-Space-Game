@@ -8,8 +8,9 @@ public partial class CameraSyncSystem : SystemBase
         foreach (var (_, localToWorld, entity) in SystemAPI.Query<RefRO<PlayerData>, RefRO<LocalToWorld>>().WithEntityAccess())
         { 
             PlayerManagedAccess pma = SystemAPI.ManagedAPI.GetComponent<PlayerManagedAccess>(entity);
-            pma.CameraGameObject.transform.position = localToWorld.ValueRO.Position;
-            pma.CameraGameObject.transform.rotation = localToWorld.ValueRO.Rotation;
+            pma.ManagedLocalPlayer.UpdatePlayerPositionAndRotation(
+                localToWorld.ValueRO.Position, localToWorld.ValueRO.Rotation
+            );
         }
     }
 }

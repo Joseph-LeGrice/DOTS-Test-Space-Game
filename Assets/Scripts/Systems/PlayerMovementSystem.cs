@@ -8,7 +8,7 @@ partial class PlayerMovementSystem : SystemBase
         foreach (var (playerData, velocity, entity) in SystemAPI.Query<RefRO<PlayerData>, RefRW<PhysicsVelocity>>().WithEntityAccess())
         {
             PlayerManagedAccess managedAccess = SystemAPI.ManagedAPI.GetComponent<PlayerManagedAccess>(entity);
-            velocity.ValueRW.Linear = playerData.ValueRO.MovementSpeed * managedAccess.PlayerInput.TargetDirection;
+            velocity.ValueRW.Linear = playerData.ValueRO.MovementSpeed * managedAccess.ManagedLocalPlayer.GetPlayerInput().TargetDirection;
         }
     }
 }
