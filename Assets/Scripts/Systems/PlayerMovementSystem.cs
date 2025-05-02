@@ -9,14 +9,39 @@ partial class PlayerMovementSystem : SystemBase
 {
     protected override void OnUpdate()
     {
-        foreach (var (playerData, velocity, physicsMass, localToWorld, entity) in SystemAPI.Query<RefRO<PlayerData>, RefRW<PhysicsVelocity>, RefRW<PhysicsMass>, RefRO<LocalToWorld>>().WithEntityAccess())
+        foreach (var (playerData, velocity, physicsMass, localToWorld, entity) in SystemAPI.Query<RefRO<PlayerData>, RefRW<PhysicsVelocity>, RefRW<PhysicsMass>, RefRO<LocalTransform>>().WithEntityAccess())
         {
             PlayerManagedAccess managedAccess = SystemAPI.ManagedAPI.GetComponent<PlayerManagedAccess>(entity);
-            velocity.ValueRW.Linear = playerData.ValueRO.MovementSpeed * math.mul(localToWorld.ValueRO.Rotation, managedAccess.ManagedLocalPlayer.GetPlayerInput().TargetDirection);
+            LocalTransform t = localToWorld.ValueRO;
+
+            float3 targetVelocity = managedAccess.ManagedLocalPlayer.GetPlayerInput().TargetDirection;
+            if (targetVelocity.z > 0.0f)
+            {
+                targetVelocity.z *= playerData.ValueRO.ForwardThrusters.Acceleration;
+            }
+            else
+            {
+                targetVelocity.z *= playerData.ValueRO.ReverseThrusters.Acceleration;
+            }
+            targetVelocity.x *= playerData.ValueRO.LateralThrusters.Acceleration;
+            targetVelocity.y *= playerData.ValueRO.LateralThrusters.Acceleration;
+            
+            float3 currentVelocityLocal = t.InverseTransformDirection(velocity.ValueRW.Linear);
+            currentVelocityLocal += targetVelocity;
+            currentVelocityLocal.z = math.clamp(currentVelocityLocal.z, -playerData.ValueRO.ReverseThrusters.MaximumVelocity, playerData.ValueRO.ForwardThrusters.MaximumVelocity);
+            currentVelocityLocal.x = math.sign(currentVelocityLocal.x) * math.min(math.abs(currentVelocityLocal.x), playerData.ValueRO.LateralThrusters.MaximumVelocity);
+            currentVelocityLocal.y = math.sign(currentVelocityLocal.y) * math.min(math.abs(currentVelocityLocal.y), playerData.ValueRO.LateralThrusters.MaximumVelocity);
+
+            if (math.lengthsq(targetVelocity) == 0.0f && math.lengthsq(currentVelocityLocal) > 0.0f && managedAccess.ManagedLocalPlayer.GetPlayerInput().VelocityDampersActive)
+            {
+                currentVelocityLocal -= math.min(playerData.ValueRO.VelocityDamperDeceleration, math.length(currentVelocityLocal)) * math.normalize(currentVelocityLocal);
+            }
+            
+            velocity.ValueRW.Linear = t.TransformDirection(currentVelocityLocal);
             
             managedAccess.ManagedLocalPlayer.GetCameraAimDirection(out Vector3 forward, out Vector3 up);
-            quaternion forwardRotation = GetFromToRotation(localToWorld.ValueRO.Forward, forward);
-            quaternion upRotation = GetFromToRotation(localToWorld.ValueRO.Up, up);
+            quaternion forwardRotation = GetFromToRotation(t.Forward(), forward);
+            quaternion upRotation = GetFromToRotation(t.Up(), up);
             quaternion finalRotation = math.mul(forwardRotation, upRotation);
             
             float3 angularVelocity = float3.zero;

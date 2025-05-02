@@ -4,7 +4,10 @@ using UnityEngine.Serialization;
 
 class MonoPlayer : MonoBehaviour
 {
-    public float ForwardSpeed;
+    public ThrusterData ForwardThrusters;
+    public ThrusterData LateralThrusters;
+    public ThrusterData ReverseThrusters;
+    public float VelocityDamperDeceleration;
     public float TurnSpeedDegreesPerSecond;
 }
 
@@ -15,7 +18,10 @@ class MonoPlayerBaker : Baker<MonoPlayer>
         Entity mainEntity = GetEntity(TransformUsageFlags.Dynamic);
         AddComponent(mainEntity, new PlayerData()
         {
-            MovementSpeed = authoring.ForwardSpeed,
+            ForwardThrusters = authoring.ForwardThrusters,
+            LateralThrusters = authoring.LateralThrusters,
+            ReverseThrusters = authoring.ReverseThrusters,
+            VelocityDamperDeceleration = authoring.VelocityDamperDeceleration,
             TurnSpeed = authoring.TurnSpeedDegreesPerSecond,
         });
         AddComponentObject(mainEntity, new PlayerManagedAccess()

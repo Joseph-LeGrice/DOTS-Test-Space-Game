@@ -64,7 +64,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 0}
+  - {fileID: 2100000, guid: 36ee911df9cd0d84a83eb68c6e5ed8e3, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -133,7 +133,16 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3d77665a6db5e954694a9b7e6bd525d1, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  ForwardSpeed: 10
+  ForwardThrusters:
+    Acceleration: 2.5
+    MaximumVelocity: 10
+  LateralThrusters:
+    Acceleration: 1.5
+    MaximumVelocity: 10
+  ReverseThrusters:
+    Acceleration: 1.5
+    MaximumVelocity: 5
+  VelocityDamperDeceleration: 10
   TurnSpeedDegreesPerSecond: 360
 --- !u!54 &5011388520281563901
 Rigidbody:
