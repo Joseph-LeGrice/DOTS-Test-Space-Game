@@ -32,9 +32,25 @@ partial class PlayerMovementSystem : SystemBase
             currentVelocityLocal.x = math.sign(currentVelocityLocal.x) * math.min(math.abs(currentVelocityLocal.x), playerData.ValueRO.LateralThrusters.MaximumVelocity);
             currentVelocityLocal.y = math.sign(currentVelocityLocal.y) * math.min(math.abs(currentVelocityLocal.y), playerData.ValueRO.LateralThrusters.MaximumVelocity);
 
-            if (math.lengthsq(targetVelocity) == 0.0f && math.lengthsq(currentVelocityLocal) > 0.0f && managedAccess.ManagedLocalPlayer.GetPlayerInput().VelocityDampersActive)
+            float currentSpeed = math.lengthsq(currentVelocityLocal); 
+            if (currentSpeed > 0.0f && managedAccess.ManagedLocalPlayer.GetPlayerInput().VelocityDampersActive)
             {
-                currentVelocityLocal -= math.min(playerData.ValueRO.VelocityDamperDeceleration, math.length(currentVelocityLocal)) * math.normalize(currentVelocityLocal);
+                float threshold = 0.001f;
+                if (math.abs(targetVelocity.x) < threshold)
+                {
+                    float absX = math.abs(currentVelocityLocal.x);
+                    currentVelocityLocal.x = math.sign(currentVelocityLocal.x) * math.max(absX - playerData.ValueRO.VelocityDamperDeceleration * SystemAPI.Time.DeltaTime, 0.0f);
+                }
+                if (math.abs(targetVelocity.y) < threshold)
+                {
+                    float absY = math.abs(currentVelocityLocal.y);
+                    currentVelocityLocal.y = math.sign(currentVelocityLocal.y) * math.max(absY - playerData.ValueRO.VelocityDamperDeceleration * SystemAPI.Time.DeltaTime, 0.0f);
+                }
+                if (math.abs(targetVelocity.z) < threshold)
+                {
+                    float absZ = math.abs(currentVelocityLocal.z);
+                    currentVelocityLocal.z = math.sign(currentVelocityLocal.z) * math.max(absZ - playerData.ValueRO.VelocityDamperDeceleration * SystemAPI.Time.DeltaTime, 0.0f);
+                }
             }
             
             velocity.ValueRW.Linear = t.TransformDirection(currentVelocityLocal);
