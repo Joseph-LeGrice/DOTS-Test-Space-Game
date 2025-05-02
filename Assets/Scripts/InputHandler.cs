@@ -19,7 +19,6 @@ public class InputHandler : MonoBehaviour, InputSystem_Actions.IPlayerActions
     [SerializeField]
     private Transform m_cameraTransform;
 
-    private Vector2 m_cameraEuler;
     private Vector2 m_cameraMoveDirection;
     private float m_rollDirection;
 
@@ -49,24 +48,17 @@ public class InputHandler : MonoBehaviour, InputSystem_Actions.IPlayerActions
 
     private void Update()
     {
-        m_cameraEuler.x = (m_cameraEuler.x + m_cameraMoveDirection.x * m_cameraLookSpeed * Time.unscaledDeltaTime + 360.0f) % 360.0f;
-        m_cameraEuler.y = (m_cameraEuler.y + m_cameraMoveDirection.y * m_cameraLookSpeed * Time.unscaledDeltaTime + 360.0f) % 360.0f;
-        
-        Vector2 adjustedEuler = m_cameraEuler;
-        adjustedEuler.x = (adjustedEuler.x - 180.0f) * Mathf.Deg2Rad;
-        adjustedEuler.y = (adjustedEuler.y - 180.0f) * Mathf.Deg2Rad;
-        
-        float xzHypotenuse = Mathf.Cos(adjustedEuler.x);
-        Vector3 forward = new Vector3(
-            xzHypotenuse * Mathf.Sin(adjustedEuler.y),
-            Mathf.Sin(adjustedEuler.x),
-            xzHypotenuse * Mathf.Cos(adjustedEuler.y)
-        );
+        float pitchDelta = m_cameraMoveDirection.x * m_cameraLookSpeed * Time.unscaledDeltaTime;
+        float yawDelta = m_cameraMoveDirection.y * m_cameraLookSpeed * Time.unscaledDeltaTime;
+
+        Vector3 forward = m_cameraTransform.forward;
+        forward = Quaternion.AngleAxis(pitchDelta, m_cameraTransform.right) * forward;
+        forward = Quaternion.AngleAxis(yawDelta, m_cameraTransform.up) * forward;
 
         Vector3 up = m_cameraTransform.up;
+        Vector3.OrthoNormalize(ref forward, ref up);
         float rollDelta = m_rollDirection * m_cameraRollSpeed * Time.unscaledDeltaTime;
         up = Quaternion.AngleAxis(rollDelta, forward) * up;
-        // Vector3.OrthoNormalize(ref forward, ref up);
         
         m_cameraTransform.localRotation = Quaternion.LookRotation(forward, up);
     }
