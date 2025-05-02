@@ -27,6 +27,9 @@ public class InputHandler : MonoBehaviour, InputSystem_Actions.IPlayerActions
         m_inputActions = new InputSystem_Actions();
         m_inputActions.Player.AddCallbacks(this);
         m_inputActions.Player.Enable();
+
+        Cursor.visible = false;
+        Cursor.lockState = CursorLockMode.Locked;
     }
     
     public void OnMove(InputAction.CallbackContext context)
