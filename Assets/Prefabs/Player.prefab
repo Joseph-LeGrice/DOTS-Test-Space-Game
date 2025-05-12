@@ -49,13 +49,13 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   ForwardThrusters:
     Acceleration: 2.5
-    MaximumVelocity: 10
+    MaximumVelocity: 50
   LateralThrusters:
-    Acceleration: 1.5
+    Acceleration: 0.25
     MaximumVelocity: 10
   ReverseThrusters:
     Acceleration: 1.5
-    MaximumVelocity: 5
+    MaximumVelocity: 10
   VelocityDamperDeceleration: 10
   TurnSpeedDegreesPerSecond: 360
 --- !u!54 &5011388520281563901
