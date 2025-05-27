@@ -51,8 +51,8 @@ public class InputHandler : MonoBehaviour, InputSystem_Actions.IPlayerActions
 
     private void Update()
     {
-        float pitchDelta = m_cameraMoveDirection.x * m_cameraLookSpeed * Time.unscaledDeltaTime;
-        float yawDelta = m_cameraMoveDirection.y * m_cameraLookSpeed * Time.unscaledDeltaTime;
+        float pitchDelta = m_cameraMoveDirection.x * m_cameraLookSpeed;
+        float yawDelta = m_cameraMoveDirection.y * m_cameraLookSpeed;
 
         Vector3 forward = m_cameraTransform.forward;
         forward = Quaternion.AngleAxis(pitchDelta, m_cameraTransform.right) * forward;
