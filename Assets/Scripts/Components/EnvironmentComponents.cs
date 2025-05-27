@@ -9,10 +9,14 @@ public struct AsteroidField : IComponentData
     public float AsteroidFieldRadius;
     public float AsteroidFieldDensity;
 
-    public NativeArray<int> AsteroidType;
-    public NativeArray<int> AsteroidMeshIndex;
-    public NativeArray<float3> AsteroidLocalPositions;
-    public NativeArray<bool> AsteroidStates;
+}
+
+public struct AsteroidBufferData : IBufferElementData
+{
+    public int Type;
+    public int MeshIndex;
+    public float3 LocalPosition;
+    public bool State;
 }
 
 public struct Asteroid : IComponentData
