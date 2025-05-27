@@ -1,5 +1,6 @@
 using Unity.Entities;
 using UnityEngine;
+using Random = Unity.Mathematics.Random; 
 
 class MonoAsteroidField : MonoBehaviour
 {
@@ -15,7 +16,7 @@ class MonoAsteroidFieldBaker : Baker<MonoAsteroidField>
         Entity e = GetEntity(TransformUsageFlags.WorldSpace);
         AddComponent(e, new AsteroidField()
         {
-            AsteroidSettings = authoring.Settings.GetBlobDataReference(this),
+            Settings = authoring.Settings.GetBlobDataReference(this),
             AsteroidFieldRadius = authoring.AsteroidFieldRadius,
             AsteroidFieldDensity = authoring.AsteroidFieldDensity,
         });
