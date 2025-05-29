@@ -14,7 +14,7 @@ public struct AsteroidField : IComponentData
 
 public struct AsteroidBufferData : IBufferElementData
 {
-    public Entity Instance;
+    public bool Created;
     public int AsteroidType;
     public bool State;
     public float RotationSpeed;

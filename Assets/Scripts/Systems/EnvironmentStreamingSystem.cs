@@ -36,19 +36,20 @@ public struct CreateAsteroidsJob : IJobParallelFor
     public void Execute(int i)
     {
         AsteroidBufferData asteroidData = m_asteroidBufferData[i];
-        if (asteroidData.State && asteroidData.Instance == Entity.Null)
+        if (!asteroidData.Created)
         {
             Entity prefab = m_asteroidTypeBufferData[asteroidData.AsteroidType].Prefab;
-            Entity instance = m_entityCommandBuffer.Instantiate(i * 10, prefab);
-            asteroidData.Instance = instance;
+            Entity instance = m_entityCommandBuffer.Instantiate(i * 3, prefab);
             
-            m_entityCommandBuffer.SetComponent(i * 10 + 1, instance, LocalTransform.FromPosition(asteroidData.LocalPosition));
-            m_entityCommandBuffer.SetComponent(i * 10 + 2, instance, new Asteroid()
+            m_entityCommandBuffer.SetComponent(i * 3 + 1, instance, LocalTransform.FromPosition(asteroidData.LocalPosition));
+            m_entityCommandBuffer.SetComponent(i * 3 + 2, instance, new Asteroid()
             {
                 TumbleAxis = asteroidData.RotationAxis,
                 TumbleSpeed = asteroidData.RotationSpeed,
             });
 
+            asteroidData.Created = true;
+            
             m_asteroidBufferData[i] = asteroidData;
         }
     }

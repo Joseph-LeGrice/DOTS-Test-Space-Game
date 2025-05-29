@@ -10,6 +10,7 @@ public class MonoAsteroidBaker : Baker<MonoAsteroid>
 {
     public override void Bake(MonoAsteroid authoring)
     {
-        
+        Entity e = GetEntity(TransformUsageFlags.Dynamic);
+        AddComponent<Asteroid>(e);
     }
 }
