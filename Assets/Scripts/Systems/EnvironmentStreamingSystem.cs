@@ -16,14 +16,14 @@ using Random = Unity.Mathematics.Random;
 public partial struct UpdateAsteroids : IJobEntity
 {
     public float m_elapsedTime;
-    
+
     private void Execute(ref Asteroid asteroid, ref LocalTransform localToWorld)
     {
         localToWorld = localToWorld.Rotate(quaternion.AxisAngle(asteroid.TumbleAxis, m_elapsedTime * asteroid.TumbleSpeed));
     }
 }
 
-//[BurstCompile]
+[BurstCompile]
 public struct CreateAsteroidsJob : IJobParallelFor
 {
     public int m_chunkIndex;
@@ -69,7 +69,7 @@ public partial struct EnvironmentStreamingSystem : ISystem
     {
     }
     
-    // [BurstCompile]
+    [BurstCompile]
     public void OnUpdate(ref SystemState state)
     {
         DynamicBuffer<AsteroidTypeBufferData> asteroidTypeBuffer = SystemAPI.GetSingletonBuffer<AsteroidTypeBufferData>();
@@ -93,6 +93,9 @@ public partial struct EnvironmentStreamingSystem : ISystem
 
         ecb.Playback(state.EntityManager);
         ecb.Dispose();
+
+        UpdateAsteroids updateAsteroidsJob = new UpdateAsteroids() { m_elapsedTime = (float)SystemAPI.Time.ElapsedTime };
+        updateAsteroidsJob.Schedule();
     }
     
     [BurstCompile]
