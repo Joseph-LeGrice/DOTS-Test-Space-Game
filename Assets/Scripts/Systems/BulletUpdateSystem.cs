@@ -23,11 +23,11 @@ public partial struct BulletMoveJob : IJobEntity
 public partial struct BulletDestroyJob : IJobEntity
 {
     public EntityCommandBuffer.ParallelWriter Ecb;
-    private void Execute(Entity e, ref Bullet bullet)
+    private void Execute(Entity e,  [ChunkIndexInQuery] int sortKey, ref Bullet bullet)
     {
         if (bullet.Lifetime <= 0.0f)
         {
-            Ecb.DestroyEntity(0, e);
+            Ecb.DestroyEntity(sortKey, e);
         }
     }
 }

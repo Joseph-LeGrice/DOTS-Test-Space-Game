@@ -4,7 +4,7 @@ using Random = Unity.Mathematics.Random;
 
 class MonoAsteroidField : MonoBehaviour
 {
-    public AsteroidSettings Settings;
+    public MonoAsteroidSettings AsteroidSettings;
     public float AsteroidFieldRadius;
     public int AsteroidFieldDensity;
 }
@@ -17,29 +17,26 @@ class MonoAsteroidFieldBaker : Baker<MonoAsteroidField>
         
         AddComponent(e, new AsteroidField()
         {
-            Settings = authoring.Settings.GetBlobDataReference(this),
             AsteroidFieldRadius = authoring.AsteroidFieldRadius,
             AsteroidFieldDensity = authoring.AsteroidFieldDensity,
         });
         
         DynamicBuffer<AsteroidBufferData> asteroidData = AddBuffer<AsteroidBufferData>(e);
-        asteroidData.Length = authoring.AsteroidFieldDensity;
-        
-        int numTypes = authoring.Settings.AsteroidTypes.Count;
         
         Random r = new Random(1);
         for (int i = 0; i < authoring.AsteroidFieldDensity; i++)
         {
-            int asteroidTypeIndex = r.NextInt(numTypes); 
-            int numMeshes = authoring.Settings.AsteroidTypes[asteroidTypeIndex].PossibleMeshHashes.Count;
-            int meshIndex = r.NextInt(numMeshes);
-            asteroidData[i] = new AsteroidBufferData()
+            int numTypes = authoring.AsteroidSettings.AsteroidTypes.Count;
+            int asteroidTypeIndex = r.NextInt(numTypes);
+            var asteroidTypeInfo = authoring.AsteroidSettings.AsteroidTypes[asteroidTypeIndex];
+            asteroidData.Add(new AsteroidBufferData()
             {
-                Type = asteroidTypeIndex,
-                MeshIndex = meshIndex,
+                AsteroidType = asteroidTypeIndex,
                 State = true,
+                RotationAxis = r.NextFloat3(),
+                RotationSpeed = r.NextFloat(asteroidTypeInfo.MinRotateSpeed, asteroidTypeInfo.MaxRotateSpeed),
                 LocalPosition = authoring.AsteroidFieldRadius * r.NextFloat3(),
-            };
+            });
         }
     }
 }

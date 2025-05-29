@@ -349,6 +349,88 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: -135, z: 0}
+--- !u!1 &1518708406
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1518708408}
+  - component: {fileID: 1518708407}
+  m_Layer: 0
+  m_Name: MonoAsteroidSettings
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &1518708407
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1518708406}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1bb0955c0a9791d42b9e3489a6dd63f2, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  AsteroidTypes:
+  - Prefab: {fileID: 1826957632511111253, guid: e0277e7fbff8eaa49afbdedcaa804e37, type: 3}
+    Size: 15
+    MinRotateSpeed: 1
+    MaxRotateSpeed: 5
+  - Prefab: {fileID: 1826957632511111253, guid: 11add227155a95d428f07c490b2585ea, type: 3}
+    Size: 15
+    MinRotateSpeed: 1
+    MaxRotateSpeed: 5
+  - Prefab: {fileID: 1826957632511111253, guid: 2bf7c8bb09cd71f468cc4e3b6260b502, type: 3}
+    Size: 15
+    MinRotateSpeed: 1
+    MaxRotateSpeed: 5
+  - Prefab: {fileID: 1826957632511111253, guid: f8b0bbd47d8e7eb48bbb3836b43e3d53, type: 3}
+    Size: 7.5
+    MinRotateSpeed: 5
+    MaxRotateSpeed: 10
+  - Prefab: {fileID: 1826957632511111253, guid: 7e4b3796cb26d6c48ae97e1566eb75db, type: 3}
+    Size: 7.5
+    MinRotateSpeed: 5
+    MaxRotateSpeed: 10
+  - Prefab: {fileID: 1826957632511111253, guid: e7f718b2ee39a694aab794f2b9af5c11, type: 3}
+    Size: 3.75
+    MinRotateSpeed: 10
+    MaxRotateSpeed: 15
+  - Prefab: {fileID: 1826957632511111253, guid: 8b846488a1a1f7943b8bb6d4656f6c4a, type: 3}
+    Size: 3.75
+    MinRotateSpeed: 10
+    MaxRotateSpeed: 15
+  - Prefab: {fileID: 1826957632511111253, guid: 6a3f93672a3df5c4893b4d719022f80f, type: 3}
+    Size: 3.75
+    MinRotateSpeed: 10
+    MaxRotateSpeed: 15
+  - Prefab: {fileID: 1826957632511111253, guid: 8e36230266cda6349aea28953b983cdd, type: 3}
+    Size: 3.75
+    MinRotateSpeed: 10
+    MaxRotateSpeed: 15
+  AsteroidFieldMinimumSpacing: 50
+--- !u!4 &1518708408
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1518708406}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: -6.84517, y: 0, z: -1.42469}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1879664947
 GameObject:
   m_ObjectHideFlags: 0
@@ -424,7 +506,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7bcc5ec22aa0e2c48885a4654c3c56d3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  Settings: {fileID: 11400000, guid: 21fda79c0d785504a973696f791efffd, type: 2}
+  AsteroidSettings: {fileID: 1518708407}
   AsteroidFieldRadius: 500
   AsteroidFieldDensity: 50
 --- !u!4 &2030789700
@@ -504,6 +586,7 @@ SceneRoots:
   m_ObjectHideFlags: 0
   m_Roots:
   - {fileID: 2030789700}
+  - {fileID: 1518708408}
   - {fileID: 7777715648153822053}
   - {fileID: 1879664949}
   - {fileID: 1405891822}

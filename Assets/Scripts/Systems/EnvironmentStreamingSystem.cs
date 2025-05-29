@@ -1,9 +1,15 @@
 using Unity.Burst;
 using Unity.Collections;
 using Unity.Entities;
+using Unity.Entities.Content;
+using Unity.Entities.Serialization;
 using Unity.Jobs;
 using Unity.Mathematics;
+using Unity.Rendering;
 using Unity.Transforms;
+using UnityEngine;
+using UnityEngine.Rendering;
+using Hash128 = Unity.Entities.Hash128;
 using Random = Unity.Mathematics.Random;
 
 [BurstCompile]
@@ -17,58 +23,77 @@ public partial struct UpdateAsteroids : IJobEntity
     }
 }
 
+//[BurstCompile]
 public struct CreateAsteroidsJob : IJobParallelFor
 {
-    public Entity m_prefab; // ??
-    public int m_chunkIndex; // ??
-    public AsteroidField m_asteroidField;
+    public int m_chunkIndex;
     public EntityCommandBuffer.ParallelWriter m_entityCommandBuffer;
-    [ReadOnly] public DynamicBuffer<AsteroidBufferData> m_bufferData;
+    [NativeDisableParallelForRestriction]
+    public DynamicBuffer<AsteroidBufferData> m_asteroidBufferData;
+    [ReadOnly]
+    public DynamicBuffer<AsteroidTypeBufferData> m_asteroidTypeBufferData;
     
     public void Execute(int i)
     {
-        if (m_bufferData[i].State)
+        AsteroidBufferData asteroidData = m_asteroidBufferData[i];
+        if (asteroidData.State && asteroidData.Instance == Entity.Null)
         {
-            Entity instance = m_entityCommandBuffer.Instantiate(m_chunkIndex, m_prefab);
+            Entity prefab = m_asteroidTypeBufferData[asteroidData.AsteroidType].Prefab;
+            Entity instance = m_entityCommandBuffer.Instantiate(i * 10, prefab);
+            asteroidData.Instance = instance;
             
-            // Todo: Set up mesh and transform parenting correctly
-            // m_bufferData[i].Type[i]; // ??
-            // m_bufferData[i].MeshIndex[i]; // ??
-            // m_entityCommandBuffer.SetComponent(m_chunkIndex, instance, ); // ??
-            
-            m_entityCommandBuffer.SetComponent(m_chunkIndex, instance, LocalTransform.FromPosition(m_bufferData[i].LocalPosition));
-            
-            m_entityCommandBuffer.SetComponent(m_chunkIndex, instance, new Asteroid()
+            m_entityCommandBuffer.SetComponent(i * 10 + 1, instance, LocalTransform.FromPosition(asteroidData.LocalPosition));
+            m_entityCommandBuffer.SetComponent(i * 10 + 2, instance, new Asteroid()
             {
-                TumbleAxis = new float3(0.0f, 1.0f, 0.0f),
-                TumbleSpeed = 5.0f,
+                TumbleAxis = asteroidData.RotationAxis,
+                TumbleSpeed = asteroidData.RotationSpeed,
             });
+
+            m_asteroidBufferData[i] = asteroidData;
         }
     }
 }
 
+readonly partial struct AsteroidFieldAspect : IAspect
+{
+    public readonly Entity Self;
+    public readonly RefRW<AsteroidField> AsteroidFieldData;
+    public readonly DynamicBuffer<AsteroidBufferData> AsteroidBufferData;
+}
+
 public partial struct EnvironmentStreamingSystem : ISystem
 {
-    private BufferLookup<AsteroidBufferData> m_asteroidBufferDataLookup;
-    
     [BurstCompile]
     public void OnCreate(ref SystemState state)
     {
-        m_asteroidBufferDataLookup = state.GetBufferLookup<AsteroidBufferData>(true);
     }
-
-    [BurstCompile]
+    
+    // [BurstCompile]
     public void OnUpdate(ref SystemState state)
     {
-        m_asteroidBufferDataLookup.Update(ref state);
-        // foreach (asteroidFieldEntity in asteroidFieldQuery)
-        // {
-        //      DynamicBuffer<AsteroidBufferData> bufferData = m_asteroidBufferDataLookup[asteroidFieldEntity];
-        //      CreateAsteroidsJob caj = new CreateAsteroidsJob() { ... }
-        //      caj.Schedule();
-        // }
-    }
+        DynamicBuffer<AsteroidTypeBufferData> asteroidTypeBuffer = SystemAPI.GetSingletonBuffer<AsteroidTypeBufferData>();
+        EntityCommandBuffer ecb = new EntityCommandBuffer(Allocator.TempJob);
 
+        foreach (AsteroidFieldAspect asteroidField in SystemAPI.Query<AsteroidFieldAspect>())
+        {
+            int chunkIndex = (int)SystemAPI.GetEntityStorageInfoLookup()[asteroidField.Self].Chunk.SequenceNumber;
+            CreateAsteroidsJob caj = new CreateAsteroidsJob()
+            {
+                m_chunkIndex = chunkIndex,
+                m_entityCommandBuffer = ecb.AsParallelWriter(),
+                m_asteroidBufferData = asteroidField.AsteroidBufferData,
+                m_asteroidTypeBufferData = asteroidTypeBuffer,
+            };
+            state.Dependency = JobHandle.CombineDependencies(state.Dependency,
+                caj.Schedule(asteroidField.AsteroidBufferData.Length, 64));
+        }
+
+        state.Dependency.Complete();
+
+        ecb.Playback(state.EntityManager);
+        ecb.Dispose();
+    }
+    
     [BurstCompile]
     public void OnDestroy(ref SystemState state)
     {
