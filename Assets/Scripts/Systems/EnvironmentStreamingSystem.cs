@@ -26,7 +26,6 @@ public partial struct UpdateAsteroids : IJobEntity
 [BurstCompile]
 public struct CreateAsteroidsJob : IJobParallelFor
 {
-    public int m_chunkIndex;
     public EntityCommandBuffer.ParallelWriter m_entityCommandBuffer;
     [NativeDisableParallelForRestriction]
     public DynamicBuffer<AsteroidBufferData> m_asteroidBufferData;
@@ -77,10 +76,8 @@ public partial struct EnvironmentStreamingSystem : ISystem
 
         foreach (AsteroidFieldAspect asteroidField in SystemAPI.Query<AsteroidFieldAspect>())
         {
-            int chunkIndex = (int)SystemAPI.GetEntityStorageInfoLookup()[asteroidField.Self].Chunk.SequenceNumber;
             CreateAsteroidsJob caj = new CreateAsteroidsJob()
             {
-                m_chunkIndex = chunkIndex,
                 m_entityCommandBuffer = ecb.AsParallelWriter(),
                 m_asteroidBufferData = asteroidField.AsteroidBufferData,
                 m_asteroidTypeBufferData = asteroidTypeBuffer,
