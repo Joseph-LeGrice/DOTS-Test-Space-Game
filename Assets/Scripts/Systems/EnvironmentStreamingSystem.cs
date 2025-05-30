@@ -1,16 +1,8 @@
 using Unity.Burst;
 using Unity.Collections;
 using Unity.Entities;
-using Unity.Entities.Content;
-using Unity.Entities.Serialization;
 using Unity.Jobs;
-using Unity.Mathematics;
-using Unity.Rendering;
 using Unity.Transforms;
-using UnityEngine;
-using UnityEngine.Rendering;
-using Hash128 = Unity.Entities.Hash128;
-using Random = Unity.Mathematics.Random;
 
 [BurstCompile]
 public partial struct UpdateAsteroids : IJobEntity

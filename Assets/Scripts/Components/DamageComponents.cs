@@ -18,12 +18,14 @@ public struct Damageable : IComponentData
 public struct ImpactDamage : IComponentData
 {
     public float FlatDamage;
+    public Entity ImpactEffectEntity;
 
-    public static ImpactDamage WithFlatDamage(float damage)
+    public static ImpactDamage WithFlatDamage(float damage, Entity impactEffect)
     {
         return new ImpactDamage()
         {
-            FlatDamage = damage
+            FlatDamage = damage,
+            ImpactEffectEntity = impactEffect,
         };
     }
 }

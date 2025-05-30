@@ -3,7 +3,7 @@ using UnityEngine;
 
 class MonoProjectile : MonoBehaviour
 {
-    public float Lifetime = 10.0f;
+    public GameObject ImpactEffectPrefab;
     public float ImpactDamage;
 }
 
@@ -13,7 +13,8 @@ class MonoProjectileBaker : Baker<MonoProjectile>
     {
         Entity mainEntity = GetEntity(TransformUsageFlags.Dynamic);
         AddComponent(mainEntity, new Prefab());
-        AddComponent(mainEntity, Projectile.WithLifetime(authoring.Lifetime));
-        AddComponent(mainEntity, ImpactDamage.WithFlatDamage(authoring.ImpactDamage));
+        AddComponent(mainEntity, new Projectile());
+        AddComponent<MarkForCleanup>(mainEntity);
+        AddComponent(mainEntity, ImpactDamage.WithFlatDamage(authoring.ImpactDamage, GetEntity(authoring.ImpactEffectPrefab, TransformUsageFlags.Renderable)));
     }
 }

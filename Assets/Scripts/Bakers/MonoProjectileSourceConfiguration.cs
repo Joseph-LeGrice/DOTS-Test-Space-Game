@@ -6,6 +6,7 @@ class MonoProjectileSourceConfiguration : MonoBehaviour
     public GameObject ProjectilePrefab;
     public float ProjectileSpeed;
     public float FireRate;
+    public float Lifetime = 3.0f;
 }
 
 class ProjectileSourceConfigurationBaker : Baker<MonoProjectileSourceConfiguration>
@@ -18,6 +19,7 @@ class ProjectileSourceConfigurationBaker : Baker<MonoProjectileSourceConfigurati
             ProjectilePrefab = GetEntity(authoring.ProjectilePrefab, TransformUsageFlags.Dynamic),
             ProjectileSpeed = authoring.ProjectileSpeed,
             ProjectileSpawnRate = authoring.FireRate,
+            ProjectileLifetime = authoring.Lifetime,
         });
     }
 }

@@ -6,12 +6,13 @@ using Unity.Transforms;
 
 // https://docs.unity3d.com/Packages/com.unity.physics@1.4/manual/ecs-packages.html
 
-[BurstCompile]
+// [BurstCompile]
 public partial struct ImpactDamageUpdate : IJobEntity
 {
     public EntityCommandBuffer.ParallelWriter m_entityCommandBuffer;
     [ReadOnly] public CollisionWorld m_physicsWorld;
     public ComponentLookup<Damageable> m_damageableLookup;
+    public float m_elapsedTime;
     
     private void Execute(Entity self, ref ImpactDamage impactDamage, ref LocalToWorld localToWorld)
     {
@@ -34,6 +35,9 @@ public partial struct ImpactDamageUpdate : IJobEntity
             d.CurrentHealth -= impactDamage.FlatDamage;
             m_damageableLookup[hit.Entity] = d;
             m_entityCommandBuffer.DestroyEntity(0, self);
+            
+            Entity impactFx = m_entityCommandBuffer.Instantiate(0, impactDamage.ImpactEffectEntity);
+            m_entityCommandBuffer.SetComponent(0, impactFx, LocalTransform.FromPosition(hit.Position));
         }
     }
 }

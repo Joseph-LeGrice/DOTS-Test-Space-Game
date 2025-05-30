@@ -148,8 +148,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f5ebe469c5fddfa45b93ad0996b81958, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  Prefab: {fileID: 7376992030637964104, guid: 4fa617928551c3f49a3b398007d2bd39, type: 3}
-  SpawnRate: 0.5
+  projectileSourceConfiguration: {fileID: 0}
+  RelatedRigidbody: {fileID: 0}
 --- !u!4 &51850228
 Transform:
   m_ObjectHideFlags: 0
@@ -194,8 +194,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f5ebe469c5fddfa45b93ad0996b81958, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  Prefab: {fileID: 7376992030637964104, guid: 4fa617928551c3f49a3b398007d2bd39, type: 3}
-  SpawnRate: 0.5
+  projectileSourceConfiguration: {fileID: 0}
+  RelatedRigidbody: {fileID: 0}
 --- !u!4 &852517476
 Transform:
   m_ObjectHideFlags: 0
@@ -240,8 +240,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f5ebe469c5fddfa45b93ad0996b81958, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  Prefab: {fileID: 7376992030637964104, guid: 4fa617928551c3f49a3b398007d2bd39, type: 3}
-  SpawnRate: 0.5
+  projectileSourceConfiguration: {fileID: 0}
+  RelatedRigidbody: {fileID: 0}
 --- !u!4 &1182363764
 Transform:
   m_ObjectHideFlags: 0
@@ -286,8 +286,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f5ebe469c5fddfa45b93ad0996b81958, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  Prefab: {fileID: 7376992030637964104, guid: 4fa617928551c3f49a3b398007d2bd39, type: 3}
-  SpawnRate: 0.5
+  projectileSourceConfiguration: {fileID: 0}
+  RelatedRigidbody: {fileID: 0}
 --- !u!4 &1321667792
 Transform:
   m_ObjectHideFlags: 0
@@ -332,8 +332,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f5ebe469c5fddfa45b93ad0996b81958, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  Prefab: {fileID: 7376992030637964104, guid: 4fa617928551c3f49a3b398007d2bd39, type: 3}
-  SpawnRate: 0.5
+  projectileSourceConfiguration: {fileID: 0}
+  RelatedRigidbody: {fileID: 0}
 --- !u!4 &1405891822
 Transform:
   m_ObjectHideFlags: 0
@@ -460,8 +460,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f5ebe469c5fddfa45b93ad0996b81958, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  Prefab: {fileID: 7376992030637964104, guid: 4fa617928551c3f49a3b398007d2bd39, type: 3}
-  SpawnRate: 0.5
+  projectileSourceConfiguration: {fileID: 0}
+  RelatedRigidbody: {fileID: 0}
 --- !u!4 &1879664949
 Transform:
   m_ObjectHideFlags: 0
