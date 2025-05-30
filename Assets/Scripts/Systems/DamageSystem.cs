@@ -9,10 +9,11 @@ using Unity.Transforms;
 [BurstCompile]
 public partial struct ImpactDamageUpdate : IJobEntity
 {
+    public EntityCommandBuffer.ParallelWriter m_entityCommandBuffer;
     [ReadOnly] public CollisionWorld m_physicsWorld;
     public ComponentLookup<Damageable> m_damageableLookup;
     
-    private void Execute(ref ImpactDamage impactDamage, ref LocalToWorld localToWorld)
+    private void Execute(Entity self, ref ImpactDamage impactDamage, ref LocalToWorld localToWorld)
     {
         float distance = 5.0f;
         RaycastInput ri = new RaycastInput()
@@ -32,6 +33,7 @@ public partial struct ImpactDamageUpdate : IJobEntity
             Damageable d = m_damageableLookup[hit.Entity];
             d.CurrentHealth -= impactDamage.FlatDamage;
             m_damageableLookup[hit.Entity] = d;
+            m_entityCommandBuffer.DestroyEntity(0, self);
         }
     }
 }
@@ -41,18 +43,20 @@ public partial struct DamageSystem : ISystem
     [BurstCompile]
     public void OnUpdate(ref SystemState state)
     {
+        BeginSimulationEntityCommandBufferSystem.Singleton ecbSystem = SystemAPI.GetSingleton<BeginSimulationEntityCommandBufferSystem.Singleton>();
+        EntityCommandBuffer ecb = ecbSystem.CreateCommandBuffer(state.WorldUnmanaged);
         PhysicsWorldSingleton physicsWorld = SystemAPI.GetSingleton<PhysicsWorldSingleton>();
         ComponentLookup<Damageable> damageableLookup = SystemAPI.GetComponentLookup<Damageable>();
         
         new ImpactDamageUpdate()
         {
+            m_entityCommandBuffer= ecb.AsParallelWriter(),
             m_physicsWorld = physicsWorld.CollisionWorld,
             m_damageableLookup = damageableLookup
         }.Schedule();
         
         state.Dependency.Complete();
         
-        EntityCommandBuffer ecb = new EntityCommandBuffer(Allocator.Temp);
         foreach (var (d, e) in SystemAPI.Query<RefRO<Damageable>>().WithEntityAccess())
         {
             if (d.ValueRO.CurrentHealth < 0.0f)
@@ -60,7 +64,5 @@ public partial struct DamageSystem : ISystem
                 ecb.DestroyEntity(e);
             }
         }
-        ecb.Playback(state.EntityManager);
-        ecb.Dispose();
     }
 }
