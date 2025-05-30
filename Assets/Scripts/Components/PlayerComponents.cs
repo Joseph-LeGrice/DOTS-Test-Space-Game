@@ -23,3 +23,8 @@ public class PlayerManagedAccess : IComponentData
 {
     public ManagedLocalPlayer ManagedLocalPlayer;
 }
+
+public struct ShipHardpointBufferElement : IBufferElementData
+{
+    public Entity Self;
+}

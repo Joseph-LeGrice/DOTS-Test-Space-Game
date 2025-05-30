@@ -8,31 +8,31 @@ using Unity.Rendering;
 using Unity.Transforms;
 
 [BurstCompile]
-public partial struct BulletMoveJob : IJobEntity
+public partial struct ProjectileMoveJob : IJobEntity
 {
     public float DeltaTime;
     
-    private void Execute(ref Bullet bullet, ref LocalTransform transform)
+    private void Execute(ref Projectile projectile, ref LocalTransform transform)
     {
-        transform = transform.Translate(bullet.CurrentVelocity * DeltaTime);
-        bullet.Lifetime -= DeltaTime;
+        transform = transform.Translate(projectile.Velocity * DeltaTime);
+        projectile.Lifetime -= DeltaTime;
     }
 }
 
 [BurstCompile]
-public partial struct BulletDestroyJob : IJobEntity
+public partial struct ProjectileDestroyJob : IJobEntity
 {
     public EntityCommandBuffer.ParallelWriter Ecb;
-    private void Execute(Entity e,  [ChunkIndexInQuery] int sortKey, ref Bullet bullet)
+    private void Execute(Entity e,  [ChunkIndexInQuery] int sortKey, ref Projectile projectile)
     {
-        if (bullet.Lifetime <= 0.0f)
+        if (projectile.Lifetime <= 0.0f)
         {
             Ecb.DestroyEntity(sortKey, e);
         }
     }
 }
 
-partial struct BulletUpdateSystem : ISystem
+partial struct ProjectileUpdateSystem : ISystem
 {
 
     [BurstCompile]
@@ -43,14 +43,14 @@ partial struct BulletUpdateSystem : ISystem
     [BurstCompile]
     public void OnUpdate(ref SystemState state)
     {
-        BulletMoveJob bmj = new BulletMoveJob()
+        ProjectileMoveJob bmj = new ProjectileMoveJob()
         {
             DeltaTime = SystemAPI.Time.DeltaTime
         };
         bmj.ScheduleParallel();
 
         BeginSimulationEntityCommandBufferSystem.Singleton commandBufferSystem = SystemAPI.GetSingleton<BeginSimulationEntityCommandBufferSystem.Singleton>();
-        BulletDestroyJob bdj = new BulletDestroyJob()
+        ProjectileDestroyJob bdj = new ProjectileDestroyJob()
         {
             Ecb = commandBufferSystem.CreateCommandBuffer(state.WorldUnmanaged).AsParallelWriter()
         };

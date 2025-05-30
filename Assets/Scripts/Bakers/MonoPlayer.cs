@@ -9,6 +9,8 @@ class MonoPlayer : MonoBehaviour
     public ThrusterData ReverseThrusters;
     public float VelocityDamperDeceleration;
     public float TurnSpeedDegreesPerSecond;
+    
+    public GameObject[] ShipHardpoints;
 }
 
 class MonoPlayerBaker : Baker<MonoPlayer>
@@ -28,5 +30,14 @@ class MonoPlayerBaker : Baker<MonoPlayer>
         {
             ManagedLocalPlayer = ManagedSceneAccess.Instance.GetPlayer(),
         });
+        
+        DynamicBuffer<ShipHardpointBufferElement> shbe = AddBuffer<ShipHardpointBufferElement>(mainEntity);
+        foreach (GameObject sh in authoring.ShipHardpoints)
+        {
+            shbe.Add(new ShipHardpointBufferElement()
+            {
+                Self = GetEntity(sh, TransformUsageFlags.Dynamic),
+            });
+        }
     }
 }

@@ -19,7 +19,7 @@ public partial struct UpdateAsteroids : IJobEntity
 
     private void Execute(ref Asteroid asteroid, ref LocalTransform localToWorld)
     {
-        localToWorld = localToWorld.Rotate(quaternion.AxisAngle(asteroid.TumbleAxis, m_elapsedTime * asteroid.TumbleSpeed));
+        // localToWorld = localToWorld.Rotate(quaternion.AxisAngle(asteroid.TumbleAxis, m_elapsedTime * asteroid.TumbleSpeed));
     }
 }
 
