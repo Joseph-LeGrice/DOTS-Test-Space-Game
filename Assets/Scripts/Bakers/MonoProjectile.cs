@@ -4,6 +4,7 @@ using UnityEngine;
 class MonoProjectile : MonoBehaviour
 {
     public float Lifetime = 10.0f;
+    public float ImpactDamage;
 }
 
 class MonoProjectileBaker : Baker<MonoProjectile>
@@ -12,6 +13,7 @@ class MonoProjectileBaker : Baker<MonoProjectile>
     {
         Entity mainEntity = GetEntity(TransformUsageFlags.Dynamic);
         AddComponent(mainEntity, new Prefab());
-        AddComponent(mainEntity, new Projectile(authoring.Lifetime));
+        AddComponent(mainEntity, Projectile.WithLifetime(authoring.Lifetime));
+        AddComponent(mainEntity, ImpactDamage.WithFlatDamage(authoring.ImpactDamage));
     }
 }

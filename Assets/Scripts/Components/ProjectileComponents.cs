@@ -6,10 +6,13 @@ public struct Projectile : IComponentData
     public float3 Velocity;
     public float Lifetime;
 
-    public Projectile(float Lifetime)
+    public static Projectile WithLifetime(float Lifetime)
     {
-        this.Lifetime = Lifetime;
-        this.Velocity = 0.0f;
+        return new Projectile()
+        {
+            Lifetime = Lifetime,
+            Velocity = 0.0f
+        };
     }
 }
 
