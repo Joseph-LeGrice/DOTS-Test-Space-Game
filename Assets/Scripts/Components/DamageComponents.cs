@@ -29,3 +29,13 @@ public struct ImpactDamage : IComponentData
         };
     }
 }
+
+public struct DetachablePart : IBufferElementData
+{
+    public Entity EffectPrefab;
+    public Entity DetachableEntity;
+    public float ImpulseForceMinimum;
+    public float ImpulseForceMaximum;
+    public float AngularForceMinimum;
+    public float AngularForceMaximum;
+}
