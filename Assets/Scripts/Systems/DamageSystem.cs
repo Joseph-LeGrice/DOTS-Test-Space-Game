@@ -46,7 +46,8 @@ public partial struct ImpactDamageUpdate : IJobEntity
 [BurstCompile]
 public partial struct DamageableUpdate : IJobEntity
 {
-    public EntityCommandBuffer.ParallelWriter m_ecbWriter;
+    public EntityCommandBuffer.ParallelWriter m_ecbWriterForEntityDestruction;
+    public EntityCommandBuffer.ParallelWriter m_ecbWriterForDetach;
     [ReadOnly]
     public BufferLookup<DetachablePart> m_detachablePartsLookup;
     [ReadOnly]
@@ -58,28 +59,29 @@ public partial struct DamageableUpdate : IJobEntity
     {
         if (d.CurrentHealth < 0.0f)
         {
-            m_ecbWriter.DestroyEntity(2, self); // also removes children as parent system not updated
+            m_ecbWriterForEntityDestruction.DestroyEntity(2, self); // also removes children as parent system not updated
             
             if (m_detachablePartsLookup.HasBuffer(self))
             {
                 foreach (DetachablePart detachablePart in m_detachablePartsLookup[self])
                 {
-                    m_ecbWriter.RemoveComponent<Parent>(1, detachablePart.DetachableEntity);
+                    m_ecbWriterForDetach.RemoveComponent<Parent>(0, detachablePart.DetachableEntity);
+                    // https://docs.unity3d.com/Packages/com.unity.entities@1.3/manual/transforms-comparison.html
                     
                     LocalTransform localTransform = m_localTransformLookup[detachablePart.DetachableEntity];
 
                     if (detachablePart.EffectPrefab != Entity.Null)
                     {
-                        Entity effect = m_ecbWriter.Instantiate(0, detachablePart.EffectPrefab);
-                        m_ecbWriter.SetComponent(0, effect, LocalTransform.FromPosition(localTransform.Position));
+                        Entity effect = m_ecbWriterForEntityDestruction.Instantiate(0, detachablePart.EffectPrefab);
+                        m_ecbWriterForDetach.SetComponent(0, effect, LocalTransform.FromPosition(localTransform.Position));
                     }
                     
-                    m_ecbWriter.AddComponent<PhysicsVelocity>(1, detachablePart.DetachableEntity);
-                    m_ecbWriter.SetComponent(1, detachablePart.DetachableEntity, new PhysicsVelocity()
-                    {
-                        Linear = localTransform.Forward() * m_random.NextFloat(detachablePart.ImpulseForceMinimum, detachablePart.ImpulseForceMaximum),
-                        Angular = m_random.NextFloat(detachablePart.AngularForceMinimum, detachablePart.AngularForceMaximum),
-                    });
+                    // m_ecbWriterForDetach.AddComponent<PhysicsVelocity>(1, detachablePart.DetachableEntity);
+                    // m_ecbWriterForDetach.SetComponent(0, detachablePart.DetachableEntity, new PhysicsVelocity()
+                    // {
+                    //     Linear = localTransform.Forward() * m_random.NextFloat(detachablePart.ImpulseForceMinimum, detachablePart.ImpulseForceMaximum),
+                    //     Angular = m_random.NextFloat(detachablePart.AngularForceMinimum, detachablePart.AngularForceMaximum),
+                    // });
                     
                     // PhysicsVelocity pv = m_physicsVelocityLookup[detachablePart.DetachableEntity];
                     // pv.Linear = localTransform.Forward() * m_random.NextFloat(detachablePart.ImpulseForceMinimum, detachablePart.ImpulseForceMaximum);
@@ -91,31 +93,40 @@ public partial struct DamageableUpdate : IJobEntity
     }
 }
 
+[UpdateBefore(typeof(TransformSystemGroup))]
 public partial struct DamageSystem : ISystem
 {
     [BurstCompile]
     public void OnUpdate(ref SystemState state)
     {
         BeginSimulationEntityCommandBufferSystem.Singleton ecbSystem = SystemAPI.GetSingleton<BeginSimulationEntityCommandBufferSystem.Singleton>();
-        EntityCommandBuffer ecb = ecbSystem.CreateCommandBuffer(state.WorldUnmanaged);
+        EntityCommandBuffer ecbForDestroy = ecbSystem.CreateCommandBuffer(state.WorldUnmanaged);
         PhysicsWorldSingleton physicsWorld = SystemAPI.GetSingleton<PhysicsWorldSingleton>();
         
         new ImpactDamageUpdate()
         {
-            m_entityCommandBuffer= ecb.AsParallelWriter(),
+            m_entityCommandBuffer= ecbForDestroy.AsParallelWriter(),
             m_physicsWorld = physicsWorld.CollisionWorld,
             m_damageableLookup = SystemAPI.GetComponentLookup<Damageable>(),
         }.Schedule();
 
         state.Dependency.Complete();
+
+        EntityCommandBuffer ecbForDetach = new EntityCommandBuffer(Allocator.TempJob);
         
         new DamageableUpdate()
         {
-            m_ecbWriter = ecb.AsParallelWriter(),
+            m_ecbWriterForEntityDestruction = ecbForDestroy.AsParallelWriter(),
+            m_ecbWriterForDetach = ecbForDetach.AsParallelWriter(),
             m_detachablePartsLookup = SystemAPI.GetBufferLookup<DetachablePart>(),
             m_localTransformLookup = SystemAPI.GetComponentLookup<LocalTransform>(),
             // m_physicsVelocityLookup = SystemAPI.GetComponentLookup<PhysicsVelocity>(),
             m_random = new Random((uint)SystemAPI.Time.ElapsedTime + 100),
         }.Schedule();
+        
+        state.Dependency.Complete();
+
+        ecbForDetach.Playback(state.EntityManager);
+        ecbForDetach.Dispose();
     }
 }
