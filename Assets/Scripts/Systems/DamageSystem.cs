@@ -93,7 +93,7 @@ public partial struct DamageableUpdate : IJobEntity
     }
 }
 
-[UpdateBefore(typeof(TransformSystemGroup))]
+[UpdateAfter(typeof(TransformSystemGroup))]
 public partial struct DamageSystem : ISystem
 {
     [BurstCompile]
@@ -111,22 +111,28 @@ public partial struct DamageSystem : ISystem
         }.Schedule();
 
         state.Dependency.Complete();
-
-        EntityCommandBuffer ecbForDetach = new EntityCommandBuffer(Allocator.TempJob);
         
-        new DamageableUpdate()
+        foreach (var (d, self) in SystemAPI.Query<RefRO<Damageable>>().WithEntityAccess())
         {
-            m_ecbWriterForEntityDestruction = ecbForDestroy.AsParallelWriter(),
-            m_ecbWriterForDetach = ecbForDetach.AsParallelWriter(),
-            m_detachablePartsLookup = SystemAPI.GetBufferLookup<DetachablePart>(),
-            m_localTransformLookup = SystemAPI.GetComponentLookup<LocalTransform>(),
-            // m_physicsVelocityLookup = SystemAPI.GetComponentLookup<PhysicsVelocity>(),
-            m_random = new Random((uint)SystemAPI.Time.ElapsedTime + 100),
-        }.Schedule();
+            if (d.ValueRO.CurrentHealth < 0.0f)
+            {
+                ecbForDestroy.DestroyEntity(self);
+            }
+        }
         
-        state.Dependency.Complete();
-
-        ecbForDetach.Playback(state.EntityManager);
-        ecbForDetach.Dispose();
+        // new DamageableUpdate()
+        // {
+        //     m_ecbWriterForEntityDestruction = ecbForDestroy.AsParallelWriter(),
+        //     m_ecbWriterForDetach = ecbForDetach.AsParallelWriter(),
+        //     m_detachablePartsLookup = SystemAPI.GetBufferLookup<DetachablePart>(),
+        //     m_localTransformLookup = SystemAPI.GetComponentLookup<LocalTransform>(),
+        //     // m_physicsVelocityLookup = SystemAPI.GetComponentLookup<PhysicsVelocity>(),
+        //     m_random = new Random((uint)SystemAPI.Time.ElapsedTime + 100),
+        // }.Schedule();
+        //
+        // state.Dependency.Complete();
+        //
+        // ecbForDetach.Playback(state.EntityManager);
+        // ecbForDetach.Dispose();
     }
 }
