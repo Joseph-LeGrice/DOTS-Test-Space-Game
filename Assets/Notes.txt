@@ -4,17 +4,24 @@ PHASE 1 - MECHANICS
 - Explosions, make a system to handle this
 - Collision damage, probably gonna need to create a system & job as described under "Modification point 2" in the unity physics docs here: https://docs.unity3d.com/Packages/com.unity.physics@1.4/manual/simulation-modification.html 
 - Gravity tether + placeholder effect
+- Beam Weapons
 - Basic UI to show player health & aim
+- Basic UI to change loadout
 - Basic AI ships
 
 PHASE 2 - GAMEPLAY
+- Game flow: Pre-match loadout, Objectives
+- Rewards & Unlockables
 - More AI fighters / better AI behaviours
 - Multiplayer support
-- Game flow: Matches, Rewards, Unlockables & Pre-match loadout
+- Sound effects
+- Think about environments, how will each match feel different?
 
 PHASE 3 - POLISH & VISUALS
-- Nicer effects / models
-- More UI
+- Iterate on effects & models
+- Iterate on UI
+- Iterate on sound effects / music
+
 
 Documentation Links:
 
