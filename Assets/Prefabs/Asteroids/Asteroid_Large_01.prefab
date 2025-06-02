@@ -275,6 +275,10 @@ PrefabInstance:
       value: 5
       objectReference: {fileID: 0}
     - target: {fileID: 7162583136424672430, guid: d0d6e60dbdd61ae4c9ed29aedda0977e, type: 3}
+      propertyPath: DestroyExplosionEffect
+      value: 
+      objectReference: {fileID: 6451376200791137170, guid: bc9b9ab2acfd2164093f1449f0752043, type: 3}
+    - target: {fileID: 7162583136424672430, guid: d0d6e60dbdd61ae4c9ed29aedda0977e, type: 3}
       propertyPath: Detachables.Array.size
       value: 6
       objectReference: {fileID: 0}

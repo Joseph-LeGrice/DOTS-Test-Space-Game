@@ -68,6 +68,10 @@ PrefabInstance:
       propertyPath: NumberOfDetachables
       value: 2
       objectReference: {fileID: 0}
+    - target: {fileID: 7162583136424672430, guid: d0d6e60dbdd61ae4c9ed29aedda0977e, type: 3}
+      propertyPath: DestroyExplosionEffect
+      value: 
+      objectReference: {fileID: 6451376200791137170, guid: 8d1e62511db13894a877ff0717a6fa0c, type: 3}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []

@@ -84,6 +84,12 @@ public partial struct DamageableUpdate : IJobEntity
                     m_ecbWriter.SetComponent(0, detachInstance, detachTransform);
                 }
             }
+
+            if (d.SpawnOnDestroy != Entity.Null)
+            {
+                Entity spawnedonDestroy = m_ecbWriter.Instantiate(0, d.SpawnOnDestroy);
+                m_ecbWriter.SetComponent(0, spawnedonDestroy, parentTransform);
+            }
         }
     }
 }

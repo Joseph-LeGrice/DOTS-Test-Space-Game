@@ -5,6 +5,7 @@ PHASE 1 - MECHANICS
 - Collision damage, probably gonna need to create a system & job as described under "Modification point 2" in the unity physics docs here: https://docs.unity3d.com/Packages/com.unity.physics@1.4/manual/simulation-modification.html 
 - Gravity tether + placeholder effect
 - Beam Weapons
+- Shields
 - Basic UI to show player health & aim
 - Basic UI to change loadout
 - Basic AI ships

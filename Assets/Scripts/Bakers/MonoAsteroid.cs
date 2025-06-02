@@ -8,6 +8,7 @@ public class MonoAsteroid : MonoBehaviour
     public float Size;
     public int NumberOfDetachables;
     public GameObject DetachablePrefab;
+    public GameObject DestroyExplosionEffect;
 }
 
 public class MonoAsteroidBaker : Baker<MonoAsteroid>
@@ -16,7 +17,10 @@ public class MonoAsteroidBaker : Baker<MonoAsteroid>
     {
         Entity e = GetEntity(TransformUsageFlags.Dynamic);
         AddComponent<Asteroid>(e);
-        AddComponent(e, Damageable.WithHealth(authoring.Health));
+
+        Damageable d = Damageable.WithHealth(authoring.Health);
+        d.SpawnOnDestroy = GetEntity(authoring.DestroyExplosionEffect, TransformUsageFlags.Dynamic);
+        AddComponent(e, d);
         
         DynamicBuffer<DetachablePart> dp = AddBuffer<DetachablePart>(e);
         for (int i=0; i<authoring.NumberOfDetachables; i++)
