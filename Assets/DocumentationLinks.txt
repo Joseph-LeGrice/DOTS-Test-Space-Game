@@ -1,9 +1,0 @@
-
-Entities
-https://docs.unity3d.com/Packages/com.unity.entities@1.3/manual/index.html
-
-Physics
-https://docs.unity3d.com/Packages/com.unity.physics@1.4/manual/index.html
-
-VFX Graph
-https://docs.unity3d.com/Packages/com.unity.visualeffectgraph@17.3/manual/index.html
