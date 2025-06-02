@@ -1,8 +1,8 @@
 using Unity.Burst;
 using Unity.Collections;
 using Unity.Entities;
-using Unity.Mathematics;
 using Unity.Physics;
+using Unity.Physics.Extensions;
 using Unity.Transforms;
 using RaycastHit = Unity.Physics.RaycastHit;
 
@@ -11,7 +11,10 @@ public partial struct ImpactDamageUpdate : IJobEntity
 {
     public EntityCommandBuffer.ParallelWriter m_ecbWriter;
     [ReadOnly] public CollisionWorld m_physicsWorld;
+    [ReadOnly] public ComponentLookup<LocalToWorld> m_localToWorldLookup;
     public ComponentLookup<Damageable> m_damageableLookup;
+    public ComponentLookup<PhysicsVelocity> m_physicsVelocityLookup;
+    [ReadOnly] public ComponentLookup<PhysicsMass> m_physicsMassLookup;
     
     private void Execute(Entity self, in ImpactDamage impactDamage, in LocalToWorld localToWorld)
     {
@@ -32,8 +35,23 @@ public partial struct ImpactDamageUpdate : IJobEntity
         {
             Damageable d = m_damageableLookup[hit.Entity];
             d.CurrentHealth -= impactDamage.FlatDamage;
-            
             m_damageableLookup[hit.Entity] = d;
+
+            if (m_physicsVelocityLookup.HasComponent(hit.Entity) && m_physicsMassLookup.HasComponent(hit.Entity))
+            {
+                LocalToWorld hitLocalToWorld = m_localToWorldLookup[hit.Entity];
+                float impulseForce = 4.0f;
+                PhysicsVelocity velocity = m_physicsVelocityLookup[hit.Entity];
+                velocity.ApplyImpulse(
+                    m_physicsMassLookup[hit.Entity],
+                    hitLocalToWorld.Position,
+                    hitLocalToWorld.Rotation,
+                    impulseForce * localToWorld.Forward,
+                    hit.Position
+                );
+                m_physicsVelocityLookup[hit.Entity] = velocity;
+            }
+            
             m_ecbWriter.DestroyEntity(0, self);
             
             Entity impactFx = m_ecbWriter.Instantiate(0, impactDamage.ImpactEffectEntity);
@@ -61,7 +79,8 @@ public partial struct DamageableUpdate : IJobEntity
                 {
                     Entity detachInstance = m_ecbWriter.Instantiate(0, dp.DetachableEntityPrefab);
                     m_ecbWriter.AddComponent(0, detachInstance, new QueueForCleanup(5.0f));
-                    LocalTransform detachTransform = parentTransform.TransformTransform(LocalTransform.FromMatrix(dp.LocalTransform));
+                    LocalTransform detachTransform = LocalTransform.FromMatrix(dp.LocalTransform);
+                    detachTransform = detachTransform.TransformTransform(parentTransform);
                     m_ecbWriter.SetComponent(0, detachInstance, detachTransform);
                 }
             }
@@ -77,13 +96,16 @@ public partial struct DamageSystem : ISystem
     {
         BeginSimulationEntityCommandBufferSystem.Singleton ecbSystem = SystemAPI.GetSingleton<BeginSimulationEntityCommandBufferSystem.Singleton>();
         EntityCommandBuffer ecbForDestroy = ecbSystem.CreateCommandBuffer(state.WorldUnmanaged);
-        PhysicsWorldSingleton physicsWorld = SystemAPI.GetSingleton<PhysicsWorldSingleton>();
+        RefRW<PhysicsWorldSingleton> physicsWorld = SystemAPI.GetSingletonRW<PhysicsWorldSingleton>();
         
         new ImpactDamageUpdate()
         {
             m_ecbWriter = ecbForDestroy.AsParallelWriter(),
-            m_physicsWorld = physicsWorld.CollisionWorld,
+            m_physicsWorld = physicsWorld.ValueRO.CollisionWorld,
+            m_localToWorldLookup = SystemAPI.GetComponentLookup<LocalToWorld>(),
             m_damageableLookup = SystemAPI.GetComponentLookup<Damageable>(),
+            m_physicsVelocityLookup = SystemAPI.GetComponentLookup<PhysicsVelocity>(),
+            m_physicsMassLookup = SystemAPI.GetComponentLookup<PhysicsMass>(),
         }.Schedule();
         
         state.Dependency.Complete();

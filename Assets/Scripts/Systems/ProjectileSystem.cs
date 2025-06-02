@@ -29,9 +29,9 @@ public partial struct CreateProjectileJob : IJobEntity
             }
             
             Entity newEntity = m_ecbWriter.Instantiate(chunkIndex, pw.ProjectilePrefab);
-            m_ecbWriter.SetComponent(chunkIndex, newEntity, LocalTransform.FromPosition(localToWorld.Position));
+            m_ecbWriter.SetComponent(chunkIndex, newEntity, LocalTransform.FromPositionRotation(localToWorld.Position, localToWorld.Rotation));
             m_ecbWriter.SetComponent(chunkIndex, newEntity, new Projectile() { Velocity = projectileVelocity});
-            m_ecbWriter.SetComponent(chunkIndex, newEntity, new MarkForCleanup((float)ElapsedTime + pw.ProjectileLifetime));
+            m_ecbWriter.SetComponent(chunkIndex, newEntity, new MarkForCleanup(ElapsedTime + pw.ProjectileLifetime));
                 
             spawner.NextSpawnTime = ElapsedTime + pw.ProjectileSpawnRate;
         }
