@@ -5,12 +5,8 @@ using UnityEngine;
 public class MonoAsteroid : MonoBehaviour
 {
     public float Health = 100.0f;
-    
-    public float DetachSpeedMin;
-    public float DetachSpeedMax;
-    public float DetachSpeedAngularMin;
-    public float DetachSpeedAngularMax;
-    
+
+    public GameObject DetachablePrefab;
     public List<Transform> Detachables = new List<Transform>();
 }
 
@@ -28,11 +24,8 @@ public class MonoAsteroidBaker : Baker<MonoAsteroid>
             {
                 dp.Add(new DetachablePart()
                 {
-                    DetachableEntity = GetEntity(d.gameObject, TransformUsageFlags.Dynamic),
-                    AngularForceMinimum = authoring.DetachSpeedAngularMin,
-                    AngularForceMaximum = authoring.DetachSpeedAngularMax,
-                    ImpulseForceMinimum = authoring.DetachSpeedMin,
-                    ImpulseForceMaximum = authoring.DetachSpeedMax,
+                    DetachableEntityPrefab = GetEntity(authoring.DetachablePrefab, TransformUsageFlags.Dynamic),
+                    LocalTransform = Matrix4x4.TRS(d.localPosition, d.localRotation, d.localScale),
                 });
             }
         }

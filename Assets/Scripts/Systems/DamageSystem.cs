@@ -1,6 +1,7 @@
 using Unity.Burst;
 using Unity.Collections;
 using Unity.Entities;
+using Unity.Mathematics;
 using Unity.Physics;
 using Unity.Transforms;
 using RaycastHit = Unity.Physics.RaycastHit;
@@ -46,9 +47,8 @@ public partial struct DamageableUpdate : IJobEntity
 {
     public EntityCommandBuffer.ParallelWriter m_ecbWriter;
     public BufferLookup<DetachablePart> m_detachablePartLookup;
-    public BufferLookup<LinkedEntityGroup> m_linkedEntityLookup;
     
-    private void Execute(Entity self, in Damageable d)
+    private void Execute(Entity self, in Damageable d, in LocalTransform parentTransform)
     {
         if (d.CurrentHealth < 0.0f)
         {
@@ -59,30 +59,17 @@ public partial struct DamageableUpdate : IJobEntity
                 DynamicBuffer<DetachablePart> detachableParts = m_detachablePartLookup[self];
                 foreach (DetachablePart dp in detachableParts)
                 {
-                    m_ecbWriter.RemoveComponent<Parent>(0, dp.DetachableEntity);
-                }
-                
-                if (m_linkedEntityLookup.HasBuffer(self))
-                {
-                    DynamicBuffer<LinkedEntityGroup> linkedEntityGroup = m_linkedEntityLookup[self];
-                    for (int i = 0; i < linkedEntityGroup.Length; i++)
-                    {
-                        foreach (DetachablePart dp in detachableParts)
-                        {
-                            if (linkedEntityGroup[i].Value == dp.DetachableEntity)
-                            {
-                                linkedEntityGroup.RemoveAt(i);
-                                i--;
-                                break;
-                            }
-                        }
-                    }
+                    Entity detachInstance = m_ecbWriter.Instantiate(0, dp.DetachableEntityPrefab);
+                    m_ecbWriter.AddComponent(0, detachInstance, new QueueForCleanup(5.0f));
+                    LocalTransform detachTransform = parentTransform.TransformTransform(LocalTransform.FromMatrix(dp.LocalTransform));
+                    m_ecbWriter.SetComponent(0, detachInstance, detachTransform);
                 }
             }
         }
     }
 }
 
+[UpdateAfter(typeof(TransformSystemGroup))]
 public partial struct DamageSystem : ISystem
 {
     [BurstCompile]
@@ -103,9 +90,8 @@ public partial struct DamageSystem : ISystem
         
         new DamageableUpdate()
         {
-            m_ecbWriter= ecbForDestroy.AsParallelWriter(),
+            m_ecbWriter = ecbForDestroy.AsParallelWriter(),
             m_detachablePartLookup = SystemAPI.GetBufferLookup<DetachablePart>(),
-            m_linkedEntityLookup = SystemAPI.GetBufferLookup<LinkedEntityGroup>()
         }.Schedule();
     }
 }
