@@ -1,13 +1,13 @@
-using System.Collections.Generic;
 using Unity.Entities;
+using Unity.Mathematics;
 using UnityEngine;
 
 public class MonoAsteroid : MonoBehaviour
 {
     public float Health = 100.0f;
-
+    public float Size;
+    public int NumberOfDetachables;
     public GameObject DetachablePrefab;
-    public List<Transform> Detachables = new List<Transform>();
 }
 
 public class MonoAsteroidBaker : Baker<MonoAsteroid>
@@ -17,17 +17,19 @@ public class MonoAsteroidBaker : Baker<MonoAsteroid>
         Entity e = GetEntity(TransformUsageFlags.Dynamic);
         AddComponent<Asteroid>(e);
         AddComponent(e, Damageable.WithHealth(authoring.Health));
-        if (authoring.Detachables.Count > 0)
+        
+        DynamicBuffer<DetachablePart> dp = AddBuffer<DetachablePart>(e);
+        for (int i=0; i<authoring.NumberOfDetachables; i++)
         {
-            DynamicBuffer<DetachablePart> dp = AddBuffer<DetachablePart>(e);
-            foreach (Transform d in authoring.Detachables)
+            dp.Add(new DetachablePart()
             {
-                dp.Add(new DetachablePart()
-                {
-                    DetachableEntityPrefab = GetEntity(authoring.DetachablePrefab, TransformUsageFlags.Dynamic),
-                    LocalTransform = Matrix4x4.TRS(d.localPosition, d.localRotation, d.localScale),
-                });
-            }
+                DetachableEntityPrefab = GetEntity(authoring.DetachablePrefab, TransformUsageFlags.Dynamic),
+                LocalTransform = Matrix4x4.TRS(
+                    authoring.Size * UnityEngine.Random.insideUnitSphere,
+                    Quaternion.Euler(UnityEngine.Random.insideUnitSphere), 
+                    new float3(1.0f)
+                ),
+            });
         }
     }
 }

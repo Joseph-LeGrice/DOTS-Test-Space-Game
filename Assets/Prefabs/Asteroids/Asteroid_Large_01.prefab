@@ -247,6 +247,10 @@ PrefabInstance:
       value: 
       objectReference: {fileID: -2637845606122310739, guid: af7d4a1438a6e2e448cf91dccefaf96c, type: 3}
     - target: {fileID: 7162583136424672430, guid: d0d6e60dbdd61ae4c9ed29aedda0977e, type: 3}
+      propertyPath: Size
+      value: 14
+      objectReference: {fileID: 0}
+    - target: {fileID: 7162583136424672430, guid: d0d6e60dbdd61ae4c9ed29aedda0977e, type: 3}
       propertyPath: DetachSpeedMax
       value: 50
       objectReference: {fileID: 0}
@@ -258,6 +262,10 @@ PrefabInstance:
       propertyPath: DetachablePrefab
       value: 
       objectReference: {fileID: 5427445279102440871, guid: 91c5d9521db8ee345b3e96f2bd1d503a, type: 3}
+    - target: {fileID: 7162583136424672430, guid: d0d6e60dbdd61ae4c9ed29aedda0977e, type: 3}
+      propertyPath: NumberOfDetachables
+      value: 8
+      objectReference: {fileID: 0}
     - target: {fileID: 7162583136424672430, guid: d0d6e60dbdd61ae4c9ed29aedda0977e, type: 3}
       propertyPath: DetachSpeedAngularMax
       value: 150

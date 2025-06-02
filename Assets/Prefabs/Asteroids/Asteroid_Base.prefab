@@ -49,8 +49,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   Health: 100
-  DetachablePrefab: {fileID: 0}
-  Detachables: []
+  Size: 0
+  NumberOfDetachables: 0
+  DetachablePrefab: {fileID: 5427445279102440871, guid: 91c5d9521db8ee345b3e96f2bd1d503a, type: 3}
 --- !u!33 &314573692165367087
 MeshFilter:
   m_ObjectHideFlags: 0

@@ -60,6 +60,14 @@ PrefabInstance:
       propertyPath: m_Mesh
       value: 
       objectReference: {fileID: -7016455604695931481, guid: af7d4a1438a6e2e448cf91dccefaf96c, type: 3}
+    - target: {fileID: 7162583136424672430, guid: d0d6e60dbdd61ae4c9ed29aedda0977e, type: 3}
+      propertyPath: Size
+      value: 3.5
+      objectReference: {fileID: 0}
+    - target: {fileID: 7162583136424672430, guid: d0d6e60dbdd61ae4c9ed29aedda0977e, type: 3}
+      propertyPath: NumberOfDetachables
+      value: 2
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
