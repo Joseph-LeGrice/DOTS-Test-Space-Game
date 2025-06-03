@@ -2,20 +2,10 @@ using Unity.Burst;
 using Unity.Collections;
 using Unity.Entities;
 using Unity.Jobs;
+using Unity.Physics;
 using Unity.Transforms;
 
-[BurstCompile]
-public partial struct UpdateAsteroids : IJobEntity
-{
-    public float m_elapsedTime;
-
-    private void Execute(ref Asteroid asteroid, ref LocalTransform localToWorld)
-    {
-        // localToWorld = localToWorld.Rotate(quaternion.AxisAngle(asteroid.TumbleAxis, m_elapsedTime * asteroid.TumbleSpeed));
-    }
-}
-
-[BurstCompile]
+// [BurstCompile]
 public struct CreateAsteroidsJob : IJobParallelFor
 {
     public EntityCommandBuffer.ParallelWriter m_entityCommandBuffer;
@@ -30,14 +20,11 @@ public struct CreateAsteroidsJob : IJobParallelFor
         if (!asteroidData.Created)
         {
             Entity prefab = m_asteroidTypeBufferData[asteroidData.AsteroidType].Prefab;
-            Entity instance = m_entityCommandBuffer.Instantiate(i * 3, prefab);
+            Entity instance = m_entityCommandBuffer.Instantiate(i, prefab);
             
-            m_entityCommandBuffer.SetComponent(i * 3 + 1, instance, LocalTransform.FromPosition(asteroidData.LocalPosition));
-            m_entityCommandBuffer.SetComponent(i * 3 + 2, instance, new Asteroid()
-            {
-                TumbleAxis = asteroidData.RotationAxis,
-                TumbleSpeed = asteroidData.RotationSpeed,
-            });
+            m_entityCommandBuffer.SetComponent(i, instance, LocalTransform.FromPosition(asteroidData.LocalPosition));
+            m_entityCommandBuffer.SetComponent(i, instance, new Asteroid());
+            m_entityCommandBuffer.SetComponent(i, instance, new PhysicsVelocity() { Angular = asteroidData.RotationSpeed * asteroidData.RotationAxis });
 
             asteroidData.Created = true;
             
@@ -46,49 +33,24 @@ public struct CreateAsteroidsJob : IJobParallelFor
     }
 }
 
-readonly partial struct AsteroidFieldAspect : IAspect
-{
-    public readonly Entity Self;
-    public readonly RefRW<AsteroidField> AsteroidFieldData;
-    public readonly DynamicBuffer<AsteroidBufferData> AsteroidBufferData;
-}
-
 public partial struct EnvironmentStreamingSystem : ISystem
 {
     [BurstCompile]
-    public void OnCreate(ref SystemState state)
-    {
-    }
-    
-    [BurstCompile]
     public void OnUpdate(ref SystemState state)
     {
-        DynamicBuffer<AsteroidTypeBufferData> asteroidTypeBuffer = SystemAPI.GetSingletonBuffer<AsteroidTypeBufferData>();
-        EntityCommandBuffer ecb = new EntityCommandBuffer(Allocator.TempJob);
+        var ecbSystem = SystemAPI.GetSingleton<BeginSimulationEntityCommandBufferSystem.Singleton>();
+        EntityCommandBuffer ecb = ecbSystem.CreateCommandBuffer(state.WorldUnmanaged);
 
-        foreach (AsteroidFieldAspect asteroidField in SystemAPI.Query<AsteroidFieldAspect>())
+        foreach (DynamicBuffer<AsteroidBufferData> asteroidBuffer in SystemAPI.Query<DynamicBuffer<AsteroidBufferData>>())
         {
             CreateAsteroidsJob caj = new CreateAsteroidsJob()
             {
                 m_entityCommandBuffer = ecb.AsParallelWriter(),
-                m_asteroidBufferData = asteroidField.AsteroidBufferData,
-                m_asteroidTypeBufferData = asteroidTypeBuffer,
+                m_asteroidBufferData = asteroidBuffer,
+                m_asteroidTypeBufferData = SystemAPI.GetSingletonBuffer<AsteroidTypeBufferData>(),
             };
             state.Dependency = JobHandle.CombineDependencies(state.Dependency,
-                caj.Schedule(asteroidField.AsteroidBufferData.Length, 64));
+                caj.Schedule(asteroidBuffer.Length, 64));
         }
-
-        state.Dependency.Complete();
-
-        ecb.Playback(state.EntityManager);
-        ecb.Dispose();
-
-        UpdateAsteroids updateAsteroidsJob = new UpdateAsteroids() { m_elapsedTime = (float)SystemAPI.Time.ElapsedTime };
-        updateAsteroidsJob.Schedule();
-    }
-    
-    [BurstCompile]
-    public void OnDestroy(ref SystemState state)
-    {
     }
 }

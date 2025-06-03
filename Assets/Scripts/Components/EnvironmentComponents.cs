@@ -21,8 +21,6 @@ public struct AsteroidBufferData : IBufferElementData
 
 public struct Asteroid : IComponentData
 {
-    public float3 TumbleAxis;
-    public float TumbleSpeed;
 }
 
 public struct AsteroidFieldSettings : IComponentData
