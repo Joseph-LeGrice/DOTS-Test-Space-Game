@@ -36,6 +36,7 @@ public partial struct QueueEntitiesForCleanup : IJobEntity
 }
 
 [BurstCompile]
+[UpdateInGroup(typeof(LateSimulationSystemGroup))]
 public partial struct CleanupEntities : IJobEntity
 {
     public EntityCommandBuffer.ParallelWriter m_ecbWriter;

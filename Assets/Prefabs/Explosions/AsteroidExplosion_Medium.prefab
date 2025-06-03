@@ -46,9 +46,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 93534b99d1141fc43943b88bbbc15c85, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  Radius: 250
+  Radius: 15
   Damage: 0
-  Force: 100
+  Force: 50
   Lifetime: 5
 --- !u!2083052967 &7500029192403578700
 VisualEffect:

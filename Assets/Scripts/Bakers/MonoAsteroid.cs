@@ -23,7 +23,7 @@ public class MonoAsteroidBaker : Baker<MonoAsteroid>
         Damageable d = Damageable.WithHealth(authoring.Health);
         d.SpawnOnDestroy = GetEntity(authoring.DestroyExplosionEffect, TransformUsageFlags.Dynamic);
         AddComponent(e, d);
-        
+
         DynamicBuffer<DetachablePart> dp = AddBuffer<DetachablePart>(e);
         for (int i=0; i<authoring.NumberOfDetachables; i++)
         {

@@ -1,9 +1,9 @@
 using Unity.Burst;
 using Unity.Collections;
 using Unity.Entities;
-using Unity.Jobs;
 using Unity.Physics;
 using Unity.Physics.Extensions;
+using Unity.Physics.Systems;
 
 public struct RequestPhysicCollisionFilterUpdate : IComponentData
 {
@@ -14,12 +14,13 @@ public struct RequestPhysicCollisionFilterUpdate : IComponentData
         CollisionFilter = cf;
     }
 }
-    
 
 [BurstCompile]
+[UpdateInGroup(typeof(FixedStepSimulationSystemGroup))]
+[UpdateBefore(typeof(PhysicsSystemGroup))]
 public partial struct ApplyPhysicCollisionFilterUpdateSystem : ISystem
 {
-
+    
     [BurstCompile]
     public void OnUpdate(ref SystemState state)
     {
@@ -35,7 +36,6 @@ public partial struct ApplyPhysicCollisionFilterUpdateSystem : ISystem
         ecb.Playback(state.EntityManager);
         ecb.Dispose();
     }
-
 
     [BurstCompile]
     private partial struct ApplyPhysicCollisionFilterUpdateJob : IJobEntity
