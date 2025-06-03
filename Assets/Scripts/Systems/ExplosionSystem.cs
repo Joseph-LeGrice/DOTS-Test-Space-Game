@@ -26,12 +26,7 @@ partial struct ExplosionSystem : ISystem
                 localToWorld.ValueRO.Position,
                 explosion.ValueRO.Radius,
                 ref outHits,
-                new CollisionFilter()
-                {
-                    BelongsTo = ~0u,
-                    CollidesWith = ~0u,
-                    GroupIndex = 0
-                },
+                PhysicsConfiguration.GetDamageDealerFilter(),
                 QueryInteraction.Default
             );
             

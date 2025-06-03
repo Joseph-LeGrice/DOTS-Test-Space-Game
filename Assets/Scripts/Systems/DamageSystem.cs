@@ -23,12 +23,7 @@ public partial struct ImpactDamageUpdate : IJobEntity
         {
             Start = localToWorld.Position - localToWorld.Forward * distance,
             End = localToWorld.Position,
-            Filter = new CollisionFilter()
-            {
-                BelongsTo = ~0u,
-                CollidesWith = ~0u,
-                GroupIndex = 0
-            }
+            Filter = PhysicsConfiguration.GetDamageDealerFilter()
         };
         
         if (m_physicsWorld.CastRay(ri, out RaycastHit hit) && m_damageableLookup.HasComponent(hit.Entity))

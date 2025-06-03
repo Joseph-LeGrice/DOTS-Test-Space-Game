@@ -1,5 +1,6 @@
 using Unity.Entities;
 using Unity.Mathematics;
+using Unity.Physics;
 using UnityEngine;
 
 public class MonoAsteroid : MonoBehaviour
@@ -17,6 +18,7 @@ public class MonoAsteroidBaker : Baker<MonoAsteroid>
     {
         Entity e = GetEntity(TransformUsageFlags.Dynamic);
         AddComponent<Asteroid>(e);
+        AddComponent(e, new RequestPhysicCollisionFilterUpdate(PhysicsConfiguration.GetDamageReceiverFilter()));
 
         Damageable d = Damageable.WithHealth(authoring.Health);
         d.SpawnOnDestroy = GetEntity(authoring.DestroyExplosionEffect, TransformUsageFlags.Dynamic);
