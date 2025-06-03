@@ -20,6 +20,7 @@ public class MonoExplosionBaker : Baker<MonoExplosion>
             Damage = authoring.Damage,
             Radius = authoring.Radius,
             Force = authoring.Force,
+            FrameDelay = 1,
         });
         AddComponent(self, new QueueForCleanup(authoring.Lifetime));
     }

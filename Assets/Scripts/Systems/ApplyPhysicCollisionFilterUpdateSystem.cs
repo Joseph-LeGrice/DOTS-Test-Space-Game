@@ -24,32 +24,48 @@ public partial struct ApplyPhysicCollisionFilterUpdateSystem : ISystem
     [BurstCompile]
     public void OnUpdate(ref SystemState state)
     {
-        var ecb = new EntityCommandBuffer(Allocator.TempJob);
-        var job = new ApplyPhysicCollisionFilterUpdateJob
+        // var ecb = new EntityCommandBuffer(Allocator.TempJob);
+        // var job = new ApplyPhysicCollisionFilterUpdateJob
+        // {
+        //     ECB = ecb.AsParallelWriter()
+        // };
+        //
+        // state.Dependency = job.ScheduleParallel(state.Dependency);
+        //
+        // state.Dependency.Complete();
+        // ecb.Playback(state.EntityManager);
+        // ecb.Dispose();
+
+        var ECB = new EntityCommandBuffer(Allocator.Temp);
+        foreach (var (physicsCollider, request, entity) in SystemAPI
+                     .Query<RefRO<PhysicsCollider>, RefRO<RequestPhysicCollisionFilterUpdate>>().WithEntityAccess())
         {
-            ECB = ecb.AsParallelWriter()
-        };
-
-        state.Dependency = job.ScheduleParallel(state.Dependency);
-
-        state.Dependency.Complete();
-        ecb.Playback(state.EntityManager);
-        ecb.Dispose();
-    }
-
-    [BurstCompile]
-    private partial struct ApplyPhysicCollisionFilterUpdateJob : IJobEntity
-    {
-        public EntityCommandBuffer.ParallelWriter ECB;
-
-        public void Execute(Entity entity, [EntityIndexInQuery] int entityIndex, ref PhysicsCollider physicsCollider, in RequestPhysicCollisionFilterUpdate request)
-        {
-            var colliderCopy = physicsCollider.Value.Value.Clone();
-            colliderCopy.Value.SetCollisionFilter(request.CollisionFilter);
+            var colliderCopy = physicsCollider.ValueRO.Value.Value.Clone();
+            colliderCopy.Value.SetCollisionFilter(request.ValueRO.CollisionFilter);
 
             PhysicsCollider newCollider = colliderCopy.AsComponent();
-            ECB.SetComponent(entityIndex, entity, newCollider);
-            ECB.RemoveComponent<RequestPhysicCollisionFilterUpdate>(entityIndex, entity);
+            ECB.SetComponent(entity, newCollider);
+            ECB.RemoveComponent<RequestPhysicCollisionFilterUpdate>(entity);
         }
+        
+        state.Dependency.Complete();
+        ECB.Playback(state.EntityManager);
+        ECB.Dispose();
     }
+
+    // [BurstCompile]
+    // private partial struct ApplyPhysicCollisionFilterUpdateJob : IJobEntity
+    // {
+    //     public EntityCommandBuffer.ParallelWriter ECB;
+    //
+    //     public void Execute(Entity entity, [EntityIndexInQuery] int entityIndex, ref PhysicsCollider physicsCollider, in RequestPhysicCollisionFilterUpdate request)
+    //     {
+    //         var colliderCopy = physicsCollider.Value.Value.Clone();
+    //         colliderCopy.Value.SetCollisionFilter(request.CollisionFilter);
+    //
+    //         PhysicsCollider newCollider = colliderCopy.AsComponent();
+    //         ECB.SetComponent(entityIndex, entity, newCollider);
+    //         ECB.RemoveComponent<RequestPhysicCollisionFilterUpdate>(entityIndex, entity);
+    //     }
+    // }
 }

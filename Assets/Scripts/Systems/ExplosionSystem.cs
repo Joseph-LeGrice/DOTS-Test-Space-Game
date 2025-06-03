@@ -6,22 +6,20 @@ using Unity.Physics;
 using Unity.Physics.Extensions;
 using Unity.Physics.Systems;
 using Unity.Transforms;
+using UnityEngine;
 
+[BurstCompile]
 [UpdateInGroup(typeof(FixedStepSimulationSystemGroup))]
 [UpdateAfter(typeof(PhysicsSystemGroup))]
 partial struct ExplosionSystem : ISystem
 {
     [BurstCompile]
-    public void OnCreate(ref SystemState state)
-    {
-    }
-    
-    [BurstCompile]
     public void OnUpdate(ref SystemState state)
     {
         state.Dependency.Complete();
         
-        EntityCommandBuffer ecb = new EntityCommandBuffer(Allocator.Temp);
+        BeginSimulationEntityCommandBufferSystem.Singleton commandBufferSystem = SystemAPI.GetSingleton<BeginSimulationEntityCommandBufferSystem.Singleton>();
+        EntityCommandBuffer ecb = commandBufferSystem.CreateCommandBuffer(state.WorldUnmanaged);
         
         RefRW<PhysicsWorldSingleton> physicsWorld = SystemAPI.GetSingletonRW<PhysicsWorldSingleton>();
         ComponentLookup<Damageable> damageableLookup = SystemAPI.GetComponentLookup<Damageable>();
@@ -29,8 +27,16 @@ partial struct ExplosionSystem : ISystem
         ComponentLookup<PhysicsVelocity> velocityLookup = SystemAPI.GetComponentLookup<PhysicsVelocity>();
         ComponentLookup<PhysicsMass> massLookup = SystemAPI.GetComponentLookup<PhysicsMass>();
         
-        foreach (var (localToWorld, explosion, self) in SystemAPI.Query<RefRO<LocalToWorld>, RefRO<Explosion>>().WithEntityAccess())
+        foreach (var (localToWorld, explosion, self) in SystemAPI.Query<RefRO<LocalToWorld>, RefRW<Explosion>>().WithEntityAccess())
         {
+            if (explosion.ValueRO.FrameDelay > 0)
+            {
+                var e = explosion.ValueRO;
+                e.FrameDelay -= 1;
+                explosion.ValueRW = e;
+                continue;
+            }
+            
             NativeList<DistanceHit> outHits = new NativeList<DistanceHit>(Allocator.Temp);
             bool didHitAny = physicsWorld.ValueRW.OverlapSphere(
                 localToWorld.ValueRO.Position,
@@ -39,6 +45,7 @@ partial struct ExplosionSystem : ISystem
                 PhysicsConfiguration.GetDamageDealerFilter(),
                 QueryInteraction.Default
             );
+            
             
             if (didHitAny)
             {
@@ -73,10 +80,5 @@ partial struct ExplosionSystem : ISystem
             outHits.Dispose();
             ecb.RemoveComponent<Explosion>(self);
         }
-        
-        state.Dependency.Complete();
-
-        ecb.Playback(state.EntityManager);
-        ecb.Dispose();
     }
 }

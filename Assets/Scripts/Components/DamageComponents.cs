@@ -34,6 +34,7 @@ public struct ImpactDamage : IComponentData
 
 public struct Explosion : IComponentData
 {
+    public int FrameDelay;
     public float Force;
     public float Radius;
     public float Damage;
