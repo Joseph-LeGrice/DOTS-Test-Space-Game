@@ -99,8 +99,8 @@ MonoBehaviour:
   - title: Current Length
     position:
       serializedVersion: 2
-      x: -5
-      y: 1354
+      x: 57
+      y: 1413
       width: 755
       height: 292
     contents:
@@ -114,6 +114,44 @@ MonoBehaviour:
       id: 4
       isStickyNote: 0
     - model: {fileID: 8926484042661615679}
+      id: 0
+      isStickyNote: 0
+  - title: Emission Source Particles
+    position:
+      serializedVersion: 2
+      x: 0
+      y: 0
+      width: 100
+      height: 100
+    contents:
+    - model: {fileID: 8926484042661615815}
+      id: 0
+      isStickyNote: 0
+    - model: {fileID: 8926484042661615878}
+      id: 0
+      isStickyNote: 0
+    - model: {fileID: 8926484042661616166}
+      id: 0
+      isStickyNote: 0
+    - model: {fileID: 8926484042661616187}
+      id: 0
+      isStickyNote: 0
+    - model: {fileID: 8926484042661615846}
+      id: 0
+      isStickyNote: 0
+    - model: {fileID: 8926484042661615876}
+      id: 0
+      isStickyNote: 0
+    - model: {fileID: 8926484042661616139}
+      id: 0
+      isStickyNote: 0
+    - model: {fileID: 8926484042661615850}
+      id: 0
+      isStickyNote: 0
+    - model: {fileID: 8926484042661615854}
+      id: 0
+      isStickyNote: 0
+    - model: {fileID: 8926484042661615953}
       id: 0
       isStickyNote: 0
   stickyNoteInfos:
@@ -133,9 +171,9 @@ MonoBehaviour:
   uiBounds:
     serializedVersion: 2
     x: -839
-    y: 1030
-    width: 3455
-    height: 2120
+    y: 977
+    width: 3374
+    height: 1759
 --- !u!114 &114350483966674976
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -739,7 +777,7 @@ MonoBehaviour:
     linkedSlots:
     - outputSlot: {fileID: 8926484042661615335}
       inputSlot: {fileID: 8926484042661615692}
-    position: {x: 277, y: 1553}
+    position: {x: 339, y: 1612}
     expandedSlots: []
     expanded: 1
     supecollapsed: 0
@@ -2548,7 +2586,7 @@ MonoBehaviour:
   m_UIIgnoredErrors: []
   m_Parent: {fileID: 114350483966674976}
   m_Children: []
-  m_UIPosition: {x: 20, y: 1413}
+  m_UIPosition: {x: 82, y: 1472}
   m_UICollapsed: 0
   m_UISuperCollapsed: 0
   m_InputSlots: []
@@ -2607,7 +2645,7 @@ MonoBehaviour:
   m_UIIgnoredErrors: []
   m_Parent: {fileID: 114350483966674976}
   m_Children: []
-  m_UIPosition: {x: 272, y: 1433}
+  m_UIPosition: {x: 334, y: 1492}
   m_UICollapsed: 0
   m_UISuperCollapsed: 0
   m_InputSlots:
@@ -2743,7 +2781,7 @@ MonoBehaviour:
   m_UIIgnoredErrors: []
   m_Parent: {fileID: 114350483966674976}
   m_Children: []
-  m_UIPosition: {x: 562, y: 1466}
+  m_UIPosition: {x: 624, y: 1525}
   m_UICollapsed: 0
   m_UISuperCollapsed: 0
   m_InputSlots:
@@ -3288,7 +3326,7 @@ MonoBehaviour:
   - {fileID: 8926484042661615878}
   - {fileID: 8926484042661616166}
   - {fileID: 8926484042661616187}
-  m_UIPosition: {x: 2192, y: 1411}
+  m_UIPosition: {x: 2086, y: 1324}
   m_UICollapsed: 0
   m_UISuperCollapsed: 0
   m_InputSlots:
@@ -3464,7 +3502,7 @@ MonoBehaviour:
   - {fileID: 8926484042661615953}
   - {fileID: 8926484042661615846}
   dataType: 0
-  capacity: 15
+  capacity: 25
   stripCapacity: 1
   particlePerStripCount: 128
   needsComputeBounds: 1
@@ -3623,7 +3661,7 @@ MonoBehaviour:
   m_Children:
   - {fileID: 8926484042661615876}
   - {fileID: 8926484042661616139}
-  m_UIPosition: {x: 2192, y: 2676}
+  m_UIPosition: {x: 2086, y: 2237}
   m_UICollapsed: 0
   m_UISuperCollapsed: 0
   m_InputSlots:
@@ -3742,7 +3780,7 @@ MonoBehaviour:
   m_Parent: {fileID: 114350483966674976}
   m_Children:
   - {fileID: 8926484042661615854}
-  m_UIPosition: {x: 2192, y: 1123}
+  m_UIPosition: {x: 2086, y: 1036}
   m_UICollapsed: 0
   m_UISuperCollapsed: 0
   m_InputSlots: []
@@ -3901,7 +3939,7 @@ MonoBehaviour:
       m_Type:
         m_SerializableType: System.Single, mscorlib, Version=4.0.0.0, Culture=neutral,
           PublicKeyToken=b77a5c561934e089
-      m_SerializableObject: 100
+      m_SerializableObject: 125
     m_Space: -1
   m_Property:
     name: Rate
@@ -4018,7 +4056,7 @@ MonoBehaviour:
   m_UIIgnoredErrors: []
   m_Parent: {fileID: 8926484042661615815}
   m_Children: []
-  m_UIPosition: {x: 0, y: 0}
+  m_UIPosition: {x: 0, y: 2}
   m_UICollapsed: 0
   m_UISuperCollapsed: 0
   m_InputSlots:
@@ -4114,7 +4152,7 @@ MonoBehaviour:
   m_UIIgnoredErrors: []
   m_Parent: {fileID: 114350483966674976}
   m_Children: []
-  m_UIPosition: {x: 2192, y: 2174}
+  m_UIPosition: {x: 2086, y: 2087}
   m_UICollapsed: 0
   m_UISuperCollapsed: 0
   m_InputSlots: []
@@ -4247,7 +4285,7 @@ MonoBehaviour:
   m_UIIgnoredErrors: []
   m_Parent: {fileID: 8926484042661615815}
   m_Children: []
-  m_UIPosition: {x: 0, y: 0}
+  m_UIPosition: {x: 0, y: 75}
   m_UICollapsed: 0
   m_UISuperCollapsed: 0
   m_InputSlots:
@@ -4292,7 +4330,7 @@ MonoBehaviour:
       m_Type:
         m_SerializableType: UnityEditor.VFX.TArcCone, Unity.VisualEffectGraph.Editor,
           Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
-      m_SerializableObject: '{"cone":{"transform":{"position":{"x":0.0,"y":0.0,"z":-0.4300000071525574},"angles":{"x":90.0,"y":0.0,"z":0.0},"scale":{"x":1.0,"y":1.0,"z":1.0}},"baseRadius":0.5751098990440369,"topRadius":0.18974611163139344,"height":0.510226309299469},"arc":6.28000020980835}'
+      m_SerializableObject: '{"cone":{"transform":{"position":{"x":0.0,"y":0.0,"z":1.0},"angles":{"x":-90.0,"y":0.0,"z":0.0},"scale":{"x":1.0,"y":1.0,"z":1.0}},"baseRadius":0.800000011920929,"topRadius":0.10000000149011612,"height":1.0},"arc":6.28000020980835}'
     m_Space: 0
   m_Property:
     name: arcCone
@@ -4960,7 +4998,7 @@ MonoBehaviour:
   m_UIIgnoredErrors: []
   m_Parent: {fileID: 8926484042661615815}
   m_Children: []
-  m_UIPosition: {x: 0, y: 0}
+  m_UIPosition: {x: 0, y: 460}
   m_UICollapsed: 0
   m_UISuperCollapsed: 0
   m_InputSlots:
