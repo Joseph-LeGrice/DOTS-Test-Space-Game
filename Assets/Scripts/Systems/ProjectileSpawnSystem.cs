@@ -15,46 +15,40 @@ public partial struct CreateProjectileJob : IJobEntity
     public ComponentLookup<PhysicsVelocity> m_velocityLookup;
     public float ElapsedTime;
     
-    private void Execute([ChunkIndexInQuery] int chunkIndex, ref ProjectileSource spawner, ref LocalToWorld localToWorld)
+    private void Execute(ref ProjectileSource spawner, ref LocalToWorld localToWorld)
     {
         if (spawner.IsFiring && spawner.ProjectileWeaponEntity != Entity.Null && spawner.NextSpawnTime < ElapsedTime)
         {
             ProjectileSourceConfiguration pw = m_sourceConfigLookup[spawner.ProjectileWeaponEntity];
 
-            float3 projectileVelocity = pw.ProjectileSpeed * localToWorld.Forward;
+            Projectile p = new Projectile();
+            p.FlatDamage = pw.ProjectileDamage;
+            p.ImpactEffectEntity = pw.ImpactEffectPrefab;
+            p.Velocity = pw.ProjectileSpeed * localToWorld.Forward;
             if (spawner.RelatedRigidbodyEntity != Entity.Null)
             {
                 PhysicsVelocity pv = m_velocityLookup[spawner.RelatedRigidbodyEntity];
-                projectileVelocity += pv.Linear;
+                p.Velocity += pv.Linear;
             }
+
+            int sortKey = 0;
+            Entity newEntity = m_ecbWriter.Instantiate(sortKey, pw.ProjectilePrefab);
+            m_ecbWriter.AddComponent(sortKey, newEntity, p);
+            m_ecbWriter.AddComponent(sortKey, newEntity, new MarkForCleanup(ElapsedTime + pw.ProjectileLifetime));
+            m_ecbWriter.SetComponent(sortKey, newEntity, localToWorld);
             
-            Entity newEntity = m_ecbWriter.Instantiate(chunkIndex, pw.ProjectilePrefab);
-            m_ecbWriter.SetComponent(chunkIndex, newEntity, LocalTransform.FromPositionRotation(localToWorld.Position, localToWorld.Rotation));
-            m_ecbWriter.SetComponent(chunkIndex, newEntity, new Projectile() { Velocity = projectileVelocity});
-            m_ecbWriter.SetComponent(chunkIndex, newEntity, new MarkForCleanup(ElapsedTime + pw.ProjectileLifetime));
-                
             spawner.NextSpawnTime = ElapsedTime + pw.ProjectileSpawnRate;
         }
     }
 }
 
-[BurstCompile]
-public partial struct ProjectileMoveJob : IJobEntity
-{
-    public float DeltaTime;
-    
-    private void Execute(ref Projectile projectile, ref LocalTransform transform)
-    {
-        transform = transform.Translate(projectile.Velocity * DeltaTime);
-    }
-}
-
-partial struct ProjectileSystem : ISystem
+partial struct ProjectileSpawnSystem : ISystem
 {
     [BurstCompile]
     public void OnUpdate(ref SystemState state)
     {
-        EntityCommandBuffer ecb = new EntityCommandBuffer(Allocator.TempJob);
+        var ecbSystem = SystemAPI.GetSingleton<BeginSimulationEntityCommandBufferSystem.Singleton>();
+        var ecb = ecbSystem.CreateCommandBuffer(state.WorldUnmanaged);
         new CreateProjectileJob()
         {
             m_ecbWriter = ecb.AsParallelWriter(),
@@ -62,15 +56,5 @@ partial struct ProjectileSystem : ISystem
             m_velocityLookup = SystemAPI.GetComponentLookup<PhysicsVelocity>(),
             ElapsedTime = (float)SystemAPI.Time.ElapsedTime,
         }.ScheduleParallel();
-        
-        state.Dependency.Complete();
-        ecb.Playback(state.EntityManager);
-        ecb.Dispose();
-        
-        ProjectileMoveJob bmj = new ProjectileMoveJob()
-        {
-            DeltaTime = SystemAPI.Time.DeltaTime
-        };
-        bmj.ScheduleParallel();
     }
 }
