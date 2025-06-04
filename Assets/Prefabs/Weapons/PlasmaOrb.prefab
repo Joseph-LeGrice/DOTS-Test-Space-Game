@@ -9,7 +9,6 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 536734003457807238}
-  - component: {fileID: -2450830070264693839}
   - component: {fileID: 8132542619691155314}
   - component: {fileID: 1296334412547251135}
   m_Layer: 0
@@ -34,21 +33,6 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &-2450830070264693839
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2420654463176376494}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: eea556d557e3ec744bde6ade653d55e8, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  ImpactEffectPrefab: {fileID: 938765056090513820, guid: 1faf09f3a69866c40870a6f113a32889, type: 3}
-  Lifetime: 5
-  ImpactDamage: 10
 --- !u!33 &8132542619691155314
 MeshFilter:
   m_ObjectHideFlags: 0

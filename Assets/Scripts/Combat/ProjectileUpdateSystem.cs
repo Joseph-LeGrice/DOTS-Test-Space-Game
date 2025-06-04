@@ -8,7 +8,7 @@ using Unity.Physics.Systems;
 using Unity.Transforms;
 using RaycastHit = Unity.Physics.RaycastHit;
 
-// [BurstCompile]
+[BurstCompile]
 public partial struct ProjectileUpdate : IJobEntity
 {
     public float DeltaTime;
