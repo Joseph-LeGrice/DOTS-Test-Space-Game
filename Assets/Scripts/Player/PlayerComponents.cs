@@ -26,5 +26,6 @@ public class PlayerManagedAccess : IComponentData
 
 public struct ShipHardpointBufferElement : IBufferElementData
 {
+    public bool Enabled;
     public Entity Self;
 }

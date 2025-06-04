@@ -13,11 +13,16 @@ public partial struct ProjectileUpdate : IJobEntity
 {
     public float DeltaTime;
     public EntityCommandBuffer.ParallelWriter m_ecbWriter;
-    [ReadOnly] public CollisionWorld m_physicsWorld;
+    [ReadOnly]
+    public CollisionWorld m_physicsWorld;
+    [NativeDisableParallelForRestriction]
     public ComponentLookup<LocalToWorld> m_localToWorldLookup;
+    [NativeDisableParallelForRestriction]
     public ComponentLookup<Damageable> m_damageableLookup;
+    [NativeDisableParallelForRestriction]
     public ComponentLookup<PhysicsVelocity> m_physicsVelocityLookup;
-    [ReadOnly] public ComponentLookup<PhysicsMass> m_physicsMassLookup;
+    [ReadOnly]
+    public ComponentLookup<PhysicsMass> m_physicsMassLookup;
     
     private void Execute(Entity self, in Projectile projectile)
     {
@@ -88,6 +93,6 @@ public partial struct ProjectileUpdateSystem : ISystem
             m_damageableLookup = SystemAPI.GetComponentLookup<Damageable>(),
             m_physicsVelocityLookup = SystemAPI.GetComponentLookup<PhysicsVelocity>(),
             m_physicsMassLookup = SystemAPI.GetComponentLookup<PhysicsMass>(),
-        }.Schedule();
+        }.ScheduleParallel();
     }
 }

@@ -1,7 +1,6 @@
 using Unity.Entities;
 using Unity.Mathematics;
 using Unity.Physics;
-using Unity.Physics.Extensions;
 using Unity.Transforms;
 using UnityEngine;
 
@@ -25,9 +24,18 @@ partial class PlayerInputSystem : SystemBase
 
             foreach (ShipHardpointBufferElement shipHardpoint in player.ShipHardpoints)
             {
-                ProjectileSource ps = SystemAPI.GetComponent<ProjectileSource>(shipHardpoint.Self);
-                ps.IsFiring = managedAccess.ManagedLocalPlayer.GetPlayerInput().IsAttacking;
-                SystemAPI.SetComponent(shipHardpoint.Self, ps);
+                if (SystemAPI.HasComponent<ProjectileSource>(shipHardpoint.Self))
+                {
+                    ProjectileSource ps = SystemAPI.GetComponent<ProjectileSource>(shipHardpoint.Self);
+                    ps.IsFiring = managedAccess.ManagedLocalPlayer.GetPlayerInput().IsAttacking;
+                    SystemAPI.SetComponent(shipHardpoint.Self, ps);
+                }
+                if (SystemAPI.HasComponent<BeamSource>(shipHardpoint.Self))
+                {
+                    BeamSource bs = SystemAPI.GetComponent<BeamSource>(shipHardpoint.Self);
+                    bs.IsFiring = managedAccess.ManagedLocalPlayer.GetPlayerInput().IsAttacking;
+                    SystemAPI.SetComponent(shipHardpoint.Self, bs);
+                }
             }
 
             float3 targetVelocity = managedAccess.ManagedLocalPlayer.GetPlayerInput().TargetDirection;

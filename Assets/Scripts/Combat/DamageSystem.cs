@@ -1,4 +1,5 @@
 using Unity.Burst;
+using Unity.Collections;
 using Unity.Entities;
 using Unity.Transforms;
 
@@ -6,6 +7,7 @@ using Unity.Transforms;
 public partial struct DamageableUpdate : IJobEntity
 {
     public EntityCommandBuffer.ParallelWriter m_ecbWriter;
+    [ReadOnly]
     public BufferLookup<DetachablePart> m_detachablePartLookup;
     
     private void Execute(Entity self, in Damageable d, in LocalTransform parentTransform)
@@ -49,6 +51,6 @@ public partial struct DamageSystem : ISystem
         {
             m_ecbWriter = ecbForDestroy.AsParallelWriter(),
             m_detachablePartLookup = SystemAPI.GetBufferLookup<DetachablePart>(),
-        }.Schedule();
+        }.ScheduleParallel();
     }
 }

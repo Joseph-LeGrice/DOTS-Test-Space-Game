@@ -32,7 +32,7 @@ public static class PhysicsConfiguration
         return new CollisionFilter()
         {
             BelongsTo = DamageDealerCollisionMask,
-            CollidesWith = DamageReceiverCollisionMask,
+            CollidesWith = DamageReceiverCollisionMask | DefaultCollisionMask,
             GroupIndex = 0,
         };
     }

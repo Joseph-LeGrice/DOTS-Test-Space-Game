@@ -34,6 +34,7 @@ class PlayerBaker : MonoBehaviour
             {
                 shbe.Add(new ShipHardpointBufferElement()
                 {
+                    Enabled = sh.activeSelf,
                     Self = GetEntity(sh, TransformUsageFlags.Dynamic),
                 });
             }
