@@ -43,22 +43,12 @@ public partial struct GravityTetherSystem : ISystem
                     {
                         Entity jointEntity = ecb.CreateEntity();
 
-                        float distance = math.max(hit.Fraction * gravityTether.MaxRange, gravityTether.MinDistance);
-                        BodyFrame bf1 = new BodyFrame()
-                        {
-                            Position = float3.zero,
-                            Axis = new float3(1, 0, 0),
-                            PerpendicularAxis = new float3(0, 1, 0)
-                        };
-                        BodyFrame bf2 = new BodyFrame()
-                        {
-                            Position = new float3(0.0f, 0.0f, -distance),
-                            Axis = new float3(1, 0, 0),
-                            PerpendicularAxis = new float3(0, 1, 0)
-                        };
-                        PhysicsJoint pj = PhysicsJoint.CreateFixed(bf1, bf2);
+                        float3 sourceRigidbodyPos = localToWorldLookup[gravityTether.SourceRigidbodyEntity].Position;
+                        float3 hitRigidbodyPos = localToWorldLookup[hit.Entity].Position;
+                        float distance = math.max(math.length(hitRigidbodyPos - sourceRigidbodyPos), gravityTether.MinDistance);
+                        PhysicsJoint pj = PhysicsJoint.CreateBallAndSocket(new float3(0,0,distance), float3.zero);
                         ecb.AddComponent(jointEntity, pj);
-                        
+
                         ecb.AddComponent(jointEntity, new PhysicsConstrainedBodyPair(gravityTether.SourceRigidbodyEntity, hit.Entity, false));
                         ecb.AddSharedComponent(jointEntity, new PhysicsWorldIndex(0));
                         ecb.AddComponent(jointEntity, new GravityTetherJoint(self, hit.Entity));
