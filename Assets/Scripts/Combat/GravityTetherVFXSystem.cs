@@ -32,9 +32,10 @@ public partial class GravityTetherVFXSystem : SystemBase
                 {
                     var attachedLocalToWorld = localToWorldLookup[tetherJoint.ValueRO.AttachedEntity];
                     tetherTargetPosition = attachedLocalToWorld.Position;
+                    break;
                 }
             }
-            vfx.SetMatrix4x4("Attachment", float4x4.Translate(tetherTargetPosition));
+            vfx.SetVector3("TargetPosition", tetherTargetPosition);
         }
     }
 }

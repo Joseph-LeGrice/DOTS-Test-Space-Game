@@ -13,7 +13,7 @@ public static class PhysicsConfiguration
         {
             BelongsTo = DefaultCollisionMask,
             CollidesWith = DefaultCollisionMask | DamageReceiverCollisionMask | DamageDealerCollisionMask,
-            GroupIndex = 0,
+            GroupIndex = -1,
         };
     }
     
@@ -34,6 +34,16 @@ public static class PhysicsConfiguration
             BelongsTo = DamageDealerCollisionMask,
             CollidesWith = DamageReceiverCollisionMask | DefaultCollisionMask,
             GroupIndex = 0,
+        };
+    }
+    
+    public static CollisionFilter GetGravityTetherFilter()
+    {
+        return new CollisionFilter()
+        {
+            BelongsTo = DamageDealerCollisionMask,
+            CollidesWith = DamageReceiverCollisionMask | DefaultCollisionMask,
+            GroupIndex = -1,
         };
     }
 }
