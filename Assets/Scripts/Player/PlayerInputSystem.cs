@@ -7,7 +7,7 @@ using UnityEngine;
 public readonly partial struct PlayerAspect : IAspect
 {
     public readonly Entity Self;
-    public readonly RefRO<PlayerData> PlayerData;
+    public readonly RefRW<PlayerData> PlayerData;
     public readonly RefRW<PhysicsVelocity> Velocity;
     public readonly RefRW<PhysicsMass> PhysicsMass;
     public readonly RefRO<LocalTransform> LocalToWorld;
@@ -35,6 +35,12 @@ partial class PlayerInputSystem : SystemBase
                     BeamSource bs = SystemAPI.GetComponent<BeamSource>(shipHardpoint.Self);
                     bs.IsFiring = managedAccess.ManagedLocalPlayer.GetPlayerInput().IsAttacking;
                     SystemAPI.SetComponent(shipHardpoint.Self, bs);
+                }
+                if (SystemAPI.HasComponent<GravityTether>(shipHardpoint.Self))
+                {
+                    GravityTether gravityTether = SystemAPI.GetComponent<GravityTether>(shipHardpoint.Self);
+                    gravityTether.IsFiring = managedAccess.ManagedLocalPlayer.GetPlayerInput().IsAttacking;
+                    SystemAPI.SetComponent(shipHardpoint.Self, gravityTether);
                 }
             }
 
@@ -81,6 +87,12 @@ partial class PlayerInputSystem : SystemBase
             player.Velocity.ValueRW.Linear = t.TransformDirection(currentVelocityLocal);
             
             managedAccess.ManagedLocalPlayer.GetCameraAimDirection(out Vector3 forward, out Vector3 up);
+            
+            var playerData = player.PlayerData.ValueRO;
+            playerData.AimDirection = forward;
+            playerData.UpDirection = up;
+            player.PlayerData.ValueRW = playerData;
+            
             quaternion forwardRotation = GetFromToRotation(t.Forward(), forward);
             quaternion upRotation = GetFromToRotation(t.Up(), up);
             quaternion finalRotation = math.mul(forwardRotation, upRotation);

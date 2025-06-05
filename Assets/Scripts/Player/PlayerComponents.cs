@@ -9,8 +9,11 @@ public struct ThrusterData
     public float MaximumVelocity;
 }
 
-public struct PlayerData : IComponentData
+public struct PlayerData : IComponentData // Treated as a singleton in GravityTetherSystem atm..
 {
+    public float3 AimDirection;
+    public float3 UpDirection;
+    
     public ThrusterData ForwardThrusters;
     public ThrusterData LateralThrusters;
     public ThrusterData ReverseThrusters;
