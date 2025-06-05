@@ -10,8 +10,6 @@ GameObject:
   m_Component:
   - component: {fileID: 2917842544400464872}
   - component: {fileID: 8803948142777611774}
-  - component: {fileID: 5716505956437389441}
-  - component: {fileID: 8145728170296910606}
   m_Layer: 0
   m_Name: WeaponMountPoint_C
   m_TagString: Untagged
@@ -31,7 +29,8 @@ Transform:
   m_LocalPosition: {x: 0, y: 0.76, z: 3.77}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
-  m_Children: []
+  m_Children:
+  - {fileID: 6457166679443698405}
   m_Father: {fileID: 115630104374442026}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &8803948142777611774
@@ -48,15 +47,49 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   MaxRange: 500
   DamagePerSecond: 30
---- !u!73398921 &5716505956437389441
+  BeamFX: {fileID: 2829928786641515750}
+--- !u!1 &2829928786641515750
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 6457166679443698405}
+  - component: {fileID: 1520792333328941069}
+  - component: {fileID: 7289494406044113390}
+  m_Layer: 0
+  m_Name: BeamFX
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 0
+--- !u!4 &6457166679443698405
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2829928786641515750}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 2917842544400464872}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!73398921 &1520792333328941069
 VFXRenderer:
   serializedVersion: 1
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2177193686902662172}
-  m_Enabled: 1
+  m_GameObject: {fileID: 2829928786641515750}
+  m_Enabled: 0
   m_CastShadows: 0
   m_ReceiveShadows: 0
   m_DynamicOccludee: 1
@@ -91,13 +124,13 @@ VFXRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
---- !u!2083052967 &8145728170296910606
+--- !u!2083052967 &7289494406044113390
 VisualEffect:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2177193686902662172}
+  m_GameObject: {fileID: 2829928786641515750}
   m_Enabled: 1
   m_Asset: {fileID: 8926484042661614526, guid: 203ced587f6e1834d9ff911a2b9412fe, type: 3}
   m_InitialEventName: OnPlay

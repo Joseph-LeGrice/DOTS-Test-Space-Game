@@ -5,9 +5,16 @@ public partial class BeamVisualEffectsSystem : SystemBase
 {
     protected override void OnUpdate()
     {
-        foreach (var (beamSource, self) in SystemAPI.Query<RefRO<BeamSource>>().WithEntityAccess())
+        var ecbSystem = SystemAPI.GetSingleton<BeginSimulationEntityCommandBufferSystem.Singleton>();
+        EntityCommandBuffer ecb = ecbSystem.CreateCommandBuffer(EntityManager.WorldUnmanaged);
+        
+        foreach (var beamSource in SystemAPI.Query<RefRO<BeamSource>>())
         {
-            VisualEffect vfx = SystemAPI.ManagedAPI.GetComponent<VisualEffect>(self);
+            if (SystemAPI.HasComponent<Disabled>(beamSource.ValueRO.BeamFXEntity))
+            {
+                ecb.RemoveComponent<Disabled>(beamSource.ValueRO.BeamFXEntity);
+            }
+            VisualEffect vfx = SystemAPI.ManagedAPI.GetComponent<VisualEffect>(beamSource.ValueRO.BeamFXEntity);
             vfx.enabled = beamSource.ValueRO.IsFiring;
             if (beamSource.ValueRO.HasHit)
             {

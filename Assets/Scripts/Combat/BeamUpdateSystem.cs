@@ -7,6 +7,7 @@ using Unity.Transforms;
 
 public struct BeamSource : IComponentData
 {
+    public Entity BeamFXEntity;
     public bool IsFiring;
     public float MaxRange;
     public bool HasHit;
