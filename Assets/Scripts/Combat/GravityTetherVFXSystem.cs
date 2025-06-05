@@ -25,7 +25,7 @@ public partial class GravityTetherVFXSystem : SystemBase
             VisualEffect vfx = SystemAPI.ManagedAPI.GetComponent<VisualEffect>(beamFxEntity);
             vfx.enabled = gravityTetherRef.ValueRO.IsFiring;
 
-            float3 tetherTargetPosition = localToWorldLookup[self].Position + gravityTetherRef.ValueRO.MaxRange * playerData.AimDirection;
+            float3 tetherTargetPosition = localToWorldLookup[self].Position + gravityTetherRef.ValueRO.MaxRange * localToWorldLookup[self].Forward;
             foreach (var tetherJoint in SystemAPI.Query<RefRO<GravityTetherJoint>>())
             {
                 if (tetherJoint.ValueRO.OwnerEntity == self)

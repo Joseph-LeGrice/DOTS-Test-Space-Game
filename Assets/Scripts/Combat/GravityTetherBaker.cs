@@ -5,6 +5,7 @@ public struct GravityTether : IComponentData
 {
     public bool IsFiring;
     public float MaxRange;
+    public float MinDistance;
     public Entity SourceRigidbodyEntity;
     public Entity BeamFXEntity;
 }
@@ -24,6 +25,7 @@ public struct GravityTetherJoint : IComponentData
 public class GravityTetherBaker : MonoBehaviour
 {
     public float MaxRange;
+    public float MinDistance;
     public Rigidbody SourceEntityRigidbody;
     public GameObject BeamFX;
     
@@ -35,6 +37,7 @@ public class GravityTetherBaker : MonoBehaviour
             AddComponent(e, new GravityTether()
             {
                 MaxRange = authoring.MaxRange,
+                MinDistance = authoring.MinDistance,
                 SourceRigidbodyEntity = GetEntity(authoring.SourceEntityRigidbody, TransformUsageFlags.Dynamic),
                 BeamFXEntity = GetEntity(authoring.BeamFX, TransformUsageFlags.Dynamic), 
             });

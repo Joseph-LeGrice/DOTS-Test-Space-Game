@@ -10,7 +10,6 @@ public partial struct GravityTetherSystem : ISystem
         var ecbSystem = SystemAPI.GetSingleton<BeginSimulationEntityCommandBufferSystem.Singleton>();
         var ecb = ecbSystem.CreateCommandBuffer(state.WorldUnmanaged);
         
-        var playerData = SystemAPI.GetSingleton<PlayerData>();
         var physicsWorldRef = SystemAPI.GetSingletonRW<PhysicsWorldSingleton>();
         var physicsWorld = physicsWorldRef.ValueRO;
         var localToWorldLookup = SystemAPI.GetComponentLookup<LocalToWorld>();
@@ -34,7 +33,7 @@ public partial struct GravityTetherSystem : ISystem
                 RaycastInput rayInput = new RaycastInput()
                 {
                     Start = localToWorldSelf.Position,
-                    End = localToWorldSelf.Position + gravityTether.MaxRange * playerData.AimDirection,
+                    End = localToWorldSelf.Position + gravityTether.MaxRange * localToWorldSelf.Forward,
                     Filter = PhysicsConfiguration.GetGravityTetherFilter()
                 };
                 
@@ -42,17 +41,21 @@ public partial struct GravityTetherSystem : ISystem
                 {
                     if (hit.RigidBodyIndex >= 0 && hit.Entity != gravityTether.SourceRigidbodyEntity)
                     {
-                        var localToWorldTarget = localToWorldLookup[hit.Entity];
-                        
-                        
                         Entity jointEntity = ecb.CreateEntity();
-                        
-                        var pivot = localToWorldSelf.Position + 0.5f * (localToWorldTarget.Position - localToWorldSelf.Position);
-                        
-                        RigidTransform rt1 = new RigidTransform(quaternion.identity, localToWorldSelf.Value.InverseTransformPoint(pivot));
-                        RigidTransform rt2 = new RigidTransform(localToWorldTarget.Rotation, localToWorldTarget.Value.InverseTransformPoint(pivot));
-                        BodyFrame bf1 = new BodyFrame(rt1);
-                        BodyFrame bf2 = new BodyFrame(rt2);
+
+                        float distance = math.max(hit.Fraction * gravityTether.MaxRange, gravityTether.MinDistance);
+                        BodyFrame bf1 = new BodyFrame()
+                        {
+                            Position = float3.zero,
+                            Axis = new float3(1, 0, 0),
+                            PerpendicularAxis = new float3(0, 1, 0)
+                        };
+                        BodyFrame bf2 = new BodyFrame()
+                        {
+                            Position = new float3(0.0f, 0.0f, -distance),
+                            Axis = new float3(1, 0, 0),
+                            PerpendicularAxis = new float3(0, 1, 0)
+                        };
                         PhysicsJoint pj = PhysicsJoint.CreateFixed(bf1, bf2);
                         ecb.AddComponent(jointEntity, pj);
                         
