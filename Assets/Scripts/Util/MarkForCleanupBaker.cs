@@ -1,6 +1,16 @@
 using Unity.Entities;
 using UnityEngine;
 
+public struct QueueForCleanup : IComponentData
+{
+    public float RemoveAfterDelay;
+    
+    public QueueForCleanup(float removalDelay)
+    {
+        RemoveAfterDelay = removalDelay;
+    }
+}
+
 public class MarkForCleanupBaker : MonoBehaviour
 {
     public float CleanupAfterDelay;

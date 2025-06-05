@@ -1,6 +1,14 @@
 using Unity.Entities;
 using UnityEngine;
 
+public struct ProjectileSource : IComponentData
+{
+    public Entity ProjectileWeaponEntity;
+    public Entity RelatedRigidbodyEntity;
+    public float NextSpawnTime;
+    public bool IsFiring;
+}
+
 class ProjectileSourceBaker : MonoBehaviour
 {
     public ProjectileSourceConfigurationBaker projectileSourceConfiguration;

@@ -1,7 +1,31 @@
 using Unity.Burst;
 using Unity.Collections;
 using Unity.Entities;
+using Unity.Mathematics;
 using Unity.Transforms;
+
+public struct Damageable : IComponentData
+{
+    public float CurrentHealth;
+    public float MaxHealth;
+    public Entity SpawnOnDestroy;
+
+    public static Damageable WithHealth(float health)
+    {
+        return new Damageable()
+        {
+            CurrentHealth = health,
+            MaxHealth = health,
+        };
+    }
+}
+
+public struct DetachablePart : IBufferElementData
+{
+    public Entity EffectPrefab;
+    public Entity DetachableEntityPrefab;
+    public float4x4 LocalTransform;
+}
 
 [BurstCompile]
 public partial struct DamageableUpdate : IJobEntity

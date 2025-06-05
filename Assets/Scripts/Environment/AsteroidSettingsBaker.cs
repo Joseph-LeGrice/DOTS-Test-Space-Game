@@ -2,6 +2,15 @@ using System.Collections.Generic;
 using Unity.Entities;
 using UnityEngine;
 
+public struct AsteroidFieldSettings : IComponentData
+{
+}
+
+public struct AsteroidTypeBufferData : IBufferElementData
+{
+    public Entity Prefab;
+}
+
 public class AsteroidSettingsBaker : MonoBehaviour
 {
     [System.Serializable]

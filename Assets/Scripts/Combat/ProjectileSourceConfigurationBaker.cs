@@ -1,6 +1,16 @@
 using Unity.Entities;
 using UnityEngine;
 
+public struct ProjectileSourceConfiguration : IComponentData
+{
+    public Entity ProjectilePrefab;
+    public Entity ImpactEffectPrefab;
+    public float ProjectileSpeed;
+    public float ProjectileSpawnRate;
+    public float ProjectileLifetime;
+    public float ProjectileDamage;
+}
+
 public class ProjectileSourceConfigurationBaker : MonoBehaviour
 {
     public GameObject ProjectilePrefab;

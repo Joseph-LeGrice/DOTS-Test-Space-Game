@@ -1,6 +1,25 @@
 using Unity.Entities;
+using Unity.Mathematics;
 using UnityEngine;
 using Random = Unity.Mathematics.Random;
+
+public struct AsteroidField : IComponentData
+{
+    public bool IsCreated;
+    public bool Initialized;
+    public float AsteroidFieldRadius;
+    public float AsteroidFieldDensity;
+}
+
+public struct AsteroidBufferData : IBufferElementData
+{
+    public bool Created;
+    public int AsteroidType;
+    public bool State;
+    public float RotationSpeed;
+    public float3 RotationAxis;
+    public float3 LocalPosition;
+}
 
 public class AsteroidFieldBaker : MonoBehaviour
 {

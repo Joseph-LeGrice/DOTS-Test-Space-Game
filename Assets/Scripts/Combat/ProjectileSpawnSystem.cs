@@ -5,6 +5,14 @@ using Unity.Mathematics;
 using Unity.Physics;
 using Unity.Transforms;
 
+[WriteGroup(typeof(LocalToWorld))]
+public struct Projectile : IComponentData
+{
+    public float3 Velocity;
+    public float FlatDamage;
+    public Entity ImpactEffectEntity;
+}
+
 [BurstCompile]
 public partial struct CreateProjectileJob : IJobEntity
 {

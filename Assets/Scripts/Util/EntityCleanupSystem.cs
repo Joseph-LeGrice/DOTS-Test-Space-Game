@@ -11,16 +11,6 @@ public struct MarkForCleanup : IComponentData
     }
 }
 
-public struct QueueForCleanup : IComponentData
-{
-    public float RemoveAfterDelay;
-    
-    public QueueForCleanup(float removalDelay)
-    {
-        RemoveAfterDelay = removalDelay;
-    }
-}
-
 [BurstCompile]
 public partial struct QueueEntitiesForCleanup : IJobEntity
 {

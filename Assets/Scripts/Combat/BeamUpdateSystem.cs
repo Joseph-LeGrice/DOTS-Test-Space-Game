@@ -5,16 +5,6 @@ using Unity.Mathematics;
 using Unity.Physics;
 using Unity.Transforms;
 
-public struct BeamSource : IComponentData
-{
-    public Entity BeamFXEntity;
-    public bool IsFiring;
-    public float MaxRange;
-    public bool HasHit;
-    public float HitDistance;
-    public float DamagePerSecond;
-}
-
 [BurstCompile]
 public partial struct CastBeams : IJobEntity
 {

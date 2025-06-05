@@ -1,6 +1,15 @@
 using Unity.Entities;
 using UnityEngine;
-using UnityEngine.VFX;
+
+public struct BeamSource : IComponentData
+{
+    public Entity BeamFXEntity;
+    public bool IsFiring;
+    public float MaxRange;
+    public bool HasHit;
+    public float HitDistance;
+    public float DamagePerSecond;
+}
 
 public class BeamSourceBaker : MonoBehaviour
 {

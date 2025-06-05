@@ -3,6 +3,10 @@ using Unity.Mathematics;
 using Unity.Physics;
 using UnityEngine;
 
+public struct Asteroid : IComponentData
+{
+}
+
 public class AsteroidBaker : MonoBehaviour
 {
     public float Health = 100.0f;
