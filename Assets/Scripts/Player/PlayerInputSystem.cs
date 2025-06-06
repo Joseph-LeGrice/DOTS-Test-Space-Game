@@ -1,6 +1,7 @@
 using Unity.Entities;
 using Unity.Mathematics;
 using Unity.Physics;
+using Unity.Physics.Extensions;
 using Unity.Transforms;
 using UnityEngine;
 
@@ -44,6 +45,14 @@ partial class PlayerInputSystem : SystemBase
                 }
             }
 
+            float angularVelocityModifier = 1.0f;
+            float linearVelocityModifier = 1.0f;
+            if (GetAttachedMass(player.Self, out PhysicsMass attachedPhysicsMass))
+            {
+                angularVelocityModifier = math.pow(attachedPhysicsMass.InverseMass, 0.1f);
+                linearVelocityModifier = math.pow(attachedPhysicsMass.InverseMass, 0.1f);
+            }
+
             float3 targetVelocity = managedAccess.ManagedLocalPlayer.GetPlayerInput().TargetDirection;
             if (targetVelocity.z > 0.0f)
             {
@@ -55,6 +64,8 @@ partial class PlayerInputSystem : SystemBase
             }
             targetVelocity.x *= player.PlayerData.ValueRO.LateralThrusters.Acceleration;
             targetVelocity.y *= player.PlayerData.ValueRO.LateralThrusters.Acceleration;
+
+            targetVelocity = linearVelocityModifier * targetVelocity;
             
             LocalTransform t = player.LocalToWorld.ValueRO;
             float3 currentVelocityLocal = t.InverseTransformDirection(player.Velocity.ValueRW.Linear);
@@ -103,7 +114,7 @@ partial class PlayerInputSystem : SystemBase
             {
                 float3 rotationAxis = math.normalize(finalRotation.value.xyz);
                 float rotationSpeed = player.PlayerData.ValueRO.TurnSpeed * math.clamp(math.degrees(rotationAngle) / 90.0f, 0, 1);
-                angularVelocity = rotationSpeed * SystemAPI.Time.DeltaTime * rotationAxis;
+                angularVelocity = rotationSpeed * angularVelocityModifier * SystemAPI.Time.DeltaTime * rotationAxis;
                 
                 quaternion inertiaOrientationInWorldSpace = math.mul(player.LocalToWorld.ValueRO.Rotation, player.PhysicsMass.ValueRO.InertiaOrientation);
                 angularVelocity = math.rotate(math.inverse(inertiaOrientationInWorldSpace), angularVelocity);
@@ -120,5 +131,21 @@ partial class PlayerInputSystem : SystemBase
         float angle = math.acos(math.clamp(math.dot(from, to), -1f, 1f));
         float3 axis = math.cross(from, to);
         return quaternion.AxisAngle(axis, angle);
+    }
+    
+    private bool GetAttachedMass(Entity ownerEntity, out PhysicsMass attachedPhysicsMass)
+    {
+        var physicsMassLookup = SystemAPI.GetComponentLookup<PhysicsMass>();
+        foreach (var activeTether in SystemAPI.Query<RefRO<GravityTetherJoint>>())
+        {
+            if (activeTether.ValueRO.OwnerEntity == ownerEntity)
+            {
+                attachedPhysicsMass = physicsMassLookup[activeTether.ValueRO.AttachedEntity];
+                return true;
+            }
+        }
+
+        attachedPhysicsMass = new PhysicsMass();
+        return false;
     }
 }

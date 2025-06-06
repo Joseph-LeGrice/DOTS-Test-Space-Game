@@ -16,17 +16,18 @@ public partial struct GravityTetherSystem : ISystem
         
         foreach (var (gravityTetherRef, self) in SystemAPI.Query<RefRW<GravityTether>>().WithEntityAccess())
         {
+            var gravityTether = gravityTetherRef.ValueRO;
+            
             var existingJointEntity = Entity.Null;
             foreach (var (activeTether, je) in SystemAPI.Query<RefRO<GravityTetherJoint>>().WithEntityAccess())
             {
-                if (activeTether.ValueRO.OwnerEntity == self)
+                if (activeTether.ValueRO.OwnerEntity == gravityTether.SourceRigidbodyEntity)
                 {
                     existingJointEntity = je;
                     break;
                 }
             }
             
-            var gravityTether = gravityTetherRef.ValueRO;
             if (gravityTether.IsFiring && existingJointEntity == Entity.Null)
             {
                 var localToWorldSelf = localToWorldLookup[self];
@@ -43,15 +44,19 @@ public partial struct GravityTetherSystem : ISystem
                     {
                         Entity jointEntity = ecb.CreateEntity();
 
+                        var hitBodyLocalToWorld = localToWorldLookup[hit.Entity];
+                        float3 hitOffsetWorld = hit.Position - hitBodyLocalToWorld.Position;
                         float3 sourceRigidbodyPos = localToWorldLookup[gravityTether.SourceRigidbodyEntity].Position;
-                        float3 hitRigidbodyPos = localToWorldLookup[hit.Entity].Position;
+                        float3 hitRigidbodyPos = hitBodyLocalToWorld.Position + hitOffsetWorld;
+                        
                         float distance = math.max(math.length(hitRigidbodyPos - sourceRigidbodyPos), gravityTether.MinDistance);
-                        PhysicsJoint pj = PhysicsJoint.CreateBallAndSocket(new float3(0,0,distance), float3.zero);
+                        PhysicsJoint pj = PhysicsJoint.CreateBallAndSocket(new float3(0,0,distance), hitBodyLocalToWorld.Value.InverseTransformDirection(hitOffsetWorld));
+                        
                         ecb.AddComponent(jointEntity, pj);
 
                         ecb.AddComponent(jointEntity, new PhysicsConstrainedBodyPair(gravityTether.SourceRigidbodyEntity, hit.Entity, false));
                         ecb.AddSharedComponent(jointEntity, new PhysicsWorldIndex(0));
-                        ecb.AddComponent(jointEntity, new GravityTetherJoint(self, hit.Entity));
+                        ecb.AddComponent(jointEntity, new GravityTetherJoint(gravityTether.SourceRigidbodyEntity, hit.Entity));
                     }
                 }
             }

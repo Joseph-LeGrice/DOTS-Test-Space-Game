@@ -9,7 +9,7 @@ public struct ThrusterData
     public float MaximumVelocity;
 }
 
-public struct PlayerData : IComponentData // Treated as a singleton in GravityTetherSystem atm..
+public struct PlayerData : IComponentData
 {
     public float3 AimDirection;
     public float3 UpDirection;
