@@ -11,7 +11,7 @@ public readonly partial struct PlayerAspect : IAspect
     public readonly RefRW<PlayerData> PlayerData;
     public readonly RefRW<PhysicsVelocity> Velocity;
     public readonly RefRW<PhysicsMass> PhysicsMass;
-    public readonly RefRO<LocalTransform> LocalToWorld;
+    public readonly RefRO<LocalToWorld> LocalToWorld;
     public readonly DynamicBuffer<ShipHardpointBufferElement> ShipHardpoints;
 }
 
@@ -22,25 +22,26 @@ partial class PlayerInputSystem : SystemBase
         foreach (PlayerAspect player in SystemAPI.Query<PlayerAspect>())
         {
             PlayerManagedAccess managedAccess = SystemAPI.ManagedAPI.GetComponent<PlayerManagedAccess>(player.Self);
-
+            InputHandler playerInput = managedAccess.ManagedLocalPlayer.GetPlayerInput();
+            
             foreach (ShipHardpointBufferElement shipHardpoint in player.ShipHardpoints)
             {
                 if (SystemAPI.HasComponent<ProjectileSource>(shipHardpoint.Self))
                 {
                     ProjectileSource ps = SystemAPI.GetComponent<ProjectileSource>(shipHardpoint.Self);
-                    ps.IsFiring = managedAccess.ManagedLocalPlayer.GetPlayerInput().IsAttacking;
+                    ps.IsFiring = playerInput.IsAttacking;
                     SystemAPI.SetComponent(shipHardpoint.Self, ps);
                 }
                 if (SystemAPI.HasComponent<BeamSource>(shipHardpoint.Self))
                 {
                     BeamSource bs = SystemAPI.GetComponent<BeamSource>(shipHardpoint.Self);
-                    bs.IsFiring = managedAccess.ManagedLocalPlayer.GetPlayerInput().IsAttacking;
+                    bs.IsFiring = playerInput.IsAttacking;
                     SystemAPI.SetComponent(shipHardpoint.Self, bs);
                 }
                 if (SystemAPI.HasComponent<GravityTether>(shipHardpoint.Self))
                 {
                     GravityTether gravityTether = SystemAPI.GetComponent<GravityTether>(shipHardpoint.Self);
-                    gravityTether.IsFiring = managedAccess.ManagedLocalPlayer.GetPlayerInput().IsAttacking;
+                    gravityTether.IsFiring = playerInput.IsAttacking;
                     SystemAPI.SetComponent(shipHardpoint.Self, gravityTether);
                 }
             }
@@ -53,7 +54,7 @@ partial class PlayerInputSystem : SystemBase
                 linearVelocityModifier = math.pow(attachedPhysicsMass.InverseMass, 0.1f);
             }
 
-            float3 targetVelocity = managedAccess.ManagedLocalPlayer.GetPlayerInput().TargetDirection;
+            float3 targetVelocity = playerInput.TargetDirection;
             if (targetVelocity.z > 0.0f)
             {
                 targetVelocity.z *= player.PlayerData.ValueRO.ForwardThrusters.Acceleration;
@@ -67,15 +68,15 @@ partial class PlayerInputSystem : SystemBase
 
             targetVelocity = linearVelocityModifier * targetVelocity;
             
-            LocalTransform t = player.LocalToWorld.ValueRO;
-            float3 currentVelocityLocal = t.InverseTransformDirection(player.Velocity.ValueRW.Linear);
+            LocalToWorld localToWorld = player.LocalToWorld.ValueRO;
+            float3 currentVelocityLocal = localToWorld.Value.InverseTransformDirection(player.Velocity.ValueRW.Linear);
             currentVelocityLocal += targetVelocity;
             currentVelocityLocal.z = math.clamp(currentVelocityLocal.z, -player.PlayerData.ValueRO.ReverseThrusters.MaximumVelocity, player.PlayerData.ValueRO.ForwardThrusters.MaximumVelocity);
             currentVelocityLocal.x = math.sign(currentVelocityLocal.x) * math.min(math.abs(currentVelocityLocal.x), player.PlayerData.ValueRO.LateralThrusters.MaximumVelocity);
             currentVelocityLocal.y = math.sign(currentVelocityLocal.y) * math.min(math.abs(currentVelocityLocal.y), player.PlayerData.ValueRO.LateralThrusters.MaximumVelocity);
 
             float currentSpeed = math.lengthsq(currentVelocityLocal); 
-            if (currentSpeed > 0.0f && managedAccess.ManagedLocalPlayer.GetPlayerInput().VelocityDampersActive)
+            if (currentSpeed > 0.0f && playerInput.ADS)
             {
                 float threshold = 0.001f;
                 if (math.abs(targetVelocity.x) < threshold)
@@ -95,42 +96,36 @@ partial class PlayerInputSystem : SystemBase
                 }
             }
             
-            player.Velocity.ValueRW.Linear = t.TransformDirection(currentVelocityLocal);
-            
-            managedAccess.ManagedLocalPlayer.GetCameraAimDirection(out Vector3 forward, out Vector3 up);
-            
-            var playerData = player.PlayerData.ValueRO;
-            playerData.AimDirection = forward;
-            playerData.UpDirection = up;
-            player.PlayerData.ValueRW = playerData;
-            
-            quaternion forwardRotation = GetFromToRotation(t.Forward(), forward);
-            quaternion upRotation = GetFromToRotation(t.Up(), up);
-            quaternion finalRotation = math.mul(forwardRotation, upRotation);
-            
+            player.Velocity.ValueRW.Linear = localToWorld.Value.TransformDirection(currentVelocityLocal);
+
             float3 angularVelocity = float3.zero;
-            float rotationAngle = 2.0f * math.acos(finalRotation.value.w);
-            if (rotationAngle != 0.0f)
-            {
-                float3 rotationAxis = math.normalize(finalRotation.value.xyz);
-                float rotationSpeed = player.PlayerData.ValueRO.TurnSpeed * math.clamp(math.degrees(rotationAngle) / 90.0f, 0, 1);
-                angularVelocity = rotationSpeed * angularVelocityModifier * SystemAPI.Time.DeltaTime * rotationAxis;
-                
-                quaternion inertiaOrientationInWorldSpace = math.mul(player.LocalToWorld.ValueRO.Rotation, player.PhysicsMass.ValueRO.InertiaOrientation);
-                angularVelocity = math.rotate(math.inverse(inertiaOrientationInWorldSpace), angularVelocity);
-            }
+            
+            float lookSensitivity = managedAccess.ManagedLocalPlayer.GetLookSensitivity();
+
+            float yawAngleVelocity = lookSensitivity * playerInput.LookDelta.x;
+            yawAngleVelocity = math.sign(yawAngleVelocity) * math.min(math.abs(yawAngleVelocity), player.PlayerData.ValueRO.MaxTurnSpeed);
+            yawAngleVelocity = math.radians(yawAngleVelocity);  
+            quaternion yawRotation = quaternion.AxisAngle(localToWorld.Up, yawAngleVelocity);
+            
+            float pitchAngleVelocity = lookSensitivity * playerInput.LookDelta.y;
+            pitchAngleVelocity = math.sign(pitchAngleVelocity) * math.min(math.abs(pitchAngleVelocity), player.PlayerData.ValueRO.MaxTurnSpeed);
+            pitchAngleVelocity = math.radians(pitchAngleVelocity);
+            quaternion pitchRotation = quaternion.AxisAngle(localToWorld.Right, pitchAngleVelocity);
+            
+            quaternion pitchYawRotation = math.mul(pitchRotation, yawRotation);
+            angularVelocity += 2.0f * math.acos(pitchYawRotation.value.w) * pitchYawRotation.value.xyz;
+
+            float rollAngleVelocity = player.PlayerData.ValueRO.MaxRollSpeed * playerInput.RollDirection;
+            rollAngleVelocity = math.radians(rollAngleVelocity);
+            
+            quaternion rollRotation = quaternion.AxisAngle(localToWorld.Forward, rollAngleVelocity);
+            angularVelocity += 2.0f * math.acos(rollRotation.value.w) * rollRotation.value.xyz;
+            
+            quaternion inertiaOrientationInWorldSpace = math.mul(localToWorld.Rotation, player.PhysicsMass.ValueRO.InertiaOrientation);
+            angularVelocity = math.rotate(math.inverse(inertiaOrientationInWorldSpace), angularVelocity);
+            
             player.Velocity.ValueRW.Angular = angularVelocity;
         }
-    }
-
-    private quaternion GetFromToRotation(float3 from , float3 to)
-    {
-        from = math.normalize(from);
-        to = math.normalize(to);
-        
-        float angle = math.acos(math.clamp(math.dot(from, to), -1f, 1f));
-        float3 axis = math.cross(from, to);
-        return quaternion.AxisAngle(axis, angle);
     }
     
     private bool GetAttachedMass(Entity ownerEntity, out PhysicsMass attachedPhysicsMass)

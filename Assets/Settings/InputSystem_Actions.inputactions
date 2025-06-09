@@ -60,7 +60,7 @@
                     "initialStateCheck": false
                 },
                 {
-                    "name": "VelocityDampers",
+                    "name": "ADS",
                     "type": "Button",
                     "id": "2c40e527-20fd-48c3-85cf-0b760a415944",
                     "expectedControlType": "",
@@ -194,11 +194,11 @@
                 {
                     "name": "",
                     "id": "3055bceb-c6ed-4a12-b856-9a6975fa921d",
-                    "path": "<Keyboard>/z",
+                    "path": "<Mouse>/rightButton",
                     "interactions": "",
                     "processors": "",
                     "groups": ";Keyboard&Mouse",
-                    "action": "VelocityDampers",
+                    "action": "ADS",
                     "isComposite": false,
                     "isPartOfComposite": false
                 },

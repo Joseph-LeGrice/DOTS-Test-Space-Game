@@ -5,23 +5,15 @@ using UnityEngine.InputSystem;
 public class InputHandler : MonoBehaviour, InputSystem_Actions.IPlayerActions
 {
     public Vector3 TargetDirection { get; private set; }
+    public Vector2 LookDelta { get; private set; }
     public bool IsAttacking { get; private set; }
-    public bool VelocityDampersActive { get; private set; } = true;
+    public bool ADS { get; private set; } = true;
     public bool IsBraking { get; private set; }
     public bool IsBoosting { get; private set; }
+    public float RollDirection { get; private set; }
 
     private InputSystem_Actions m_inputActions;
     
-    [SerializeField]
-    private float m_cameraLookSpeed;
-    [SerializeField]
-    private float m_cameraRollSpeed;
-    [SerializeField]
-    private Transform m_cameraTransform;
-
-    private Vector2 m_cameraMoveDirection;
-    private float m_rollDirection;
-
     private void Awake()
     {
         m_inputActions = new InputSystem_Actions();
@@ -40,30 +32,12 @@ public class InputHandler : MonoBehaviour, InputSystem_Actions.IPlayerActions
     public void OnLook(InputAction.CallbackContext context)
     {
         Vector2 input = context.ReadValue<Vector2>();
-        m_cameraMoveDirection.x = -input.y;
-        m_cameraMoveDirection.y = input.x;
+        LookDelta = new Vector2(input.x, -input.y);
     }
 
     public void OnRoll(InputAction.CallbackContext context)
     {
-        m_rollDirection = -context.ReadValue<float>();
-    }
-
-    private void Update()
-    {
-        float pitchDelta = m_cameraMoveDirection.x * m_cameraLookSpeed;
-        float yawDelta = m_cameraMoveDirection.y * m_cameraLookSpeed;
-
-        Vector3 forward = m_cameraTransform.forward;
-        forward = Quaternion.AngleAxis(pitchDelta, m_cameraTransform.right) * forward;
-        forward = Quaternion.AngleAxis(yawDelta, m_cameraTransform.up) * forward;
-
-        Vector3 up = m_cameraTransform.up;
-        Vector3.OrthoNormalize(ref forward, ref up);
-        float rollDelta = m_rollDirection * m_cameraRollSpeed * Time.unscaledDeltaTime;
-        up = Quaternion.AngleAxis(rollDelta, forward) * up;
-        
-        m_cameraTransform.localRotation = Quaternion.LookRotation(forward, up);
+        RollDirection = -context.ReadValue<float>();
     }
 
     public void OnAttack(InputAction.CallbackContext context)
@@ -81,11 +55,8 @@ public class InputHandler : MonoBehaviour, InputSystem_Actions.IPlayerActions
         IsBraking = context.ReadValueAsButton();
     }
 
-    public void OnVelocityDampers(InputAction.CallbackContext context)
+    public void OnADS(InputAction.CallbackContext context)
     {
-        if (context.action.WasPressedThisFrame())
-        {
-            VelocityDampersActive = !VelocityDampersActive;
-        }
+        ADS = context.ReadValueAsButton();
     }
 }

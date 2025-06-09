@@ -7,7 +7,8 @@ class PlayerBaker : MonoBehaviour
     public ThrusterData LateralThrusters;
     public ThrusterData ReverseThrusters;
     public float VelocityDamperDeceleration;
-    public float TurnSpeedDegreesPerSecond;
+    public float MaxTurnSpeed;
+    public float MaxRollSpeed;
     
     public GameObject[] ShipHardpoints;
     
@@ -22,7 +23,8 @@ class PlayerBaker : MonoBehaviour
                 LateralThrusters = authoring.LateralThrusters,
                 ReverseThrusters = authoring.ReverseThrusters,
                 VelocityDamperDeceleration = authoring.VelocityDamperDeceleration,
-                TurnSpeed = authoring.TurnSpeedDegreesPerSecond,
+                MaxTurnSpeed = authoring.MaxTurnSpeed,
+                MaxRollSpeed = authoring.MaxRollSpeed,
             });
             AddComponentObject(mainEntity, new PlayerManagedAccess()
             {

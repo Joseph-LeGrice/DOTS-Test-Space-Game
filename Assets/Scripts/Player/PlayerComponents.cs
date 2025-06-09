@@ -11,14 +11,12 @@ public struct ThrusterData
 
 public struct PlayerData : IComponentData
 {
-    public float3 AimDirection;
-    public float3 UpDirection;
-    
     public ThrusterData ForwardThrusters;
     public ThrusterData LateralThrusters;
     public ThrusterData ReverseThrusters;
     
-    public float TurnSpeed;
+    public float MaxTurnSpeed;
+    public float MaxRollSpeed;
     public float VelocityDamperDeceleration;
 }
 

@@ -391,7 +391,8 @@ MonoBehaviour:
     Acceleration: 1.5
     MaximumVelocity: 10
   VelocityDamperDeceleration: 10
-  TurnSpeedDegreesPerSecond: 720
+  MaxTurnSpeed: 90
+  MaxRollSpeed: 180
   ShipHardpoints:
   - {fileID: 7275956222017740260}
   - {fileID: 5660096965790956094}
