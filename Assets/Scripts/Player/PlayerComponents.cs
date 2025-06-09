@@ -6,18 +6,28 @@ using UnityEngine;
 public struct ThrusterData
 {
     public float Acceleration;
+}
+
+[System.Serializable]
+public struct ThrusterSetup
+{
+    public ThrusterData ForwardThrusters;
+    public ThrusterData LateralThrusters;
+    public ThrusterData ReverseThrusters;
     public float MaximumVelocity;
 }
 
 public struct PlayerData : IComponentData
 {
-    public ThrusterData ForwardThrusters;
-    public ThrusterData LateralThrusters;
-    public ThrusterData ReverseThrusters;
+    public ThrusterSetup DefaultMovement;
+    public ThrusterSetup ADSMovement;
     
     public float MaxTurnSpeed;
     public float MaxRollSpeed;
+    
     public float VelocityDamperDeceleration;
+
+    public bool IsADS;
 }
 
 public class PlayerManagedAccess : IComponentData

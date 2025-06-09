@@ -7,7 +7,7 @@ public class InputHandler : MonoBehaviour, InputSystem_Actions.IPlayerActions
     public Vector3 TargetDirection { get; private set; }
     public Vector2 LookDelta { get; private set; }
     public bool IsAttacking { get; private set; }
-    public bool ADS { get; private set; } = true;
+    public bool IsADS { get; private set; }
     public bool IsBraking { get; private set; }
     public bool IsBoosting { get; private set; }
     public float RollDirection { get; private set; }
@@ -24,7 +24,7 @@ public class InputHandler : MonoBehaviour, InputSystem_Actions.IPlayerActions
         Cursor.lockState = CursorLockMode.Locked;
     }
     
-    public void OnMove(InputAction.CallbackContext context)
+    public void OnMovement(InputAction.CallbackContext context)
     {
         TargetDirection = context.ReadValue<Vector3>();
     }
@@ -57,6 +57,6 @@ public class InputHandler : MonoBehaviour, InputSystem_Actions.IPlayerActions
 
     public void OnADS(InputAction.CallbackContext context)
     {
-        ADS = context.ReadValueAsButton();
+        IsADS = context.ReadValueAsButton();
     }
 }

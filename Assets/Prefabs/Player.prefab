@@ -381,17 +381,24 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3d77665a6db5e954694a9b7e6bd525d1, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  ForwardThrusters:
-    Acceleration: 2.5
-    MaximumVelocity: 50
-  LateralThrusters:
-    Acceleration: 0.25
-    MaximumVelocity: 10
-  ReverseThrusters:
-    Acceleration: 1.5
-    MaximumVelocity: 10
-  VelocityDamperDeceleration: 10
-  MaxTurnSpeed: 90
+  DefaultMovement:
+    ForwardThrusters:
+      Acceleration: 75
+    LateralThrusters:
+      Acceleration: 75
+    ReverseThrusters:
+      Acceleration: 75
+    MaximumVelocity: 150
+  ADSMovement:
+    ForwardThrusters:
+      Acceleration: 37.5
+    LateralThrusters:
+      Acceleration: 100
+    ReverseThrusters:
+      Acceleration: 37.5
+    MaximumVelocity: 300
+  VelocityDamperDeceleration: 75
+  MaxTurnSpeed: 180
   MaxRollSpeed: 180
   ShipHardpoints:
   - {fileID: 7275956222017740260}

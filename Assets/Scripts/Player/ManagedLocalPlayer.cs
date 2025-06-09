@@ -33,7 +33,7 @@ public class ManagedLocalPlayer : MonoBehaviour
 
     private void Update()
     {
-        m_mainCamera.SetActive(!m_playerInput.ADS);
-        m_adsCamera.SetActive(m_playerInput.ADS);
+        m_mainCamera.SetActive(!m_playerInput.IsADS);
+        m_adsCamera.SetActive(m_playerInput.IsADS);
     }
 }

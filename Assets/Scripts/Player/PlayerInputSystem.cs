@@ -54,77 +54,11 @@ partial class PlayerInputSystem : SystemBase
                 linearVelocityModifier = math.pow(attachedPhysicsMass.InverseMass, 0.1f);
             }
 
-            float3 targetVelocity = playerInput.TargetDirection;
-            if (targetVelocity.z > 0.0f)
-            {
-                targetVelocity.z *= player.PlayerData.ValueRO.ForwardThrusters.Acceleration;
-            }
-            else
-            {
-                targetVelocity.z *= player.PlayerData.ValueRO.ReverseThrusters.Acceleration;
-            }
-            targetVelocity.x *= player.PlayerData.ValueRO.LateralThrusters.Acceleration;
-            targetVelocity.y *= player.PlayerData.ValueRO.LateralThrusters.Acceleration;
+            float3 linearVelocity = GetLinearVelocity(player, managedAccess);
+            player.Velocity.ValueRW.Linear = linearVelocityModifier * linearVelocity;
 
-            targetVelocity = linearVelocityModifier * targetVelocity;
-            
-            LocalToWorld localToWorld = player.LocalToWorld.ValueRO;
-            float3 currentVelocityLocal = localToWorld.Value.InverseTransformDirection(player.Velocity.ValueRW.Linear);
-            currentVelocityLocal += targetVelocity;
-            currentVelocityLocal.z = math.clamp(currentVelocityLocal.z, -player.PlayerData.ValueRO.ReverseThrusters.MaximumVelocity, player.PlayerData.ValueRO.ForwardThrusters.MaximumVelocity);
-            currentVelocityLocal.x = math.sign(currentVelocityLocal.x) * math.min(math.abs(currentVelocityLocal.x), player.PlayerData.ValueRO.LateralThrusters.MaximumVelocity);
-            currentVelocityLocal.y = math.sign(currentVelocityLocal.y) * math.min(math.abs(currentVelocityLocal.y), player.PlayerData.ValueRO.LateralThrusters.MaximumVelocity);
-
-            float currentSpeed = math.lengthsq(currentVelocityLocal); 
-            if (currentSpeed > 0.0f && playerInput.ADS)
-            {
-                float threshold = 0.001f;
-                if (math.abs(targetVelocity.x) < threshold)
-                {
-                    float absX = math.abs(currentVelocityLocal.x);
-                    currentVelocityLocal.x = math.sign(currentVelocityLocal.x) * math.max(absX - player.PlayerData.ValueRO.VelocityDamperDeceleration * SystemAPI.Time.DeltaTime, 0.0f);
-                }
-                if (math.abs(targetVelocity.y) < threshold)
-                {
-                    float absY = math.abs(currentVelocityLocal.y);
-                    currentVelocityLocal.y = math.sign(currentVelocityLocal.y) * math.max(absY - player.PlayerData.ValueRO.VelocityDamperDeceleration * SystemAPI.Time.DeltaTime, 0.0f);
-                }
-                if (math.abs(targetVelocity.z) < threshold)
-                {
-                    float absZ = math.abs(currentVelocityLocal.z);
-                    currentVelocityLocal.z = math.sign(currentVelocityLocal.z) * math.max(absZ - player.PlayerData.ValueRO.VelocityDamperDeceleration * SystemAPI.Time.DeltaTime, 0.0f);
-                }
-            }
-            
-            player.Velocity.ValueRW.Linear = localToWorld.Value.TransformDirection(currentVelocityLocal);
-
-            float3 angularVelocity = float3.zero;
-            
-            float lookSensitivity = managedAccess.ManagedLocalPlayer.GetLookSensitivity();
-
-            float yawAngleVelocity = lookSensitivity * playerInput.LookDelta.x;
-            yawAngleVelocity = math.sign(yawAngleVelocity) * math.min(math.abs(yawAngleVelocity), player.PlayerData.ValueRO.MaxTurnSpeed);
-            yawAngleVelocity = math.radians(yawAngleVelocity);  
-            quaternion yawRotation = quaternion.AxisAngle(localToWorld.Up, yawAngleVelocity);
-            
-            float pitchAngleVelocity = lookSensitivity * playerInput.LookDelta.y;
-            pitchAngleVelocity = math.sign(pitchAngleVelocity) * math.min(math.abs(pitchAngleVelocity), player.PlayerData.ValueRO.MaxTurnSpeed);
-            pitchAngleVelocity = math.radians(pitchAngleVelocity);
-            quaternion pitchRotation = quaternion.AxisAngle(localToWorld.Right, pitchAngleVelocity);
-            
-            quaternion pitchYawRotation = math.mul(pitchRotation, yawRotation);
-            angularVelocity += 2.0f * math.acos(pitchYawRotation.value.w) * pitchYawRotation.value.xyz;
-
-            float rollAngleVelocity = player.PlayerData.ValueRO.MaxRollSpeed * playerInput.RollDirection;
-            rollAngleVelocity = math.radians(rollAngleVelocity);
-            
-            quaternion rollRotation = quaternion.AxisAngle(localToWorld.Forward, rollAngleVelocity);
-            angularVelocity += 2.0f * math.acos(rollRotation.value.w) * rollRotation.value.xyz;
-            
-            quaternion inertiaOrientationInWorldSpace = math.mul(localToWorld.Rotation, player.PhysicsMass.ValueRO.InertiaOrientation);
-            angularVelocity = math.rotate(math.inverse(inertiaOrientationInWorldSpace), angularVelocity);
-            
-            player.Velocity.ValueRW.Angular = angularVelocity;
+            float3 angularVelocity = GetAngularVelocity(player, managedAccess);
+            player.Velocity.ValueRW.Angular = angularVelocityModifier * angularVelocity;
         }
     }
     
@@ -142,5 +76,87 @@ partial class PlayerInputSystem : SystemBase
 
         attachedPhysicsMass = new PhysicsMass();
         return false;
+    }
+
+    private float3 GetLinearVelocity(PlayerAspect player, PlayerManagedAccess managedAccess)
+    {
+        InputHandler playerInput = managedAccess.ManagedLocalPlayer.GetPlayerInput();
+        PlayerData playerData = player.PlayerData.ValueRO;
+
+        ThrusterSetup thrusterSetup = playerData.DefaultMovement;
+        if (playerInput.IsADS)
+        {
+            thrusterSetup = playerData.ADSMovement;
+        }
+        
+        float3 acceleration = playerInput.TargetDirection;
+        if (acceleration.z > 0.0f)
+        {
+            acceleration.z *= thrusterSetup.ForwardThrusters.Acceleration;
+        }
+        else
+        {
+            acceleration.z *= thrusterSetup.ReverseThrusters.Acceleration;
+        }
+        
+        acceleration.x *= thrusterSetup.LateralThrusters.Acceleration;
+        acceleration.y *= thrusterSetup.LateralThrusters.Acceleration;
+        
+        LocalToWorld localToWorld = player.LocalToWorld.ValueRO;
+        float3 currentVelocityLocal = localToWorld.Value.InverseTransformDirection(player.Velocity.ValueRO.Linear);
+        currentVelocityLocal += acceleration * SystemAPI.Time.DeltaTime;
+        
+        currentVelocityLocal.x = math.sign(currentVelocityLocal.x) * math.min(math.abs(currentVelocityLocal.x), thrusterSetup.MaximumVelocity);
+        currentVelocityLocal.y = math.sign(currentVelocityLocal.y) * math.min(math.abs(currentVelocityLocal.y), thrusterSetup.MaximumVelocity);
+        currentVelocityLocal.z = math.sign(currentVelocityLocal.z) * math.min(math.abs(currentVelocityLocal.z), thrusterSetup.MaximumVelocity);
+
+        if (!playerInput.IsADS && math.lengthsq(acceleration) < 1.0f)
+        {
+            currentVelocityLocal = DampVelocity(currentVelocityLocal, ref playerData);
+        }
+        
+        return localToWorld.Value.TransformDirection(currentVelocityLocal);
+    }
+
+    private float3 DampVelocity(float3 velocity, ref PlayerData playerData)
+    {
+        return new float3(
+            math.sign(velocity.x) * math.max(math.abs(velocity.x) - playerData.VelocityDamperDeceleration * SystemAPI.Time.DeltaTime, 0.0f),
+            math.sign(velocity.y) * math.max(math.abs(velocity.y) - playerData.VelocityDamperDeceleration * SystemAPI.Time.DeltaTime, 0.0f),
+            math.sign(velocity.z) * math.max(math.abs(velocity.z) - playerData.VelocityDamperDeceleration * SystemAPI.Time.DeltaTime, 0.0f)
+        );
+    }
+
+    private float3 GetAngularVelocity(PlayerAspect player, PlayerManagedAccess managedAccess)
+    {
+        InputHandler playerInput = managedAccess.ManagedLocalPlayer.GetPlayerInput();
+        LocalToWorld localToWorld = player.LocalToWorld.ValueRO;
+        PlayerData playerData = player.PlayerData.ValueRO;
+        
+        float3 angularVelocity = float3.zero;
+            
+        float lookSensitivity = managedAccess.ManagedLocalPlayer.GetLookSensitivity();
+
+        float yawAngleVelocity = lookSensitivity * playerInput.LookDelta.x;
+        yawAngleVelocity = math.sign(yawAngleVelocity) * math.min(math.abs(yawAngleVelocity), playerData.MaxTurnSpeed);
+        yawAngleVelocity = math.radians(yawAngleVelocity);  
+        quaternion yawRotation = quaternion.AxisAngle(localToWorld.Up, yawAngleVelocity);
+            
+        float pitchAngleVelocity = lookSensitivity * playerInput.LookDelta.y;
+        pitchAngleVelocity = math.sign(pitchAngleVelocity) * math.min(math.abs(pitchAngleVelocity), playerData.MaxTurnSpeed);
+        pitchAngleVelocity = math.radians(pitchAngleVelocity);
+        quaternion pitchRotation = quaternion.AxisAngle(localToWorld.Right, pitchAngleVelocity);
+            
+        quaternion pitchYawRotation = math.mul(pitchRotation, yawRotation);
+        angularVelocity += 2.0f * math.acos(pitchYawRotation.value.w) * pitchYawRotation.value.xyz;
+
+        float rollAngleVelocity = playerData.MaxRollSpeed * playerInput.RollDirection;
+        rollAngleVelocity = math.radians(rollAngleVelocity);
+            
+        quaternion rollRotation = quaternion.AxisAngle(localToWorld.Forward, rollAngleVelocity);
+        angularVelocity += 2.0f * math.acos(rollRotation.value.w) * rollRotation.value.xyz;
+            
+        quaternion inertiaOrientationInWorldSpace = math.mul(localToWorld.Rotation, player.PhysicsMass.ValueRO.InertiaOrientation);
+        return math.rotate(math.inverse(inertiaOrientationInWorldSpace), angularVelocity);
     }
 }

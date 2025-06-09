@@ -3,9 +3,9 @@ using UnityEngine;
 
 class PlayerBaker : MonoBehaviour
 {
-    public ThrusterData ForwardThrusters;
-    public ThrusterData LateralThrusters;
-    public ThrusterData ReverseThrusters;
+    public ThrusterSetup DefaultMovement;
+    public ThrusterSetup ADSMovement;
+    
     public float VelocityDamperDeceleration;
     public float MaxTurnSpeed;
     public float MaxRollSpeed;
@@ -19,9 +19,8 @@ class PlayerBaker : MonoBehaviour
             Entity mainEntity = GetEntity(TransformUsageFlags.Dynamic);
             AddComponent(mainEntity, new PlayerData()
             {
-                ForwardThrusters = authoring.ForwardThrusters,
-                LateralThrusters = authoring.LateralThrusters,
-                ReverseThrusters = authoring.ReverseThrusters,
+                DefaultMovement = authoring.DefaultMovement,
+                ADSMovement = authoring.ADSMovement,
                 VelocityDamperDeceleration = authoring.VelocityDamperDeceleration,
                 MaxTurnSpeed = authoring.MaxTurnSpeed,
                 MaxRollSpeed = authoring.MaxRollSpeed,

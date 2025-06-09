@@ -6,10 +6,19 @@
             "id": "df70fa95-8a34-4494-b137-73ab6b9c7d37",
             "actions": [
                 {
-                    "name": "Move",
+                    "name": "Movement",
                     "type": "Value",
                     "id": "351f2ccd-1f9f-44bf-9bec-d62ac5c5f408",
                     "expectedControlType": "Vector3",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": true
+                },
+                {
+                    "name": "Roll",
+                    "type": "Value",
+                    "id": "e58ca3a4-0dea-4111-b956-973aa6a37f3b",
+                    "expectedControlType": "Analog",
                     "processors": "",
                     "interactions": "",
                     "initialStateCheck": true
@@ -24,18 +33,18 @@
                     "initialStateCheck": true
                 },
                 {
-                    "name": "Roll",
-                    "type": "Value",
-                    "id": "fbf5350a-fb92-46e3-b1aa-5168901b13fb",
-                    "expectedControlType": "Analog",
-                    "processors": "",
-                    "interactions": "",
-                    "initialStateCheck": true
-                },
-                {
                     "name": "Attack",
                     "type": "Button",
                     "id": "6c2ab1b8-8984-453a-af3d-a3c78ae1679a",
+                    "expectedControlType": "",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+                },
+                {
+                    "name": "ADS",
+                    "type": "Button",
+                    "id": "2c40e527-20fd-48c3-85cf-0b760a415944",
                     "expectedControlType": "",
                     "processors": "",
                     "interactions": "",
@@ -58,15 +67,6 @@
                     "processors": "",
                     "interactions": "",
                     "initialStateCheck": false
-                },
-                {
-                    "name": "ADS",
-                    "type": "Button",
-                    "id": "2c40e527-20fd-48c3-85cf-0b760a415944",
-                    "expectedControlType": "",
-                    "processors": "",
-                    "interactions": "",
-                    "initialStateCheck": false
                 }
             ],
             "bindings": [
@@ -77,7 +77,7 @@
                     "interactions": "",
                     "processors": "",
                     "groups": "",
-                    "action": "Move",
+                    "action": "Movement",
                     "isComposite": true,
                     "isPartOfComposite": false
                 },
@@ -88,7 +88,7 @@
                     "interactions": "",
                     "processors": "",
                     "groups": ";Keyboard&Mouse",
-                    "action": "Move",
+                    "action": "Movement",
                     "isComposite": false,
                     "isPartOfComposite": true
                 },
@@ -99,7 +99,7 @@
                     "interactions": "",
                     "processors": "",
                     "groups": ";Keyboard&Mouse",
-                    "action": "Move",
+                    "action": "Movement",
                     "isComposite": false,
                     "isPartOfComposite": true
                 },
@@ -110,7 +110,7 @@
                     "interactions": "",
                     "processors": "",
                     "groups": ";Keyboard&Mouse",
-                    "action": "Move",
+                    "action": "Movement",
                     "isComposite": false,
                     "isPartOfComposite": true
                 },
@@ -121,7 +121,7 @@
                     "interactions": "",
                     "processors": "",
                     "groups": ";Keyboard&Mouse",
-                    "action": "Move",
+                    "action": "Movement",
                     "isComposite": false,
                     "isPartOfComposite": true
                 },
@@ -132,7 +132,7 @@
                     "interactions": "",
                     "processors": "",
                     "groups": ";Keyboard&Mouse",
-                    "action": "Move",
+                    "action": "Movement",
                     "isComposite": false,
                     "isPartOfComposite": true
                 },
@@ -143,7 +143,7 @@
                     "interactions": "",
                     "processors": "",
                     "groups": ";Keyboard&Mouse",
-                    "action": "Move",
+                    "action": "Movement",
                     "isComposite": false,
                     "isPartOfComposite": true
                 },
@@ -183,7 +183,7 @@
                 {
                     "name": "",
                     "id": "df002980-b42b-49bd-ac60-d538970924bd",
-                    "path": "<Keyboard>/f",
+                    "path": "<Keyboard>/leftAlt",
                     "interactions": "",
                     "processors": "",
                     "groups": ";Keyboard&Mouse",
@@ -204,7 +204,7 @@
                 },
                 {
                     "name": "1D Axis",
-                    "id": "951e0770-e8fb-4e42-80d7-cb19654b8f45",
+                    "id": "a4450de5-e38b-4634-bf96-603d8beaee6a",
                     "path": "1DAxis",
                     "interactions": "",
                     "processors": "",
@@ -214,23 +214,23 @@
                     "isPartOfComposite": false
                 },
                 {
-                    "name": "Negative",
-                    "id": "de57e48b-ca6a-44f9-b914-bf3e62b46297",
+                    "name": "negative",
+                    "id": "81c144ae-b944-47b7-a219-819048973702",
                     "path": "<Keyboard>/q",
                     "interactions": "",
                     "processors": "",
-                    "groups": ";Keyboard&Mouse",
+                    "groups": "",
                     "action": "Roll",
                     "isComposite": false,
                     "isPartOfComposite": true
                 },
                 {
-                    "name": "Positive",
-                    "id": "efb99e6f-0136-4071-9468-d41eeb9d3f4f",
+                    "name": "positive",
+                    "id": "3d785b71-84eb-410d-8c95-4c558a49a941",
                     "path": "<Keyboard>/e",
                     "interactions": "",
                     "processors": "",
-                    "groups": ";Keyboard&Mouse",
+                    "groups": "",
                     "action": "Roll",
                     "isComposite": false,
                     "isPartOfComposite": true
