@@ -6,7 +6,10 @@ class PlayerBaker : MonoBehaviour
     public ThrusterSetup DefaultMovement;
     public ThrusterSetup ADSMovement;
     
-    public float VelocityDamperDeceleration;
+    public float MaximumVelocity;
+    public float VelocityDamperDecelerationDefault;
+    public float VelocityDamperDecelerationADS;
+    
     public float MaxTurnSpeed;
     public float MaxRollSpeed;
     
@@ -21,7 +24,9 @@ class PlayerBaker : MonoBehaviour
             {
                 DefaultMovement = authoring.DefaultMovement,
                 ADSMovement = authoring.ADSMovement,
-                VelocityDamperDeceleration = authoring.VelocityDamperDeceleration,
+                MaximumVelocity = authoring.MaximumVelocity,
+                VelocityDamperDecelerationDefault = authoring.VelocityDamperDecelerationDefault,
+                VelocityDamperDecelerationADS = authoring.VelocityDamperDecelerationADS,
                 MaxTurnSpeed = authoring.MaxTurnSpeed,
                 MaxRollSpeed = authoring.MaxRollSpeed,
             });

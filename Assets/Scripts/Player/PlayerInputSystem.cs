@@ -92,41 +92,47 @@ partial class PlayerInputSystem : SystemBase
         float3 acceleration = playerInput.TargetDirection;
         if (acceleration.z > 0.0f)
         {
-            acceleration.z *= thrusterSetup.ForwardThrusters.Acceleration;
+            acceleration.z *= thrusterSetup.ForwardThrustersAcceleration;
         }
         else
         {
-            acceleration.z *= thrusterSetup.ReverseThrusters.Acceleration;
+            acceleration.z *= thrusterSetup.ReverseThrustersAcceleration;
         }
         
-        acceleration.x *= thrusterSetup.LateralThrusters.Acceleration;
-        acceleration.y *= thrusterSetup.LateralThrusters.Acceleration;
+        acceleration.x *= thrusterSetup.LateralThrustersAcceleration;
+        acceleration.y *= thrusterSetup.LateralThrustersAcceleration;
         
         LocalToWorld localToWorld = player.LocalToWorld.ValueRO;
         float3 currentVelocityLocal = localToWorld.Value.InverseTransformDirection(player.Velocity.ValueRO.Linear);
         currentVelocityLocal += acceleration * SystemAPI.Time.DeltaTime;
+        currentVelocityLocal = math.normalizesafe(currentVelocityLocal) * math.min(playerData.MaximumVelocity, math.length(currentVelocityLocal));
         
-        currentVelocityLocal.x = math.sign(currentVelocityLocal.x) * math.min(math.abs(currentVelocityLocal.x), thrusterSetup.MaximumVelocity);
-        currentVelocityLocal.y = math.sign(currentVelocityLocal.y) * math.min(math.abs(currentVelocityLocal.y), thrusterSetup.MaximumVelocity);
-        currentVelocityLocal.z = math.sign(currentVelocityLocal.z) * math.min(math.abs(currentVelocityLocal.z), thrusterSetup.MaximumVelocity);
-
-        if (!playerInput.IsADS && math.lengthsq(acceleration) < 1.0f)
+        if (!playerInput.IsADS)
         {
-            currentVelocityLocal = DampVelocity(currentVelocityLocal, ref playerData);
+            currentVelocityLocal = DampVelocity(currentVelocityLocal, acceleration, playerData.VelocityDamperDecelerationDefault);
+        }
+        else
+        {
+            currentVelocityLocal = DampVelocity(currentVelocityLocal, acceleration, playerData.VelocityDamperDecelerationADS);
         }
         
         return localToWorld.Value.TransformDirection(currentVelocityLocal);
     }
-
-    private float3 DampVelocity(float3 velocity, ref PlayerData playerData)
+    
+    private float3 DampVelocity(float3 currentVelocity, float3 targetDirection, float velocityDampingDeceleration)
     {
-        return new float3(
-            math.sign(velocity.x) * math.max(math.abs(velocity.x) - playerData.VelocityDamperDeceleration * SystemAPI.Time.DeltaTime, 0.0f),
-            math.sign(velocity.y) * math.max(math.abs(velocity.y) - playerData.VelocityDamperDeceleration * SystemAPI.Time.DeltaTime, 0.0f),
-            math.sign(velocity.z) * math.max(math.abs(velocity.z) - playerData.VelocityDamperDeceleration * SystemAPI.Time.DeltaTime, 0.0f)
+        targetDirection = math.normalizesafe(targetDirection);
+        float3 targetVelocity = math.length(currentVelocity) * targetDirection;
+        float likeness = math.max(math.dot(targetVelocity, currentVelocity), 0.0f);
+        float3 toDamp = currentVelocity - likeness * targetDirection;
+        float3 dampedComponent = new float3(
+            math.sign(toDamp.x) * math.max(math.abs(toDamp.x) - velocityDampingDeceleration * SystemAPI.Time.DeltaTime, 0.0f),
+            math.sign(toDamp.y) * math.max(math.abs(toDamp.y) - velocityDampingDeceleration * SystemAPI.Time.DeltaTime, 0.0f),
+            math.sign(toDamp.z) * math.max(math.abs(toDamp.z) - velocityDampingDeceleration * SystemAPI.Time.DeltaTime, 0.0f)
         );
+        return dampedComponent + likeness * targetDirection;
     }
-
+    
     private float3 GetAngularVelocity(PlayerAspect player, PlayerManagedAccess managedAccess)
     {
         InputHandler playerInput = managedAccess.ManagedLocalPlayer.GetPlayerInput();
@@ -134,9 +140,9 @@ partial class PlayerInputSystem : SystemBase
         PlayerData playerData = player.PlayerData.ValueRO;
         
         float3 angularVelocity = float3.zero;
-            
+        
         float lookSensitivity = managedAccess.ManagedLocalPlayer.GetLookSensitivity();
-
+        
         float yawAngleVelocity = lookSensitivity * playerInput.LookDelta.x;
         yawAngleVelocity = math.sign(yawAngleVelocity) * math.min(math.abs(yawAngleVelocity), playerData.MaxTurnSpeed);
         yawAngleVelocity = math.radians(yawAngleVelocity);  

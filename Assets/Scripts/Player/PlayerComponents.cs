@@ -1,20 +1,11 @@
 using Unity.Entities;
-using Unity.Mathematics;
-using UnityEngine;
-
-[System.Serializable]
-public struct ThrusterData
-{
-    public float Acceleration;
-}
 
 [System.Serializable]
 public struct ThrusterSetup
 {
-    public ThrusterData ForwardThrusters;
-    public ThrusterData LateralThrusters;
-    public ThrusterData ReverseThrusters;
-    public float MaximumVelocity;
+    public float ForwardThrustersAcceleration;
+    public float LateralThrustersAcceleration;
+    public float ReverseThrustersAcceleration;
 }
 
 public struct PlayerData : IComponentData
@@ -22,12 +13,12 @@ public struct PlayerData : IComponentData
     public ThrusterSetup DefaultMovement;
     public ThrusterSetup ADSMovement;
     
+    public float MaximumVelocity;
+    public float VelocityDamperDecelerationDefault;
+    public float VelocityDamperDecelerationADS;
     public float MaxTurnSpeed;
     public float MaxRollSpeed;
     
-    public float VelocityDamperDeceleration;
-
-    public bool IsADS;
 }
 
 public class PlayerManagedAccess : IComponentData
