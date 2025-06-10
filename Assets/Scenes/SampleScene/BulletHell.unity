@@ -231,8 +231,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   AsteroidSettings: {fileID: 1518708407}
-  AsteroidFieldRadius: 500
-  AsteroidFieldDensity: 50
+  AsteroidFieldRadiusMin: 250
+  AsteroidFieldRadiusMax: 5000
+  AsteroidFieldDensity: 2500
 --- !u!4 &2030789700
 Transform:
   m_ObjectHideFlags: 0
@@ -299,6 +300,10 @@ PrefabInstance:
     - target: {fileID: 4079038141965027303, guid: faccb168a5276a744892ac8eec092250, type: 3}
       propertyPath: m_Name
       value: Player
+      objectReference: {fileID: 0}
+    - target: {fileID: 5032434670896585865, guid: faccb168a5276a744892ac8eec092250, type: 3}
+      propertyPath: VelocityDamperDecelerationDefault
+      value: 150
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []

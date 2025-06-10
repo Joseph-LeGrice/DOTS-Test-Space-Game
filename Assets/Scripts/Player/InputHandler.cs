@@ -8,8 +8,8 @@ public class InputHandler : MonoBehaviour, InputSystem_Actions.IPlayerActions
     public Vector2 LookDelta { get; private set; }
     public bool IsAttacking { get; private set; }
     public bool IsADS { get; private set; }
-    public bool IsBraking { get; private set; }
     public bool IsBoosting { get; private set; }
+    public bool VelocityDampersActive { get; private set; } = true;
     public float RollDirection { get; private set; }
 
     private InputSystem_Actions m_inputActions;
@@ -50,9 +50,12 @@ public class InputHandler : MonoBehaviour, InputSystem_Actions.IPlayerActions
         IsBoosting = context.ReadValueAsButton();
     }
 
-    public void OnBrake(InputAction.CallbackContext context)
+    public void OnToggleVelocityDampers(InputAction.CallbackContext context)
     {
-        IsBraking = context.ReadValueAsButton();
+        if (context.phase == InputActionPhase.Performed)
+        {
+            VelocityDampersActive = !VelocityDampersActive;
+        }
     }
 
     public void OnADS(InputAction.CallbackContext context)

@@ -24,7 +24,8 @@ public struct AsteroidBufferData : IBufferElementData
 public class AsteroidFieldBaker : MonoBehaviour
 {
     public AsteroidSettingsBaker AsteroidSettings;
-    public float AsteroidFieldRadius;
+    public float AsteroidFieldRadiusMin;
+    public float AsteroidFieldRadiusMax;
     public int AsteroidFieldDensity;
 
     public class Baker : Baker<AsteroidFieldBaker>
@@ -35,7 +36,7 @@ public class AsteroidFieldBaker : MonoBehaviour
 
             AddComponent(e, new AsteroidField()
             {
-                AsteroidFieldRadius = authoring.AsteroidFieldRadius,
+                AsteroidFieldRadius = authoring.AsteroidFieldRadiusMax,
                 AsteroidFieldDensity = authoring.AsteroidFieldDensity,
             });
 
@@ -53,7 +54,7 @@ public class AsteroidFieldBaker : MonoBehaviour
                     State = true,
                     RotationAxis = r.NextFloat3(),
                     RotationSpeed = r.NextFloat(asteroidTypeInfo.MinRotateSpeed, asteroidTypeInfo.MaxRotateSpeed),
-                    LocalPosition = authoring.AsteroidFieldRadius * r.NextFloat3(),
+                    LocalPosition = math.lerp(authoring.AsteroidFieldRadiusMin, authoring.AsteroidFieldRadiusMax, r.NextFloat()) * r.NextFloat3Direction(),
                 });
             }
         }

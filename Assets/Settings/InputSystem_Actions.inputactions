@@ -60,9 +60,9 @@
                     "initialStateCheck": false
                 },
                 {
-                    "name": "Brake",
+                    "name": "ToggleVelocityDampers",
                     "type": "Button",
-                    "id": "98533fde-373c-4e47-8e60-dc50874e0da8",
+                    "id": "2e9a831f-af9e-4f3a-bafc-b6f0b74030fb",
                     "expectedControlType": "",
                     "processors": "",
                     "interactions": "",
@@ -182,17 +182,6 @@
                 },
                 {
                     "name": "",
-                    "id": "df002980-b42b-49bd-ac60-d538970924bd",
-                    "path": "<Keyboard>/leftAlt",
-                    "interactions": "",
-                    "processors": "",
-                    "groups": ";Keyboard&Mouse",
-                    "action": "Brake",
-                    "isComposite": false,
-                    "isPartOfComposite": false
-                },
-                {
-                    "name": "",
                     "id": "3055bceb-c6ed-4a12-b856-9a6975fa921d",
                     "path": "<Mouse>/rightButton",
                     "interactions": "",
@@ -234,6 +223,17 @@
                     "action": "Roll",
                     "isComposite": false,
                     "isPartOfComposite": true
+                },
+                {
+                    "name": "",
+                    "id": "e66bcde2-128c-417d-86e1-0c4fa7916580",
+                    "path": "<Keyboard>/alt",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": ";Keyboard&Mouse",
+                    "action": "ToggleVelocityDampers",
+                    "isComposite": false,
+                    "isPartOfComposite": false
                 }
             ]
         },

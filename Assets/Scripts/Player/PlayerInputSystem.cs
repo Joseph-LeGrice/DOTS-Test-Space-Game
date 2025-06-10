@@ -9,6 +9,7 @@ public readonly partial struct PlayerAspect : IAspect
 {
     public readonly Entity Self;
     public readonly RefRW<PlayerData> PlayerData;
+    public readonly RefRW<PlayerBoosterState> PlayerBoostState;
     public readonly RefRW<PhysicsVelocity> Velocity;
     public readonly RefRW<PhysicsMass> PhysicsMass;
     public readonly RefRO<LocalToWorld> LocalToWorld;
@@ -44,6 +45,12 @@ partial class PlayerInputSystem : SystemBase
                     gravityTether.IsFiring = playerInput.IsAttacking;
                     SystemAPI.SetComponent(shipHardpoint.Self, gravityTether);
                 }
+            }
+            
+            player.PlayerBoostState.ValueRW.UpdateBoost(SystemAPI.Time.DeltaTime, player.PlayerData.ValueRO.BoostRechargeTime);
+            if (playerInput.IsBoosting)
+            {
+                player.PlayerBoostState.ValueRW.TryBoostPerformed(player.PlayerData.ValueRO.BoostTime);
             }
 
             float angularVelocityModifier = 1.0f;
@@ -82,6 +89,7 @@ partial class PlayerInputSystem : SystemBase
     {
         InputHandler playerInput = managedAccess.ManagedLocalPlayer.GetPlayerInput();
         PlayerData playerData = player.PlayerData.ValueRO;
+        PlayerBoosterState playerBoosters = player.PlayerBoostState.ValueRO;
 
         ThrusterSetup thrusterSetup = playerData.DefaultMovement;
         if (playerInput.IsADS)
@@ -89,33 +97,49 @@ partial class PlayerInputSystem : SystemBase
             thrusterSetup = playerData.ADSMovement;
         }
         
-        float3 acceleration = playerInput.TargetDirection;
-        if (acceleration.z > 0.0f)
+        float3 acceleration = new float3();
+        float maximumVelocity = playerData.MaximumVelocity;
+        
+        if (playerBoosters.IsBoosting())
         {
-            acceleration.z *= thrusterSetup.ForwardThrustersAcceleration;
+            acceleration.z = playerBoosters.GetBoostAcceleration(playerData.BoostAcceleration, playerData.BoostTime);
+            maximumVelocity = playerData.BoostMaximumVelocity;
         }
         else
         {
-            acceleration.z *= thrusterSetup.ReverseThrustersAcceleration;
+            float dir = playerInput.TargetDirection.z;
+            if (dir > 0.0f)
+            {
+                acceleration.z = thrusterSetup.ForwardThrustersAcceleration;
+            }
+            else if (dir < 0.0f)
+            {
+                acceleration.z = -thrusterSetup.ReverseThrustersAcceleration;
+            }
         }
-        
+
         acceleration.x *= thrusterSetup.LateralThrustersAcceleration;
         acceleration.y *= thrusterSetup.LateralThrustersAcceleration;
         
         LocalToWorld localToWorld = player.LocalToWorld.ValueRO;
         float3 currentVelocityLocal = localToWorld.Value.InverseTransformDirection(player.Velocity.ValueRO.Linear);
         currentVelocityLocal += acceleration * SystemAPI.Time.DeltaTime;
-        currentVelocityLocal = math.normalizesafe(currentVelocityLocal) * math.min(playerData.MaximumVelocity, math.length(currentVelocityLocal));
-        
-        if (!playerInput.IsADS)
+        currentVelocityLocal = math.normalizesafe(currentVelocityLocal) * math.min(maximumVelocity, math.length(currentVelocityLocal));
+
+        if (playerInput.VelocityDampersActive)
         {
-            currentVelocityLocal = DampVelocity(currentVelocityLocal, acceleration, playerData.VelocityDamperDecelerationDefault);
+            if (!playerInput.IsADS)
+            {
+                currentVelocityLocal = DampVelocity(currentVelocityLocal, acceleration,
+                    playerData.VelocityDamperDecelerationDefault);
+            }
+            else
+            {
+                currentVelocityLocal = DampVelocity(currentVelocityLocal, acceleration,
+                    playerData.VelocityDamperDecelerationADS);
+            }
         }
-        else
-        {
-            currentVelocityLocal = DampVelocity(currentVelocityLocal, acceleration, playerData.VelocityDamperDecelerationADS);
-        }
-        
+
         return localToWorld.Value.TransformDirection(currentVelocityLocal);
     }
     

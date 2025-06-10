@@ -392,6 +392,10 @@ MonoBehaviour:
   MaximumVelocity: 150
   VelocityDamperDecelerationDefault: 250
   VelocityDamperDecelerationADS: 10
+  BoostTime: 1.5
+  BoostRechargeTime: 5
+  BoostAcceleration: 75
+  BoostMaximumVelocity: 250
   MaxTurnSpeed: 180
   MaxRollSpeed: 180
   ShipHardpoints:
