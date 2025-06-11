@@ -118,8 +118,8 @@ partial class PlayerInputSystem : SystemBase
             }
         }
 
-        acceleration.x *= thrusterSetup.LateralThrustersAcceleration;
-        acceleration.y *= thrusterSetup.LateralThrustersAcceleration;
+        acceleration.x = playerInput.TargetDirection.x * thrusterSetup.LateralThrustersAcceleration;
+        acceleration.y = playerInput.TargetDirection.y * thrusterSetup.LateralThrustersAcceleration;
         
         LocalToWorld localToWorld = player.LocalToWorld.ValueRO;
         float3 currentVelocityLocal = localToWorld.Value.InverseTransformDirection(player.Velocity.ValueRO.Linear);
