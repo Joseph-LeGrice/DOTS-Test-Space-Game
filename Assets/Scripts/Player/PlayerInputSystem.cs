@@ -53,19 +53,19 @@ partial class PlayerInputSystem : SystemBase
                 player.PlayerBoostState.ValueRW.TryBoostPerformed(player.PlayerData.ValueRO.BoostTime);
             }
 
-            float angularVelocityModifier = 1.0f;
-            float linearVelocityModifier = 1.0f;
-            if (GetAttachedMass(player.Self, out PhysicsMass attachedPhysicsMass))
-            {
-                angularVelocityModifier = math.pow(attachedPhysicsMass.InverseMass, 0.1f);
-                linearVelocityModifier = math.pow(attachedPhysicsMass.InverseMass, 0.1f);
-            }
+            // float angularVelocityModifier = 1.0f;
+            // float linearVelocityModifier = 1.0f;
+            // if (GetAttachedMass(player.Self, out PhysicsMass attachedPhysicsMass))
+            // {
+            //     angularVelocityModifier = m_slowdown * (1.0f - attachedPhysicsMass.InverseMass);
+            //     linearVelocityModifier = m_slowdown * (1.0f - attachedPhysicsMass.InverseMass) * SystemAPI.Time.DeltaTime;
+            // }
 
             float3 linearVelocity = GetLinearVelocity(player, managedAccess);
-            player.Velocity.ValueRW.Linear = linearVelocityModifier * linearVelocity;
+            player.Velocity.ValueRW.Linear = linearVelocity;// - linearVelocityModifier;
 
             float3 angularVelocity = GetAngularVelocity(player, managedAccess);
-            player.Velocity.ValueRW.Angular = angularVelocityModifier * angularVelocity;
+            player.Velocity.ValueRW.Angular = angularVelocity; // * angularVelocityModifier;
         }
     }
     

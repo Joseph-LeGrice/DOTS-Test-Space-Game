@@ -1,12 +1,12 @@
 
 TODO:
 PHASE 1 - MECHANICS
-- Gravity tether + placeholder effect
-- Collision damage, probably gonna need to create a system & job as described under "Modification point 2" in the unity physics docs here: https://docs.unity3d.com/Packages/com.unity.physics@1.4/manual/simulation-modification.html 
-- Shields
 - Basic UI to show player health & aim
 - Basic UI to change loadout
 - Basic AI ships
+- Gravity tether + placeholder effect
+- Collision damage, probably gonna need to create a system & job as described under "Modification point 2" in the unity physics docs here: https://docs.unity3d.com/Packages/com.unity.physics@1.4/manual/simulation-modification.html 
+- Shields
 
 PHASE 2 - GAMEPLAY
 - Game flow: Pre-match loadout, Objectives
