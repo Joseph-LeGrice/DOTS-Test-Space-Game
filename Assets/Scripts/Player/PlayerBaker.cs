@@ -7,16 +7,11 @@ class PlayerBaker : MonoBehaviour
     public ThrusterSetup ADSMovement;
     
     public float MaximumVelocity;
-    public float VelocityDamperDecelerationDefault;
-    public float VelocityDamperDecelerationADS;
     
     public float BoostTime;
     public float BoostRechargeTime;
     public float BoostAcceleration;
     public float BoostMaximumVelocity;
-    
-    public float MaxTurnSpeed;
-    public float MaxRollSpeed;
     
     public GameObject[] ShipHardpoints;
     
@@ -30,10 +25,6 @@ class PlayerBaker : MonoBehaviour
                 DefaultMovement = authoring.DefaultMovement,
                 ADSMovement = authoring.ADSMovement,
                 MaximumVelocity = authoring.MaximumVelocity,
-                VelocityDamperDecelerationDefault = authoring.VelocityDamperDecelerationDefault,
-                VelocityDamperDecelerationADS = authoring.VelocityDamperDecelerationADS,
-                MaxTurnSpeed = authoring.MaxTurnSpeed,
-                MaxRollSpeed = authoring.MaxRollSpeed,
                 BoostTime = authoring.BoostTime,
                 BoostRechargeTime = authoring.BoostRechargeTime,
                 BoostAcceleration = authoring.BoostAcceleration,

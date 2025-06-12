@@ -7,6 +7,15 @@ public struct ThrusterSetup
     public float ForwardThrustersAcceleration;
     public float LateralThrustersAcceleration;
     public float ReverseThrustersAcceleration;
+    
+    public float MaxTurnAcceleration;
+    public float MaxTurnSpeed;
+    
+    public float MaxRollAcceleration;
+    public float MaxRollSpeed;
+    
+    public float AngularDamperDeceleration;
+    public float VelocityDamperDeceleration;
 }
 
 public struct PlayerData : IComponentData
@@ -15,10 +24,6 @@ public struct PlayerData : IComponentData
     public ThrusterSetup ADSMovement;
     
     public float MaximumVelocity;
-    public float VelocityDamperDecelerationDefault;
-    public float VelocityDamperDecelerationADS;
-    public float MaxTurnSpeed;
-    public float MaxRollSpeed;
     
     public float BoostTime;
     public float BoostRechargeTime;

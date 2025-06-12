@@ -64,7 +64,7 @@ partial class PlayerInputSystem : SystemBase
             float3 linearVelocity = GetLinearVelocity(player, managedAccess);
             player.Velocity.ValueRW.Linear = linearVelocity;// - linearVelocityModifier;
 
-            float3 angularVelocity = GetAngularVelocity(player, managedAccess);
+            float3 angularVelocity = GetAngularAcceleration(player, managedAccess); // GetAngularVelocity(player, managedAccess);
             player.Velocity.ValueRW.Angular = angularVelocity; // * angularVelocityModifier;
         }
     }
@@ -128,16 +128,7 @@ partial class PlayerInputSystem : SystemBase
 
         if (playerInput.VelocityDampersActive)
         {
-            if (!playerInput.IsADS)
-            {
-                currentVelocityLocal = DampVelocity(currentVelocityLocal, acceleration,
-                    playerData.VelocityDamperDecelerationDefault);
-            }
-            else
-            {
-                currentVelocityLocal = DampVelocity(currentVelocityLocal, acceleration,
-                    playerData.VelocityDamperDecelerationADS);
-            }
+            currentVelocityLocal = DampVelocity(currentVelocityLocal, acceleration, thrusterSetup.VelocityDamperDeceleration);
         }
 
         return localToWorld.Value.TransformDirection(currentVelocityLocal);
@@ -157,36 +148,53 @@ partial class PlayerInputSystem : SystemBase
         return dampedComponent + likeness * targetDirection;
     }
     
-    private float3 GetAngularVelocity(PlayerAspect player, PlayerManagedAccess managedAccess)
+    private float3 GetAngularAcceleration(PlayerAspect player, PlayerManagedAccess managedAccess)
     {
         InputHandler playerInput = managedAccess.ManagedLocalPlayer.GetPlayerInput();
-        LocalToWorld localToWorld = player.LocalToWorld.ValueRO;
         PlayerData playerData = player.PlayerData.ValueRO;
         
-        float3 angularVelocity = float3.zero;
+        ThrusterSetup thrusterSetup = playerData.DefaultMovement;
+        if (playerInput.IsADS)
+        {
+            thrusterSetup = playerData.ADSMovement;
+        }
+        
+        float3 angularAcceleration = float3.zero;
         
         float lookSensitivity = managedAccess.ManagedLocalPlayer.GetLookSensitivity();
         
-        float yawAngleVelocity = lookSensitivity * playerInput.LookDelta.x;
-        yawAngleVelocity = math.sign(yawAngleVelocity) * math.min(math.abs(yawAngleVelocity), playerData.MaxTurnSpeed);
-        yawAngleVelocity = math.radians(yawAngleVelocity);  
-        quaternion yawRotation = quaternion.AxisAngle(localToWorld.Up, yawAngleVelocity);
+        float yawAngleAcceleration = lookSensitivity * playerInput.LookDelta.x;
+        yawAngleAcceleration = math.sign(yawAngleAcceleration) * math.min(math.abs(yawAngleAcceleration), thrusterSetup.MaxTurnAcceleration);
+        angularAcceleration.y = math.radians(yawAngleAcceleration);
             
-        float pitchAngleVelocity = lookSensitivity * playerInput.LookDelta.y;
-        pitchAngleVelocity = math.sign(pitchAngleVelocity) * math.min(math.abs(pitchAngleVelocity), playerData.MaxTurnSpeed);
-        pitchAngleVelocity = math.radians(pitchAngleVelocity);
-        quaternion pitchRotation = quaternion.AxisAngle(localToWorld.Right, pitchAngleVelocity);
-            
-        quaternion pitchYawRotation = math.mul(pitchRotation, yawRotation);
-        angularVelocity += 2.0f * math.acos(pitchYawRotation.value.w) * pitchYawRotation.value.xyz;
+        float pitchAngleAcceleration = lookSensitivity * playerInput.LookDelta.y;
+        pitchAngleAcceleration = math.sign(pitchAngleAcceleration) * math.min(math.abs(pitchAngleAcceleration), thrusterSetup.MaxTurnAcceleration);
+        angularAcceleration.x = math.radians(pitchAngleAcceleration);
+        
+        float rollSensitivity = managedAccess.ManagedLocalPlayer.GetLookSensitivity();
+        float rollAngleAcceleration = rollSensitivity * thrusterSetup.MaxRollAcceleration * playerInput.RollDirection;
+        angularAcceleration.z = math.radians(rollAngleAcceleration);
+        
+        float3 angularVelocity = player.Velocity.ValueRO.Angular;
+        angularVelocity += angularAcceleration * SystemAPI.Time.DeltaTime;
+        angularVelocity.x = math.sign(angularVelocity.x) * math.min(math.abs(angularVelocity.x), math.radians(thrusterSetup.MaxTurnSpeed));
+        angularVelocity.y = math.sign(angularVelocity.y) * math.min(math.abs(angularVelocity.y), math.radians(thrusterSetup.MaxTurnSpeed));
+        angularVelocity.z = math.sign(angularVelocity.z) * math.min(math.abs(angularVelocity.z), math.radians(thrusterSetup.MaxRollSpeed));
+        
+        return DampAngularVelocity(angularVelocity, angularAcceleration, thrusterSetup.AngularDamperDeceleration);
+    }
 
-        float rollAngleVelocity = playerData.MaxRollSpeed * playerInput.RollDirection;
-        rollAngleVelocity = math.radians(rollAngleVelocity);
-            
-        quaternion rollRotation = quaternion.AxisAngle(localToWorld.Forward, rollAngleVelocity);
-        angularVelocity += 2.0f * math.acos(rollRotation.value.w) * rollRotation.value.xyz;
-            
-        quaternion inertiaOrientationInWorldSpace = math.mul(localToWorld.Rotation, player.PhysicsMass.ValueRO.InertiaOrientation);
-        return math.rotate(math.inverse(inertiaOrientationInWorldSpace), angularVelocity);
+    private float3 DampAngularVelocity(float3 currentVelocity, float3 currentAcceleration, float velocityDampingDeceleration)
+    {
+        float3 currentVelocityNormalised = math.normalizesafe(currentVelocity);
+        float3 currentAccelerationNormalised = math.normalizesafe(currentAcceleration);
+        float likeness = math.max(math.dot(currentVelocityNormalised, currentAccelerationNormalised), 0.0f);
+        float3 toDamp = math.length(currentVelocity) * (currentVelocityNormalised - likeness * currentAccelerationNormalised);
+        float3 dampedComponent = new float3(
+            math.sign(toDamp.x) * math.max(math.abs(toDamp.x) - math.radians(velocityDampingDeceleration) * SystemAPI.Time.DeltaTime, 0.0f),
+            math.sign(toDamp.y) * math.max(math.abs(toDamp.y) - math.radians(velocityDampingDeceleration) * SystemAPI.Time.DeltaTime, 0.0f),
+            math.sign(toDamp.z) * math.max(math.abs(toDamp.z) - math.radians(velocityDampingDeceleration) * SystemAPI.Time.DeltaTime, 0.0f)
+        );
+        return dampedComponent + math.length(currentVelocity) * likeness * currentAccelerationNormalised;
     }
 }

@@ -7,18 +7,39 @@ public class ManagedLocalPlayer : MonoBehaviour
     private Transform m_playerTrackedTransform;
     [SerializeField]
     private InputHandler m_playerInput;
+    [SerializeField]
+    private CrosshairLayout m_crosshair;
     
+    [SerializeField]
+    private Camera m_cinemachineCamera;
     [SerializeField]
     private GameObject m_mainCamera;
     [SerializeField]
     private GameObject m_adsCamera;
 
     [SerializeField]
-    private float m_lookSensitivity;
+    private float m_lookSensitivity = 20.0f;
+    [SerializeField]
+    private float m_rollSensitivity = 1.0f;
+
+    public CrosshairLayout GetCrosshair()
+    {
+        return m_crosshair;
+    }
+    
+    public Camera GetMainCamera()
+    {
+        return m_cinemachineCamera;
+    }
     
     public void UpdatePlayerPositionAndRotation(Vector3 position, Quaternion rotation)
     {
         m_playerTrackedTransform.SetPositionAndRotation(position, rotation);
+    }
+
+    public Transform GetPlayerTrackedTransform()
+    {
+        return m_playerTrackedTransform;
     }
     
     public InputHandler GetPlayerInput()
@@ -29,6 +50,11 @@ public class ManagedLocalPlayer : MonoBehaviour
     public float GetLookSensitivity()
     {
         return m_lookSensitivity;
+    }
+
+    public float GetRollSensitivity()
+    {
+        return m_rollSensitivity;
     }
 
     private void Update()
