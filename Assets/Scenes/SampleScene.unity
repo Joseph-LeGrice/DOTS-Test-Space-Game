@@ -347,7 +347,8 @@ MonoBehaviour:
   m_cinemachineCamera: {fileID: 1784217747}
   m_mainCamera: {fileID: 330585543}
   m_adsCamera: {fileID: 1246461136}
-  m_lookSensitivity: 1000
+  m_lookSensitivity: 100
+  m_lookSensitivityADS: 100
   m_rollSensitivity: 1
 --- !u!1 &330585543
 GameObject:

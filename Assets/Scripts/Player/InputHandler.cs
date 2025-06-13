@@ -9,7 +9,8 @@ public class InputHandler : MonoBehaviour, InputSystem_Actions.IPlayerActions
     public bool IsAttacking { get; private set; }
     public bool IsADS { get; private set; }
     public bool IsBoosting { get; private set; }
-    public bool VelocityDampersActive { get; private set; } = true;
+    public bool LinearDampersActive { get; private set; } = true;
+    public bool AngularDampersActive { get; private set; } = false;
     public float RollDirection { get; private set; }
 
     private InputSystem_Actions m_inputActions;
@@ -54,7 +55,7 @@ public class InputHandler : MonoBehaviour, InputSystem_Actions.IPlayerActions
     {
         if (context.phase == InputActionPhase.Performed)
         {
-            VelocityDampersActive = !VelocityDampersActive;
+            LinearDampersActive = !LinearDampersActive;
         }
     }
 

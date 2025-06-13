@@ -301,6 +301,22 @@ PrefabInstance:
       propertyPath: m_Name
       value: Player
       objectReference: {fileID: 0}
+    - target: {fileID: 5032434670896585865, guid: faccb168a5276a744892ac8eec092250, type: 3}
+      propertyPath: ADSMovement.MaxTurnSpeed
+      value: 30
+      objectReference: {fileID: 0}
+    - target: {fileID: 5032434670896585865, guid: faccb168a5276a744892ac8eec092250, type: 3}
+      propertyPath: DefaultMovement.MaxTurnSpeed
+      value: 45
+      objectReference: {fileID: 0}
+    - target: {fileID: 5032434670896585865, guid: faccb168a5276a744892ac8eec092250, type: 3}
+      propertyPath: ADSMovement.MaxTurnAcceleration
+      value: -1
+      objectReference: {fileID: 0}
+    - target: {fileID: 5032434670896585865, guid: faccb168a5276a744892ac8eec092250, type: 3}
+      propertyPath: DefaultMovement.MaxTurnAcceleration
+      value: 100
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []

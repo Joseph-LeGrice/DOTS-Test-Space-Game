@@ -64,7 +64,7 @@ partial class PlayerInputSystem : SystemBase
             float3 linearVelocity = GetLinearVelocity(player, managedAccess);
             player.Velocity.ValueRW.Linear = linearVelocity;// - linearVelocityModifier;
 
-            float3 angularVelocity = GetAngularAcceleration(player, managedAccess); // GetAngularVelocity(player, managedAccess);
+            float3 angularVelocity = GetAngularVelocity(player, managedAccess); // GetAngularVelocity(player, managedAccess);
             player.Velocity.ValueRW.Angular = angularVelocity; // * angularVelocityModifier;
         }
     }
@@ -126,7 +126,7 @@ partial class PlayerInputSystem : SystemBase
         currentVelocityLocal += acceleration * SystemAPI.Time.DeltaTime;
         currentVelocityLocal = math.normalizesafe(currentVelocityLocal) * math.min(maximumVelocity, math.length(currentVelocityLocal));
 
-        if (playerInput.VelocityDampersActive)
+        if (playerInput.LinearDampersActive)
         {
             currentVelocityLocal = DampVelocity(currentVelocityLocal, acceleration, thrusterSetup.VelocityDamperDeceleration);
         }
@@ -148,7 +148,7 @@ partial class PlayerInputSystem : SystemBase
         return dampedComponent + likeness * targetDirection;
     }
     
-    private float3 GetAngularAcceleration(PlayerAspect player, PlayerManagedAccess managedAccess)
+    private float3 GetAngularVelocity(PlayerAspect player, PlayerManagedAccess managedAccess)
     {
         InputHandler playerInput = managedAccess.ManagedLocalPlayer.GetPlayerInput();
         PlayerData playerData = player.PlayerData.ValueRO;
@@ -161,27 +161,50 @@ partial class PlayerInputSystem : SystemBase
         
         float3 angularAcceleration = float3.zero;
         
-        float lookSensitivity = managedAccess.ManagedLocalPlayer.GetLookSensitivity();
-        
-        float yawAngleAcceleration = lookSensitivity * playerInput.LookDelta.x;
-        yawAngleAcceleration = math.sign(yawAngleAcceleration) * math.min(math.abs(yawAngleAcceleration), thrusterSetup.MaxTurnAcceleration);
-        angularAcceleration.y = math.radians(yawAngleAcceleration);
-            
-        float pitchAngleAcceleration = lookSensitivity * playerInput.LookDelta.y;
-        pitchAngleAcceleration = math.sign(pitchAngleAcceleration) * math.min(math.abs(pitchAngleAcceleration), thrusterSetup.MaxTurnAcceleration);
-        angularAcceleration.x = math.radians(pitchAngleAcceleration);
-        
-        float rollSensitivity = managedAccess.ManagedLocalPlayer.GetLookSensitivity();
+        if (!playerInput.IsADS)
+        {
+            float lookSensitivity = managedAccess.ManagedLocalPlayer.GetLookSensitivity();
+            float yawAngleAcceleration = lookSensitivity * playerInput.LookDelta.x;
+            yawAngleAcceleration = math.sign(yawAngleAcceleration) *
+                                   math.min(math.abs(yawAngleAcceleration), thrusterSetup.MaxTurnAcceleration);
+            angularAcceleration.y = math.radians(yawAngleAcceleration);
+
+            float pitchAngleAcceleration = lookSensitivity * playerInput.LookDelta.y;
+            pitchAngleAcceleration = math.sign(pitchAngleAcceleration) *
+                                     math.min(math.abs(pitchAngleAcceleration), thrusterSetup.MaxTurnAcceleration);
+            angularAcceleration.x = math.radians(pitchAngleAcceleration);
+        }
+
+        float rollSensitivity = managedAccess.ManagedLocalPlayer.GetRollSensitivity();
         float rollAngleAcceleration = rollSensitivity * thrusterSetup.MaxRollAcceleration * playerInput.RollDirection;
         angularAcceleration.z = math.radians(rollAngleAcceleration);
         
         float3 angularVelocity = player.Velocity.ValueRO.Angular;
+
+        if (playerInput.IsADS)
+        {
+            float lookSensitivity = managedAccess.ManagedLocalPlayer.GetLookSensitivityADS();
+            float yawTargetVelocity = lookSensitivity * playerInput.LookDelta.x;
+            yawTargetVelocity = math.sign(yawTargetVelocity) * math.min(math.abs(yawTargetVelocity), thrusterSetup.MaxTurnSpeed);
+            angularVelocity.y = math.radians(yawTargetVelocity);
+            
+            float pitchTargetVelocity = lookSensitivity * playerInput.LookDelta.y;
+            pitchTargetVelocity = math.sign(pitchTargetVelocity) * math.min(math.abs(pitchTargetVelocity), thrusterSetup.MaxTurnSpeed);
+            angularVelocity.x = math.radians(pitchTargetVelocity);
+        }
+        
         angularVelocity += angularAcceleration * SystemAPI.Time.DeltaTime;
+        
         angularVelocity.x = math.sign(angularVelocity.x) * math.min(math.abs(angularVelocity.x), math.radians(thrusterSetup.MaxTurnSpeed));
         angularVelocity.y = math.sign(angularVelocity.y) * math.min(math.abs(angularVelocity.y), math.radians(thrusterSetup.MaxTurnSpeed));
         angularVelocity.z = math.sign(angularVelocity.z) * math.min(math.abs(angularVelocity.z), math.radians(thrusterSetup.MaxRollSpeed));
-        
-        return DampAngularVelocity(angularVelocity, angularAcceleration, thrusterSetup.AngularDamperDeceleration);
+
+        if (playerInput.AngularDampersActive)
+        {
+            angularVelocity = DampAngularVelocity(angularVelocity, angularAcceleration, thrusterSetup.AngularDamperDeceleration);
+        }
+
+        return angularVelocity;
     }
 
     private float3 DampAngularVelocity(float3 currentVelocity, float3 currentAcceleration, float velocityDampingDeceleration)

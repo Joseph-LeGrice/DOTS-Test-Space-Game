@@ -48,16 +48,21 @@ public partial class UserInterfaceUpdateSystem : SystemBase
             Vector2 shipForwardScreen = localPlayer.GetMainCamera().WorldToScreenPoint(shipForwardWorld);
             playerUi.SetShipAim(shipForwardScreen);
 
-            var thrusterSetup = player.PlayerData.ValueRO.DefaultMovement;
-            if (localPlayer.GetPlayerInput().IsADS)
+            if (!localPlayer.GetPlayerInput().IsADS)
             {
-                thrusterSetup = player.PlayerData.ValueRO.ADSMovement;
-            }
+                var thrusterSetup = player.PlayerData.ValueRO.DefaultMovement;
 
-            float2 accelerationXY = new float2(player.PhysicsVelocity.ValueRO.Angular.y, -player.PhysicsVelocity.ValueRO.Angular.x);
-            float2 accelerationDirection = math.normalizesafe(accelerationXY);
-            float accelerationNormalised = math.lengthsq(accelerationXY) / math.pow(math.radians(thrusterSetup.MaxTurnSpeed), 2.0f);
-            playerUi.SetAcceleration(accelerationDirection, accelerationNormalised);
+                float2 accelerationXY = new float2(player.PhysicsVelocity.ValueRO.Angular.y,
+                    -player.PhysicsVelocity.ValueRO.Angular.x);
+                float2 accelerationDirection = math.normalizesafe(accelerationXY);
+                float accelerationNormalised = math.lengthsq(accelerationXY) /
+                                               math.pow(math.radians(thrusterSetup.MaxTurnSpeed), 2.0f);
+                playerUi.SetAcceleration(accelerationDirection, accelerationNormalised);
+            }
+            else
+            {
+                playerUi.SetAcceleration(Vector2.up, 0.0f);
+            }
         }
     }
 }

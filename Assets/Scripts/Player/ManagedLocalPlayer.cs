@@ -20,6 +20,8 @@ public class ManagedLocalPlayer : MonoBehaviour
     [SerializeField]
     private float m_lookSensitivity = 20.0f;
     [SerializeField]
+    private float m_lookSensitivityADS = 20.0f;
+    [SerializeField]
     private float m_rollSensitivity = 1.0f;
 
     public LocalPlayerUserInterface GetUserInterface()
@@ -50,6 +52,11 @@ public class ManagedLocalPlayer : MonoBehaviour
     public float GetLookSensitivity()
     {
         return m_lookSensitivity;
+    }
+
+    public float GetLookSensitivityADS()
+    {
+        return m_lookSensitivityADS;
     }
 
     public float GetRollSensitivity()
