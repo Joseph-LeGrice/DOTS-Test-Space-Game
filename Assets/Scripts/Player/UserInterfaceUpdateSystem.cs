@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using Unity.Entities;
 using Unity.Mathematics;
 using Unity.Physics;
@@ -10,12 +11,11 @@ public readonly partial struct PlayerUIAspect : IAspect
     public readonly Entity Self;
     public readonly RefRO<PlayerData> PlayerData;
     public readonly RefRO<PhysicsVelocity> PhysicsVelocity;
-    public readonly RefRO<PlayerBoosterState> PlayerBoostState;
-    public readonly DynamicBuffer<ShipHardpointBufferElement> ShipHardpoints;
+    public readonly DynamicBuffer<DetectedTarget> DetectedTargets;
 }
 
-[UpdateInGroup(typeof(FixedStepSimulationSystemGroup))]
-[UpdateAfter(typeof(PhysicsSystemGroup))]
+[UpdateInGroup(typeof(LateSimulationSystemGroup))]
+[UpdateAfter(typeof(TargetSystem))]
 public partial class UserInterfaceUpdateSystem : SystemBase
 {
     protected override void OnUpdate()
@@ -29,25 +29,6 @@ public partial class UserInterfaceUpdateSystem : SystemBase
             ManagedLocalPlayer localPlayer = managedAccess.ManagedLocalPlayer;
             LocalPlayerUserInterface playerUi = localPlayer.GetUserInterface();
             
-            if (!playerUi.HasCreated())
-            {
-                playerUi.Initialize(player.ShipHardpoints.Length);
-            }
-
-            float aimDistance = 500.0f;
-            for (int i = 0; i < player.ShipHardpoints.Length; i++)
-            {
-                LocalToWorld l2w = localToWorldLookup[player.ShipHardpoints[i].Self];
-                Vector3 aimPositionWorld = l2w.Position + aimDistance * l2w.Forward;
-                Vector2 aimPositionScreen = localPlayer.GetMainCamera().WorldToScreenPoint(aimPositionWorld);
-                playerUi.SetHardpointAim(i, aimPositionScreen);
-            }
-
-            LocalToWorld shipLocalToWorld = localToWorldLookup[player.Self];
-            Vector3 shipForwardWorld = shipLocalToWorld.Position + aimDistance * shipLocalToWorld.Forward;
-            Vector2 shipForwardScreen = localPlayer.GetMainCamera().WorldToScreenPoint(shipForwardWorld);
-            playerUi.SetShipAim(shipForwardScreen);
-
             if (!localPlayer.GetPlayerInput().IsADS)
             {
                 var thrusterSetup = player.PlayerData.ValueRO.DefaultMovement;
@@ -63,6 +44,17 @@ public partial class UserInterfaceUpdateSystem : SystemBase
             {
                 playerUi.SetAcceleration(Vector2.up, 0.0f);
             }
+            
+            List<TargetData> targetData = new List<TargetData>();
+            foreach (DetectedTarget dt in player.DetectedTargets)
+            {
+                targetData.Add(new TargetData()
+                {
+                    IsTargeting = false,
+                    Position = localToWorldLookup[dt.TargetableEntity].Position,
+                });
+            }
+            playerUi.SetTargets(targetData);
         }
     }
 }

@@ -40,6 +40,8 @@ public class AsteroidBaker : MonoBehaviour
                     ),
                 });
             }
+            
+            AddComponent<Targetable>(e);
         }
     }
 }

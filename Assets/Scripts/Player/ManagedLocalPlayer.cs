@@ -11,8 +11,6 @@ public class ManagedLocalPlayer : MonoBehaviour
     private LocalPlayerUserInterface m_userInterface;
     
     [SerializeField]
-    private Camera m_cinemachineCamera;
-    [SerializeField]
     private GameObject m_mainCamera;
     [SerializeField]
     private GameObject m_adsCamera;
@@ -27,11 +25,6 @@ public class ManagedLocalPlayer : MonoBehaviour
     public LocalPlayerUserInterface GetUserInterface()
     {
         return m_userInterface;
-    }
-    
-    public Camera GetMainCamera()
-    {
-        return m_cinemachineCamera;
     }
     
     public void UpdatePlayerPositionAndRotation(Vector3 position, Quaternion rotation)

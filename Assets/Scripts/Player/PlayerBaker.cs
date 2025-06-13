@@ -45,6 +45,10 @@ class PlayerBaker : MonoBehaviour
                     Self = GetEntity(sh, TransformUsageFlags.Dynamic),
                 });
             }
+            
+            AddComponent<Targetable>(mainEntity);
+            AddComponent<TargetDetector>(mainEntity, new TargetDetector() { Range = 500.0f});
+            AddBuffer<DetectedTarget>(mainEntity);
         }
     }
 }
