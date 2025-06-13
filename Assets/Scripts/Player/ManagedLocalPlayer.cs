@@ -8,7 +8,7 @@ public class ManagedLocalPlayer : MonoBehaviour
     [SerializeField]
     private InputHandler m_playerInput;
     [SerializeField]
-    private CrosshairLayout m_crosshair;
+    private LocalPlayerUserInterface m_userInterface;
     
     [SerializeField]
     private Camera m_cinemachineCamera;
@@ -22,9 +22,9 @@ public class ManagedLocalPlayer : MonoBehaviour
     [SerializeField]
     private float m_rollSensitivity = 1.0f;
 
-    public CrosshairLayout GetCrosshair()
+    public LocalPlayerUserInterface GetUserInterface()
     {
-        return m_crosshair;
+        return m_userInterface;
     }
     
     public Camera GetMainCamera()

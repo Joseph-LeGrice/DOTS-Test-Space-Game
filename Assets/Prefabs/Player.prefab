@@ -386,7 +386,7 @@ MonoBehaviour:
     LateralThrustersAcceleration: 75
     ReverseThrustersAcceleration: 75
     MaxTurnAcceleration: 180
-    MaxTurnSpeed: 180
+    MaxTurnSpeed: 90
     MaxRollAcceleration: 30
     MaxRollSpeed: 90
     AngularDamperDeceleration: 180
@@ -402,17 +402,10 @@ MonoBehaviour:
     AngularDamperDeceleration: 360
     VelocityDamperDeceleration: 10
   MaximumVelocity: 150
-  VelocityDamperDecelerationDefault: 150
-  VelocityDamperDecelerationADS: 10
   BoostTime: 1.5
   BoostRechargeTime: 5
   BoostAcceleration: 75
   BoostMaximumVelocity: 250
-  MaxTurnSpeed: 180
-  MaxRollSpeed: 90
-  MaxTurnAcceleration: 180
-  MaxRollAcceleration: 30
-  AngularDamperDecelerationDefault: 180
   ShipHardpoints:
   - {fileID: 7275956222017740260}
   - {fileID: 5660096965790956094}

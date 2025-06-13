@@ -5,8 +5,6 @@ using UnityEngine;
 public class CrosshairLayout : MonoBehaviour
 {
     [SerializeField]
-    private Camera m_uiCamera;
-    [SerializeField]
     private Sprite m_dotSprite;
     [SerializeField]
     private float m_lineThickness = 0.05f;
@@ -14,34 +12,17 @@ public class CrosshairLayout : MonoBehaviour
     private float m_lineLength = 2.0f;
     [SerializeField]
     private float m_centerGap = 1.0f;
-    [SerializeField]
-    private Color m_uiColor;
 
-    private bool m_initialised;
     private GameObject m_crosshairParent;
     private List<SpriteRenderer> m_createdAimDots = new List<SpriteRenderer>();
     private List<SpriteRenderer> m_createdCrosshairs = new List<SpriteRenderer>();
-
-    public bool HasCreated()
+    
+    public Transform GetDotTransform(int dotIndex)
     {
-        return m_initialised;
-    }
-
-    public void SetShipAim(Vector2 screenPosition)
-    {
-        Vector3 position = m_uiCamera.ScreenToWorldPoint(screenPosition);
-        position.z = 50.0f;
-        m_crosshairParent.transform.position = position;
+        return m_createdAimDots[dotIndex].transform;
     }
     
-    public void SetDotPosition(int dotIndex, Vector2 screenPosition)
-    {
-        Vector3 position = m_uiCamera.ScreenToWorldPoint(screenPosition);
-        position.z = 50.0f;
-        m_createdAimDots[dotIndex].transform.position = position;
-    }
-    
-    public void RefreshCrosshairs(int numberOfDots)
+    public void RefreshCrosshairs(int numberOfDots, Color uiColor)
     {
         Destroy(m_crosshairParent);
         
@@ -75,7 +56,7 @@ public class CrosshairLayout : MonoBehaviour
 
             SpriteRenderer sr = go.AddComponent<SpriteRenderer>();
             sr.sprite = m_dotSprite;
-            sr.color = m_uiColor;
+            sr.color = uiColor;
             sr.drawMode = SpriteDrawMode.Sliced;
             sr.size = new Vector2(m_lineThickness, m_lineLength);
             
@@ -89,11 +70,9 @@ public class CrosshairLayout : MonoBehaviour
             go.transform.parent = transform;
             SpriteRenderer sr = go.AddComponent<SpriteRenderer>();
             sr.sprite = m_dotSprite;
-            sr.color = m_uiColor;
+            sr.color = uiColor;
             
             m_createdAimDots.Add(sr);
         }
-        
-        m_initialised = true;
     }
 }
