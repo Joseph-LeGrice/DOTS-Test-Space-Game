@@ -2,6 +2,7 @@ using Unity.Collections;
 using Unity.Entities;
 using Unity.Mathematics;
 using Unity.Transforms;
+using Unity.VisualScripting;
 
 public struct Gimbal : IComponentData
 {
@@ -27,28 +28,31 @@ public partial struct ShipHardpointGimbalingSystem : ISystem
                 {
                     ref ShipHardpointBufferElement hardpoint = ref shipHardpointBuffer.ElementAt(i);
                     LocalToWorld l2wHardpoint = localToWorldLookup[hardpoint.Self];
-                    float3 worldDir = math.normalize(l2wTarget.Position - l2wHardpoint.Position);
-                    float angle = math.radians(math.acos(math.dot(l2wHardpoint.Forward, worldDir)));
+                    float3 worldDir = l2wTarget.Position - l2wHardpoint.Position;
+                    float3 worldDirNormalised = math.normalize(worldDir);
+                    float angle = math.degrees(math.acos(math.dot(l2wHardpoint.Forward, worldDirNormalised)));
 
                     float3 targetLocalForward = new float3(0.0f, 0.0f, 1.0f);
-                    if (angle < 30.0f)
+                    if (angle < 45.0f)
                     {
-                        LocalTransform ltTarget = localTransformLookup[hardpoint.Self];
-                        targetLocalForward = ltTarget.TransformDirection(worldDir);
+                        targetLocalForward = l2wHardpoint.Value.InverseTransformDirection(worldDirNormalised);
                     }
                     hardpoint.TargetLocalForward = targetLocalForward;
+                    hardpoint.AimDistance = math.length(worldDir);
                 }
             }
             else
             {
                 for (int i = 0; i < shipHardpointBuffer.Length; i++)
                 {
-                    shipHardpointBuffer.ElementAt(i).TargetLocalForward = new float3(0.0f, 0.0f, 1.0f);
+                    ref ShipHardpointBufferElement hardpoint = ref shipHardpointBuffer.ElementAt(i);
+                    hardpoint.AimDistance = 500.0f;
+                    hardpoint.TargetLocalForward = new float3(0.0f, 0.0f, 1.0f);
                 }
             }
         }
 
-        float adjustSpeed = math.radians(360.0f);
+        float adjustSpeed = math.radians(45.0f);
         foreach (var shipHardpointBuffer in SystemAPI.Query<DynamicBuffer<ShipHardpointBufferElement>>())
         {
             foreach (var hardpoint in shipHardpointBuffer)
@@ -56,14 +60,22 @@ public partial struct ShipHardpointGimbalingSystem : ISystem
                 if (gimbalLookup.HasComponent(hardpoint.Self))
                 {
                     Gimbal hardpointGimbal = gimbalLookup[hardpoint.Self];
-                    LocalTransform ltHardpoint = localTransformLookup[hardpointGimbal.GimbalEntity];
-                    // quaternion fromToRotation = PhysicsHelpers.GetFromToRotation(ltHardpoint.Forward(), hardpoint.TargetLocalForward);
-                    // float3 rotationAxis = math.normalize(fromToRotation.value.xyz);
-                    // quaternion rotation = quaternion.AxisAngle(rotationAxis, math.min(adjustSpeed * SystemAPI.Time.DeltaTime, fromToRotation.value.w));
-                    // float3 newForward = math.mul(rotation, ltHardpoint.Forward());
-                    // ltHardpoint.Rotation = quaternion.LookRotation(newForward, new float3(0, 1, 0));
-                    ltHardpoint.Rotation = quaternion.LookRotation(hardpoint.TargetLocalForward, new float3(0, 1, 0));
-                    localTransformLookup[hardpointGimbal.GimbalEntity] = ltHardpoint;
+                    // LocalToWorld l2wGimbal = localToWorldLookup[hardpointGimbal.GimbalEntity];
+                    LocalTransform ltGimbal = localTransformLookup[hardpointGimbal.GimbalEntity];
+                    
+                    // quaternion fromToRotation = PhysicsHelpers.GetFromToRotation(ltGimbal.Forward(), hardpoint.TargetLocalForward);
+                    // ltGimbal.Rotation = math.mul(ltGimbal.Rotation, fromToRotation);
+                    
+                    // fromToRotation.value.w = math.min(fromToRotation.value.w, adjustSpeed * SystemAPI.Time.DeltaTime);
+                    //
+                    // float3 newForward = math.rotate(fromToRotation, ltGimbal.Forward());
+                    // newForward = ltGimbal.TransformDirection(newForward);
+                    //
+                    // ltGimbal.Rotation = quaternion.LookRotation(newForward, new float3(0, 1, 0));
+                    
+                    ltGimbal.Rotation = quaternion.LookRotation(hardpoint.TargetLocalForward, new float3(0, 1, 0));
+                    
+                    localTransformLookup[hardpointGimbal.GimbalEntity] = ltGimbal;
                 }
             }
         }

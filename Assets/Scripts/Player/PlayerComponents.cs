@@ -89,5 +89,6 @@ public struct ShipHardpointBufferElement : IBufferElementData
 {
     public bool Enabled;
     public Entity Self;
+    public float AimDistance;
     public float3 TargetLocalForward;
 }

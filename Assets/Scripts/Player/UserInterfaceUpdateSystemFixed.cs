@@ -21,6 +21,7 @@ public partial class UserInterfaceUpdateSystemFixed : SystemBase
         Dependency.Complete();
 
         ComponentLookup<LocalToWorld> localToWorldLookup = SystemAPI.GetComponentLookup<LocalToWorld>();
+        ComponentLookup<Gimbal> gimbalLookup = SystemAPI.GetComponentLookup<Gimbal>();
         foreach (PlayerUIAspectFixed player in SystemAPI.Query<PlayerUIAspectFixed>())
         {
             PlayerManagedAccess managedAccess = SystemAPI.ManagedAPI.GetComponent<PlayerManagedAccess>(player.Self);
@@ -32,16 +33,25 @@ public partial class UserInterfaceUpdateSystemFixed : SystemBase
                 playerUi.Initialize(player.ShipHardpoints.Length);
             }
 
-            float aimDistance = 500.0f;
+            float avgAimDistance = 0.0f;
             for (int i = 0; i < player.ShipHardpoints.Length; i++)
             {
-                LocalToWorld l2w = localToWorldLookup[player.ShipHardpoints[i].Self];
-                Vector3 aimPositionWorld = l2w.Position + aimDistance * l2w.Forward;
+                ShipHardpointBufferElement hardpoint = player.ShipHardpoints[i];
+                LocalToWorld l2w = localToWorldLookup[hardpoint.Self];
+                if (gimbalLookup.HasComponent(hardpoint.Self))
+                {
+                    l2w = localToWorldLookup[gimbalLookup[hardpoint.Self].GimbalEntity];
+                }
+                Vector3 aimPositionWorld = l2w.Position + hardpoint.AimDistance * l2w.Forward;
                 playerUi.SetHardpointAim(i, aimPositionWorld);
+                
+                avgAimDistance += hardpoint.AimDistance;
             }
 
+            avgAimDistance /= player.ShipHardpoints.Length;
+
             LocalToWorld shipLocalToWorld = localToWorldLookup[player.Self];
-            Vector3 shipForwardWorld = shipLocalToWorld.Position + aimDistance * shipLocalToWorld.Forward;
+            Vector3 shipForwardWorld = shipLocalToWorld.Position + avgAimDistance * shipLocalToWorld.Forward;
             playerUi.SetShipAim(shipForwardWorld);
         }
     }

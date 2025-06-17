@@ -346,8 +346,8 @@ MonoBehaviour:
   m_userInterface: {fileID: 1447984277}
   m_mainCamera: {fileID: 330585543}
   m_adsCamera: {fileID: 1246461136}
-  m_lookSensitivity: 100
-  m_lookSensitivityADS: 100
+  m_lookSensitivity: 10
+  m_lookSensitivityADS: 10
   m_rollSensitivity: 1
 --- !u!1 &330585543
 GameObject:

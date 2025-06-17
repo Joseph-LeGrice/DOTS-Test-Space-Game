@@ -39,7 +39,10 @@ class ProjectileSourceBaker : MonoBehaviour
                 NextSpawnTime = 0.0f
             });
             
-            AddComponent(mainEntity, new Gimbal() { GimbalEntity = GetEntity(authoring.projectileSourceConfiguration.GimbalHierarchy, TransformUsageFlags.Dynamic)});
+            AddComponent(mainEntity, new Gimbal()
+            {
+                GimbalEntity = GetEntity(authoring.projectileSourceConfiguration.GimbalHierarchy, TransformUsageFlags.Dynamic)
+            });
         }
     }
 }

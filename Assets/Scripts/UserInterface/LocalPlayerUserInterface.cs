@@ -31,7 +31,7 @@ public class LocalPlayerUserInterface : MonoBehaviour
         Vector3 screenPosition = m_playerCamera.WorldToScreenPoint(worldPosition);
         Vector3 position = m_uiCamera.ScreenToWorldPoint(screenPosition);
         isVisible = position.z > 0.0f;
-        position.z = 50.0f;
+        // position.z = 50.0f;
         return position;
     }
     
