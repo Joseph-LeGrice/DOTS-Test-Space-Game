@@ -185,7 +185,6 @@ MonoBehaviour:
     Size: 3.75
     MinRotateSpeed: 10
     MaxRotateSpeed: 15
-  AsteroidFieldMinimumSpacing: 50
 --- !u!4 &1518708408
 Transform:
   m_ObjectHideFlags: 0

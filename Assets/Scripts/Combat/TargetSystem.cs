@@ -6,17 +6,18 @@ using Unity.Transforms;
 
 public struct Targetable : IComponentData
 {
-    // Add stealth / team stuff here eventually
 }
 
 public struct TargetDetector : IComponentData
 {
-    public float Range;
+    public float RangeSquared;
 }
 
 public struct DetectedTarget : IBufferElementData
 {
     public Entity TargetableEntity;
+    public bool IsSelected;
+    public bool CanTargetAhead;
 }
 
 [BurstCompile]
@@ -26,17 +27,56 @@ public partial struct TargetSystem : ISystem
     [BurstCompile]
     public void OnUpdate(ref SystemState state)
     {
+        ComponentLookup<LocalToWorld> localToWorldLookup = SystemAPI.GetComponentLookup<LocalToWorld>();
         foreach (var (td, targetBuffer, localToWorldSelf, entitySelf) in SystemAPI.Query<RefRO<TargetDetector>, DynamicBuffer<DetectedTarget>, RefRO<LocalToWorld>>().WithEntityAccess())
         {
-            targetBuffer.Clear();
+            int numElements = targetBuffer.Length;
+            for (int i = 0; i < numElements; i++)
+            {
+                bool shouldRemove = false;
+                if (!state.EntityManager.Exists(targetBuffer[i].TargetableEntity))
+                {
+                    shouldRemove = true;
+                }
+                else
+                {
+                    var l2w = localToWorldLookup[targetBuffer[i].TargetableEntity];
+                    float distSq = math.lengthsq(l2w.Position - localToWorldSelf.ValueRO.Position);
+                    if (distSq > td.ValueRO.RangeSquared)
+                    {
+                        shouldRemove = true;
+                    }
+                }
+
+                if (shouldRemove)
+                {
+                    targetBuffer.RemoveAtSwapBack(i);
+                    i--;
+                    numElements--;
+                }
+            }
+            
             foreach (var (targetable, localToWorldTarget, entityTarget) in SystemAPI.Query<RefRO<Targetable>, RefRO<LocalToWorld>>().WithEntityAccess())
             {
                 if (entitySelf != entityTarget)
                 {
                     float sqDist = math.lengthsq(localToWorldSelf.ValueRO.Position - localToWorldTarget.ValueRO.Position);
-                    if (sqDist <= math.square(td.ValueRO.Range))
+                    if (sqDist <= td.ValueRO.RangeSquared)
                     {
-                        targetBuffer.Add(new DetectedTarget() { TargetableEntity = entityTarget });
+                        bool canAdd = true;
+                        
+                        foreach (DetectedTarget currentTargets in targetBuffer)
+                        {
+                            if (currentTargets.TargetableEntity == entityTarget)
+                            {
+                                canAdd = false;
+                            }
+                        }
+
+                        if (canAdd)
+                        {
+                            targetBuffer.Add(new DetectedTarget() { TargetableEntity = entityTarget });
+                        }
                     }
                 }
             }

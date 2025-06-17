@@ -4,6 +4,7 @@ using UnityEngine;
 public class TargetData
 {
     public bool IsTargeting;
+    public bool CanTargetAhead;
     public Vector3 Position;
 }
 
@@ -12,7 +13,7 @@ public class TargetDisplay : MonoBehaviour
     [SerializeField]
     private GameObject m_prefab;
 
-    private List<Transform> m_createdTargets = new List<Transform>();
+    private List<TargetInstance> m_createdTargets = new List<TargetInstance>();
     
     public void UpdateTargets(List<TargetData> targets)
     {
@@ -24,7 +25,7 @@ public class TargetDisplay : MonoBehaviour
             GameObject instance = Instantiate(m_prefab, transform);
             instance.layer = gameObject.layer;
             
-            m_createdTargets.Add(instance.transform);
+            m_createdTargets.Add(instance.GetComponent<TargetInstance>());
         }
         
         int toRemove = Mathf.Abs(Mathf.Min(diff, 0));
@@ -36,6 +37,8 @@ public class TargetDisplay : MonoBehaviour
 
         for (int i = 0; i < targets.Count; i++)
         {
+            m_createdTargets[i].SetSelected(targets[i].IsTargeting);
+            m_createdTargets[i].SetCanTargetAhead(targets[i].CanTargetAhead);
             m_createdTargets[i].transform.position = targets[i].Position;
         }
     }

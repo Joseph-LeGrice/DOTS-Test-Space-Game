@@ -14,6 +14,7 @@ public readonly partial struct PlayerAspect : IAspect
     public readonly RefRW<PhysicsMass> PhysicsMass;
     public readonly RefRO<LocalToWorld> LocalToWorld;
     public readonly DynamicBuffer<ShipHardpointBufferElement> ShipHardpoints;
+    public readonly DynamicBuffer<DetectedTarget> DetectedTargets;
 }
 
 partial class PlayerInputSystem : SystemBase
@@ -46,7 +47,9 @@ partial class PlayerInputSystem : SystemBase
                     SystemAPI.SetComponent(shipHardpoint.Self, gravityTether);
                 }
             }
-            
+
+            UpdateTargets(player, playerInput);
+
             player.PlayerBoostState.ValueRW.UpdateBoost(SystemAPI.Time.DeltaTime, player.PlayerData.ValueRO.BoostRechargeTime);
             if (playerInput.IsBoosting)
             {
@@ -68,7 +71,50 @@ partial class PlayerInputSystem : SystemBase
             player.Velocity.ValueRW.Angular = angularVelocity; // * angularVelocityModifier;
         }
     }
-    
+
+    private void UpdateTargets(PlayerAspect player, InputHandler playerInput)
+    {
+        var localToWorldLookup = SystemAPI.GetComponentLookup<LocalToWorld>();
+        
+        float threshold = 0.99f;
+        int bestTargetAhead = -1;
+        float bestDot = 0.0f;
+        for (int i=0; i< player.DetectedTargets.Length; i++)
+        {
+            DetectedTarget target = player.DetectedTargets[i];
+            if (EntityManager.Exists(target.TargetableEntity))
+            {
+                LocalToWorld targetTransform = localToWorldLookup[target.TargetableEntity];
+                float3 deltaNormalised = math.normalize(targetTransform.Position - player.LocalToWorld.ValueRO.Position);
+                float dot = math.dot(player.LocalToWorld.ValueRO.Forward, deltaNormalised);
+                if (dot > bestDot && dot >= threshold)
+                {
+                    bestDot = dot;
+                    bestTargetAhead = i;
+                }
+            }
+        }
+            
+        var detectedTargets = player.DetectedTargets;
+        for (int i = 0; i < player.DetectedTargets.Length; i++)
+        {
+            var t = player.DetectedTargets[i];
+            t.CanTargetAhead = i == bestTargetAhead;
+            if (playerInput.TargetSelectAhead)
+            {
+                if (i == bestTargetAhead)
+                {
+                    t.IsSelected = !t.IsSelected;
+                }
+                else
+                {
+                    t.IsSelected = false;
+                }
+            }
+            detectedTargets[i] = t;
+        }
+    }
+
     private bool GetAttachedMass(Entity ownerEntity, out PhysicsMass attachedPhysicsMass)
     {
         var physicsMassLookup = SystemAPI.GetComponentLookup<PhysicsMass>();
@@ -197,6 +243,7 @@ partial class PlayerInputSystem : SystemBase
         
         angularVelocity.x = math.sign(angularVelocity.x) * math.min(math.abs(angularVelocity.x), math.radians(thrusterSetup.MaxTurnSpeed));
         angularVelocity.y = math.sign(angularVelocity.y) * math.min(math.abs(angularVelocity.y), math.radians(thrusterSetup.MaxTurnSpeed));
+        
         angularVelocity.z = math.sign(angularVelocity.z) * math.min(math.abs(angularVelocity.z), math.radians(thrusterSetup.MaxRollSpeed));
 
         if (playerInput.AngularDampersActive)

@@ -48,10 +48,12 @@ public partial class UserInterfaceUpdateSystem : SystemBase
             List<TargetData> targetData = new List<TargetData>();
             foreach (DetectedTarget dt in player.DetectedTargets)
             {
+                var l2wTarget = localToWorldLookup[dt.TargetableEntity];
                 targetData.Add(new TargetData()
                 {
-                    IsTargeting = false,
-                    Position = localToWorldLookup[dt.TargetableEntity].Position,
+                    IsTargeting = dt.IsSelected,
+                    Position = l2wTarget.Position,
+                    CanTargetAhead = dt.CanTargetAhead,
                 });
             }
             playerUi.SetTargets(targetData);

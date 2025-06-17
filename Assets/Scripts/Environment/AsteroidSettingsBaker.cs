@@ -2,10 +2,6 @@ using System.Collections.Generic;
 using Unity.Entities;
 using UnityEngine;
 
-public struct AsteroidFieldSettings : IComponentData
-{
-}
-
 public struct AsteroidTypeBufferData : IBufferElementData
 {
     public Entity Prefab;
@@ -23,14 +19,12 @@ public class AsteroidSettingsBaker : MonoBehaviour
     }
     
     public List<MonoAsteroidData> AsteroidTypes;
-    public float AsteroidFieldMinimumSpacing;
     
     public class Baker : Baker<AsteroidSettingsBaker>
     {
         public override void Bake(AsteroidSettingsBaker authoring)
         {
             Entity asteroidSettingsEntity = GetEntity(TransformUsageFlags.None);
-            AddComponent(asteroidSettingsEntity, new AsteroidFieldSettings());
             
             DynamicBuffer<AsteroidTypeBufferData> asteroidTypes = AddBuffer<AsteroidTypeBufferData>(asteroidSettingsEntity);
             for (int i=0; i<authoring.AsteroidTypes.Count; i++)

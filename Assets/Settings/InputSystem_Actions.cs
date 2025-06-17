@@ -153,6 +153,15 @@ public partial class @InputSystem_Actions: IInputActionCollection2, IDisposable
                     ""processors"": """",
                     ""interactions"": """",
                     ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""SelectAhead"",
+                    ""type"": ""Button"",
+                    ""id"": ""77d286ac-55d5-4655-ba6f-85aa33a334c9"",
+                    ""expectedControlType"": """",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
                 }
             ],
             ""bindings"": [
@@ -318,6 +327,17 @@ public partial class @InputSystem_Actions: IInputActionCollection2, IDisposable
                     ""processors"": """",
                     ""groups"": "";Keyboard&Mouse"",
                     ""action"": ""ToggleVelocityDampers"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""2980e329-d6c5-4758-bab3-5152302b9dbc"",
+                    ""path"": ""<Mouse>/backButton"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": "";Keyboard&Mouse"",
+                    ""action"": ""SelectAhead"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
                 }
@@ -912,6 +932,7 @@ public partial class @InputSystem_Actions: IInputActionCollection2, IDisposable
         m_Player_ADS = m_Player.FindAction("ADS", throwIfNotFound: true);
         m_Player_Boost = m_Player.FindAction("Boost", throwIfNotFound: true);
         m_Player_ToggleVelocityDampers = m_Player.FindAction("ToggleVelocityDampers", throwIfNotFound: true);
+        m_Player_SelectAhead = m_Player.FindAction("SelectAhead", throwIfNotFound: true);
         // UI
         m_UI = asset.FindActionMap("UI", throwIfNotFound: true);
         m_UI_Navigate = m_UI.FindAction("Navigate", throwIfNotFound: true);
@@ -1012,6 +1033,7 @@ public partial class @InputSystem_Actions: IInputActionCollection2, IDisposable
     private readonly InputAction m_Player_ADS;
     private readonly InputAction m_Player_Boost;
     private readonly InputAction m_Player_ToggleVelocityDampers;
+    private readonly InputAction m_Player_SelectAhead;
     /// <summary>
     /// Provides access to input actions defined in input action map "Player".
     /// </summary>
@@ -1051,6 +1073,10 @@ public partial class @InputSystem_Actions: IInputActionCollection2, IDisposable
         /// Provides access to the underlying input action "Player/ToggleVelocityDampers".
         /// </summary>
         public InputAction @ToggleVelocityDampers => m_Wrapper.m_Player_ToggleVelocityDampers;
+        /// <summary>
+        /// Provides access to the underlying input action "Player/SelectAhead".
+        /// </summary>
+        public InputAction @SelectAhead => m_Wrapper.m_Player_SelectAhead;
         /// <summary>
         /// Provides access to the underlying input action map instance.
         /// </summary>
@@ -1098,6 +1124,9 @@ public partial class @InputSystem_Actions: IInputActionCollection2, IDisposable
             @ToggleVelocityDampers.started += instance.OnToggleVelocityDampers;
             @ToggleVelocityDampers.performed += instance.OnToggleVelocityDampers;
             @ToggleVelocityDampers.canceled += instance.OnToggleVelocityDampers;
+            @SelectAhead.started += instance.OnSelectAhead;
+            @SelectAhead.performed += instance.OnSelectAhead;
+            @SelectAhead.canceled += instance.OnSelectAhead;
         }
 
         /// <summary>
@@ -1130,6 +1159,9 @@ public partial class @InputSystem_Actions: IInputActionCollection2, IDisposable
             @ToggleVelocityDampers.started -= instance.OnToggleVelocityDampers;
             @ToggleVelocityDampers.performed -= instance.OnToggleVelocityDampers;
             @ToggleVelocityDampers.canceled -= instance.OnToggleVelocityDampers;
+            @SelectAhead.started -= instance.OnSelectAhead;
+            @SelectAhead.performed -= instance.OnSelectAhead;
+            @SelectAhead.canceled -= instance.OnSelectAhead;
         }
 
         /// <summary>
@@ -1479,6 +1511,13 @@ public partial class @InputSystem_Actions: IInputActionCollection2, IDisposable
         /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
         /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
         void OnToggleVelocityDampers(InputAction.CallbackContext context);
+        /// <summary>
+        /// Method invoked when associated input action "SelectAhead" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
+        /// </summary>
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.started" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
+        void OnSelectAhead(InputAction.CallbackContext context);
     }
     /// <summary>
     /// Interface to implement callback methods for all input action callbacks associated with input actions defined by "UI" which allows adding and removing callbacks.

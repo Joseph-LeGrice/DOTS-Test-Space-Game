@@ -47,7 +47,7 @@ class PlayerBaker : MonoBehaviour
             }
             
             AddComponent<Targetable>(mainEntity);
-            AddComponent<TargetDetector>(mainEntity, new TargetDetector() { Range = 500.0f});
+            AddComponent<TargetDetector>(mainEntity, new TargetDetector() { RangeSquared = Mathf.Pow(500.0f, 2.0f)});
             AddBuffer<DetectedTarget>(mainEntity);
         }
     }

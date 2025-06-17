@@ -5,7 +5,7 @@ using Unity.Jobs;
 using Unity.Physics;
 using Unity.Transforms;
 
-// [BurstCompile]
+[BurstCompile]
 public struct CreateAsteroidsJob : IJobParallelFor
 {
     public EntityCommandBuffer.ParallelWriter m_entityCommandBuffer;
