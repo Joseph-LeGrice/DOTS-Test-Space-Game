@@ -1,6 +1,7 @@
 using Unity.Entities;
 using UnityEngine;
 
+
 class PlayerBaker : MonoBehaviour
 {
     public ThrusterSetup DefaultMovement;

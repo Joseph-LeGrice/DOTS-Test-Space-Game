@@ -89,4 +89,5 @@ public struct ShipHardpointBufferElement : IBufferElementData
 {
     public bool Enabled;
     public Entity Self;
+    public float3 TargetLocalForward;
 }

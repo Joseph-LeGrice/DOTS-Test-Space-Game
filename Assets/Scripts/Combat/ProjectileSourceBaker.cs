@@ -38,6 +38,8 @@ class ProjectileSourceBaker : MonoBehaviour
                 RelatedRigidbodyEntity = rigidbodyEntity,
                 NextSpawnTime = 0.0f
             });
+            
+            AddComponent(mainEntity, new Gimbal() { GimbalEntity = GetEntity(authoring.projectileSourceConfiguration.GimbalHierarchy, TransformUsageFlags.Dynamic)});
         }
     }
 }
