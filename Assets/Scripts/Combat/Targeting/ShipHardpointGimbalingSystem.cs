@@ -60,20 +60,12 @@ public partial struct ShipHardpointGimbalingSystem : ISystem
                 if (gimbalLookup.HasComponent(hardpoint.Self))
                 {
                     Gimbal hardpointGimbal = gimbalLookup[hardpoint.Self];
-                    // LocalToWorld l2wGimbal = localToWorldLookup[hardpointGimbal.GimbalEntity];
                     LocalTransform ltGimbal = localTransformLookup[hardpointGimbal.GimbalEntity];
                     
-                    // quaternion fromToRotation = PhysicsHelpers.GetFromToRotation(ltGimbal.Forward(), hardpoint.TargetLocalForward);
-                    // ltGimbal.Rotation = math.mul(ltGimbal.Rotation, fromToRotation);
-                    
+                    quaternion fromToRotation = PhysicsHelpers.GetFromToRotation(ltGimbal.Forward(), hardpoint.TargetLocalForward);
                     // fromToRotation.value.w = math.min(fromToRotation.value.w, adjustSpeed * SystemAPI.Time.DeltaTime);
-                    //
-                    // float3 newForward = math.rotate(fromToRotation, ltGimbal.Forward());
-                    // newForward = ltGimbal.TransformDirection(newForward);
-                    //
-                    // ltGimbal.Rotation = quaternion.LookRotation(newForward, new float3(0, 1, 0));
-                    
-                    ltGimbal.Rotation = quaternion.LookRotation(hardpoint.TargetLocalForward, new float3(0, 1, 0));
+                    float3 newForward = math.rotate(fromToRotation, ltGimbal.Forward());
+                    ltGimbal.Rotation = quaternion.LookRotation(newForward, new float3(0, 1, 0));
                     
                     localTransformLookup[hardpointGimbal.GimbalEntity] = ltGimbal;
                 }
