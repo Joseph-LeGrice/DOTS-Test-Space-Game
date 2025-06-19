@@ -1,3 +1,4 @@
+using Unity.Burst;
 using Unity.Collections;
 using Unity.Entities;
 using Unity.Mathematics;
@@ -12,6 +13,7 @@ public struct Gimbal : IComponentData
 
 public partial struct ShipHardpointGimbalingSystem : ISystem
 {
+    [BurstCompile]
     public void OnUpdate(ref SystemState state)
     {
         state.Dependency.Complete();
@@ -38,26 +40,30 @@ public partial struct ShipHardpointGimbalingSystem : ISystem
                     float3 worldDir = l2wTarget.Position - l2wHardpoint.Position;
 
                     float3 aimAhead = new float3();
-                    if (physicsVelocityLookup.HasComponent(self) && projectileSourceConfigLookup.HasComponent(hardpoint.ValueRO.WeaponInstanceEntity))
+                    if (projectileSourceConfigLookup.HasComponent(hardpoint.ValueRO.WeaponInstanceEntity))
                     {
                         // todo: work on aim ahead
                         var config = projectileSourceConfigLookup[hardpoint.ValueRO.WeaponInstanceEntity];
-                        
-                        PhysicsVelocity velocitySelf = physicsVelocityLookup[self];
-                        float likeness = math.dot(math.normalize(worldDir), velocitySelf.Linear);
 
                         float distanceToTarget = math.distance(l2wTarget.Position, localToWorldLookup[config.FireNode].Position);
-                        float timeToTarget = distanceToTarget / (config.ProjectileSpeed + likeness);
+                        float timeToTarget = distanceToTarget / config.ProjectileSpeed;
+                        
+                        if (physicsVelocityLookup.HasComponent(self))
+                        {
+                            PhysicsVelocity velocitySelf = physicsVelocityLookup[self];
+                            float likeness = math.dot(math.normalize(worldDir), velocitySelf.Linear);
+                            timeToTarget = distanceToTarget / (config.ProjectileSpeed + likeness);
 
-                        float remove = math.sqrt(math.lengthsq(velocitySelf.Linear) - math.square(likeness));
-                        float3 dir = math.cross(math.normalize(worldDir), math.cross(math.normalize(worldDir), math.normalizesafe(velocitySelf.Linear)));
-                        aimAhead += remove * dir * timeToTarget;
-
-                        // if (physicsVelocityLookup.HasComponent(selectedTarget.TargetableEntity))
-                        // {
-                        //     PhysicsVelocity velocityTarget = physicsVelocityLookup[selectedTarget.TargetableEntity];
-                        //     aimAhead += math.normalizesafe(velocityTarget.Linear) * timeToTarget;
-                        // }
+                            float remove = math.sqrt(math.lengthsq(velocitySelf.Linear) - math.square(likeness));
+                            float3 dir = math.cross(math.normalize(worldDir), math.cross(math.normalize(worldDir), math.normalizesafe(velocitySelf.Linear)));
+                            aimAhead += remove * dir * timeToTarget;
+                        }
+                        
+                        if (physicsVelocityLookup.HasComponent(selectedTarget.TargetableEntity))
+                        {
+                            PhysicsVelocity velocityTarget = physicsVelocityLookup[selectedTarget.TargetableEntity];
+                            aimAhead += velocityTarget.Linear * timeToTarget;
+                        }
                     }
                     
                     worldDir += aimAhead;
