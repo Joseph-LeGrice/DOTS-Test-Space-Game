@@ -50,7 +50,7 @@ MonoBehaviour:
   ImpactEffectPrefab: {fileID: 938765056090513820, guid: 1faf09f3a69866c40870a6f113a32889, type: 3}
   GimbalHierarchy: {fileID: 3905336826315032352}
   FireNode: {fileID: 9092198818562624713}
-  ProjectileSpeed: 250
+  ProjectileSpeed: 500
   ImpactDamage: 10
   FireRate: 0.2
   Lifetime: 3
