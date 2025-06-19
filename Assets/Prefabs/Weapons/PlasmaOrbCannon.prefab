@@ -45,6 +45,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: bc83f90dfd99da04ea99249dca8d018c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  RelatedHardpoint: {fileID: 0}
   ProjectilePrefab: {fileID: 2420654463176376494, guid: 2916e4435ce05c74897ee1880b0f3fc0, type: 3}
   ImpactEffectPrefab: {fileID: 938765056090513820, guid: 1faf09f3a69866c40870a6f113a32889, type: 3}
   GimbalHierarchy: {fileID: 3905336826315032352}

@@ -37,12 +37,11 @@ class PlayerBaker : MonoBehaviour
             });
             AddComponent<PlayerBoosterState>(mainEntity);
             
-            DynamicBuffer<ShipHardpointBufferElement> shbe = AddBuffer<ShipHardpointBufferElement>(mainEntity);
+            DynamicBuffer<ShipHardpointReference> shbe = AddBuffer<ShipHardpointReference>(mainEntity);
             foreach (GameObject sh in authoring.ShipHardpoints)
             {
-                shbe.Add(new ShipHardpointBufferElement()
+                shbe.Add(new ShipHardpointReference()
                 {
-                    Enabled = sh.activeSelf,
                     Self = GetEntity(sh, TransformUsageFlags.Dynamic),
                 });
             }

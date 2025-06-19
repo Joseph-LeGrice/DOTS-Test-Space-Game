@@ -1,6 +1,7 @@
 using Unity.Collections;
 using Unity.Entities;
 using Unity.Mathematics;
+using Unity.Physics;
 using Unity.Transforms;
 using Unity.VisualScripting;
 
@@ -18,7 +19,9 @@ public partial struct ShipHardpointGimbalingSystem : ISystem
         ComponentLookup<Gimbal> gimbalLookup = SystemAPI.GetComponentLookup<Gimbal>();
         ComponentLookup<LocalToWorld> localToWorldLookup = SystemAPI.GetComponentLookup<LocalToWorld>();
         ComponentLookup<LocalTransform> localTransformLookup = SystemAPI.GetComponentLookup<LocalTransform>();
-        foreach (var (shipHardpointBuffer, targetBuffer) in SystemAPI.Query<DynamicBuffer<ShipHardpointBufferElement>, DynamicBuffer<DetectedTarget>>())
+        ComponentLookup<ShipHardpointInstance> hardpointInstanceLookup = SystemAPI.GetComponentLookup<ShipHardpointInstance>();
+        
+        foreach (var (shipHardpointBuffer, targetBuffer, velocity) in SystemAPI.Query<DynamicBuffer<ShipHardpointReference>, DynamicBuffer<DetectedTarget>, RefRO<PhysicsVelocity>>())
         {
             if (GetSelectedTarget(ref state, targetBuffer, out DetectedTarget selectedTarget))
             {
@@ -26,9 +29,17 @@ public partial struct ShipHardpointGimbalingSystem : ISystem
                 
                 for (int i = 0; i < shipHardpointBuffer.Length; i++)
                 {
-                    ref ShipHardpointBufferElement hardpoint = ref shipHardpointBuffer.ElementAt(i);
-                    LocalToWorld l2wHardpoint = localToWorldLookup[hardpoint.Self];
+                    ref ShipHardpointReference hardpointReference = ref shipHardpointBuffer.ElementAt(i);
+                    RefRW<ShipHardpointInstance> hardpoint = hardpointInstanceLookup.GetRefRW(hardpointReference.Self);
+                    
+                    LocalToWorld l2wHardpoint = localToWorldLookup[hardpoint.ValueRO.WeaponInstanceEntity];
                     float3 worldDir = l2wTarget.Position - l2wHardpoint.Position;
+
+                    float3 aimAhead = new float3();
+                    aimAhead += velocity.ValueRO.Linear * SystemAPI.Time.DeltaTime;
+                    
+                    worldDir += aimAhead;
+                    
                     float3 worldDirNormalised = math.normalize(worldDir);
                     float angle = math.degrees(math.acos(math.dot(l2wHardpoint.Forward, worldDirNormalised)));
 
@@ -37,29 +48,32 @@ public partial struct ShipHardpointGimbalingSystem : ISystem
                     {
                         targetLocalForward = l2wHardpoint.Value.InverseTransformDirection(worldDirNormalised);
                     }
-                    hardpoint.TargetLocalForward = targetLocalForward;
-                    hardpoint.AimDistance = math.length(worldDir);
+                    hardpoint.ValueRW.TargetLocalForward = targetLocalForward;
+                    hardpoint.ValueRW.AimDistance = math.length(worldDir);
                 }
             }
             else
             {
                 for (int i = 0; i < shipHardpointBuffer.Length; i++)
                 {
-                    ref ShipHardpointBufferElement hardpoint = ref shipHardpointBuffer.ElementAt(i);
-                    hardpoint.AimDistance = 500.0f;
-                    hardpoint.TargetLocalForward = new float3(0.0f, 0.0f, 1.0f);
+                    ref ShipHardpointReference hardpointReference = ref shipHardpointBuffer.ElementAt(i);
+                    RefRW<ShipHardpointInstance> hardpoint = hardpointInstanceLookup.GetRefRW(hardpointReference.Self);
+                    
+                    hardpoint.ValueRW.AimDistance = 500.0f;
+                    hardpoint.ValueRW.TargetLocalForward = new float3(0.0f, 0.0f, 1.0f);
                 }
             }
         }
 
         float adjustSpeed = math.radians(45.0f);
-        foreach (var shipHardpointBuffer in SystemAPI.Query<DynamicBuffer<ShipHardpointBufferElement>>())
+        foreach (var shipHardpointBuffer in SystemAPI.Query<DynamicBuffer<ShipHardpointReference>>())
         {
-            foreach (var hardpoint in shipHardpointBuffer)
+            foreach (ShipHardpointReference hardpointReference in shipHardpointBuffer)
             {
-                if (gimbalLookup.HasComponent(hardpoint.Self))
+                ShipHardpointInstance hardpoint = hardpointInstanceLookup[hardpointReference.Self];
+                if (gimbalLookup.HasComponent(hardpoint.WeaponInstanceEntity))
                 {
-                    Gimbal hardpointGimbal = gimbalLookup[hardpoint.Self];
+                    Gimbal hardpointGimbal = gimbalLookup[hardpoint.WeaponInstanceEntity];
                     LocalTransform ltGimbal = localTransformLookup[hardpointGimbal.GimbalEntity];
                     
                     quaternion fromToRotation = PhysicsHelpers.GetFromToRotation(ltGimbal.Forward(), hardpoint.TargetLocalForward);

@@ -18,37 +18,37 @@ public partial struct CreateProjectileJob : IJobEntity
 {
     public EntityCommandBuffer.ParallelWriter m_ecbWriter;
     [ReadOnly]
-    public ComponentLookup<ProjectileSourceConfiguration> m_sourceConfigLookup;
-    [ReadOnly]
     public ComponentLookup<PhysicsVelocity> m_velocityLookup;
     [ReadOnly]
     public ComponentLookup<LocalToWorld> m_localToWorldLookup;
+    [ReadOnly]
+    public ComponentLookup<ShipHardpointInstance> m_hardpointLookup;
     public float ElapsedTime;
     
-    private void Execute(ref ProjectileSource spawner)
+    private void Execute(ref ProjectileSourceData spawner, ref ProjectileSourceConfiguration config)
     {
-        if (spawner.IsFiring && spawner.ProjectileWeaponEntity != Entity.Null && spawner.NextSpawnTime < ElapsedTime)
+        var hardpoint = m_hardpointLookup[spawner.RelatedHardpoint];
+        if (hardpoint.IsFiring && hardpoint.WeaponInstanceEntity != Entity.Null && spawner.NextSpawnTime < ElapsedTime)
         {
-            ProjectileSourceConfiguration pw = m_sourceConfigLookup[spawner.ProjectileWeaponEntity];
-            LocalToWorld l2wFireNode = m_localToWorldLookup[pw.FireNode];
+            LocalToWorld l2wFireNode = m_localToWorldLookup[config.FireNode];
             
             Projectile p = new Projectile();
-            p.FlatDamage = pw.ProjectileDamage;
-            p.ImpactEffectEntity = pw.ImpactEffectPrefab;
-            p.Velocity = pw.ProjectileSpeed * l2wFireNode.Forward;
-            if (spawner.RelatedRigidbodyEntity != Entity.Null)
+            p.FlatDamage = config.ProjectileDamage;
+            p.ImpactEffectEntity = config.ImpactEffectPrefab;
+            p.Velocity = config.ProjectileSpeed * l2wFireNode.Forward;
+            if (hardpoint.RelatedRigidbodyEntity != Entity.Null)
             {
-                PhysicsVelocity pv = m_velocityLookup[spawner.RelatedRigidbodyEntity];
+                PhysicsVelocity pv = m_velocityLookup[hardpoint.RelatedRigidbodyEntity];
                 p.Velocity += pv.Linear;
             }
 
             int sortKey = 0;
-            Entity newEntity = m_ecbWriter.Instantiate(sortKey, pw.ProjectilePrefab);
+            Entity newEntity = m_ecbWriter.Instantiate(sortKey, config.ProjectilePrefab);
             m_ecbWriter.AddComponent(sortKey, newEntity, p);
-            m_ecbWriter.AddComponent(sortKey, newEntity, new MarkForCleanup(ElapsedTime + pw.ProjectileLifetime));
+            m_ecbWriter.AddComponent(sortKey, newEntity, new MarkForCleanup(ElapsedTime + config.ProjectileLifetime));
             m_ecbWriter.SetComponent(sortKey, newEntity, new LocalToWorld() { Value = float4x4.TRS(l2wFireNode.Position, l2wFireNode.Rotation, new float3(1.0f))});
             
-            spawner.NextSpawnTime = ElapsedTime + pw.ProjectileSpawnRate;
+            spawner.NextSpawnTime = ElapsedTime + config.ProjectileSpawnRate;
         }
     }
 }
@@ -63,7 +63,7 @@ partial struct ProjectileSpawnSystem : ISystem
         new CreateProjectileJob()
         {
             m_ecbWriter = ecb.AsParallelWriter(),
-            m_sourceConfigLookup = SystemAPI.GetComponentLookup<ProjectileSourceConfiguration>(),
+            m_hardpointLookup = SystemAPI.GetComponentLookup<ShipHardpointInstance>(),
             m_velocityLookup = SystemAPI.GetComponentLookup<PhysicsVelocity>(),
             m_localToWorldLookup = SystemAPI.GetComponentLookup<LocalToWorld>(),
             ElapsedTime = (float)SystemAPI.Time.ElapsedTime,

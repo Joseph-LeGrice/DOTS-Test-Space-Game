@@ -13,7 +13,7 @@ public readonly partial struct PlayerAspect : IAspect
     public readonly RefRW<PhysicsVelocity> Velocity;
     public readonly RefRW<PhysicsMass> PhysicsMass;
     public readonly RefRO<LocalToWorld> LocalToWorld;
-    public readonly DynamicBuffer<ShipHardpointBufferElement> ShipHardpoints;
+    public readonly DynamicBuffer<ShipHardpointReference> ShipHardpoints;
     public readonly DynamicBuffer<DetectedTarget> DetectedTargets;
 }
 
@@ -26,26 +26,11 @@ partial class PlayerInputSystem : SystemBase
             PlayerManagedAccess managedAccess = SystemAPI.ManagedAPI.GetComponent<PlayerManagedAccess>(player.Self);
             InputHandler playerInput = managedAccess.ManagedLocalPlayer.GetPlayerInput();
             
-            foreach (ShipHardpointBufferElement shipHardpoint in player.ShipHardpoints)
+            foreach (ShipHardpointReference shipHardpoint in player.ShipHardpoints)
             {
-                if (SystemAPI.HasComponent<ProjectileSource>(shipHardpoint.Self))
-                {
-                    ProjectileSource ps = SystemAPI.GetComponent<ProjectileSource>(shipHardpoint.Self);
-                    ps.IsFiring = playerInput.IsAttacking;
-                    SystemAPI.SetComponent(shipHardpoint.Self, ps);
-                }
-                if (SystemAPI.HasComponent<BeamSource>(shipHardpoint.Self))
-                {
-                    BeamSource bs = SystemAPI.GetComponent<BeamSource>(shipHardpoint.Self);
-                    bs.IsFiring = playerInput.IsAttacking;
-                    SystemAPI.SetComponent(shipHardpoint.Self, bs);
-                }
-                if (SystemAPI.HasComponent<GravityTether>(shipHardpoint.Self))
-                {
-                    GravityTether gravityTether = SystemAPI.GetComponent<GravityTether>(shipHardpoint.Self);
-                    gravityTether.IsFiring = playerInput.IsAttacking;
-                    SystemAPI.SetComponent(shipHardpoint.Self, gravityTether);
-                }
+                ShipHardpointInstance hardpoint = SystemAPI.GetComponent<ShipHardpointInstance>(shipHardpoint.Self);
+                hardpoint.IsFiring = playerInput.IsAttacking;
+                SystemAPI.SetComponent(shipHardpoint.Self, hardpoint);
             }
 
             UpdateTargets(player, playerInput);

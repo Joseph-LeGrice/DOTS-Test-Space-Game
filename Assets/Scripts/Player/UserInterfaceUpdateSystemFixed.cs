@@ -9,7 +9,7 @@ using UnityEngine;
 public readonly partial struct PlayerUIAspectFixed : IAspect
 {
     public readonly Entity Self;
-    public readonly DynamicBuffer<ShipHardpointBufferElement> ShipHardpoints;
+    public readonly DynamicBuffer<ShipHardpointReference> ShipHardpoints;
 }
 
 [UpdateInGroup(typeof(FixedStepSimulationSystemGroup))]
@@ -21,6 +21,7 @@ public partial class UserInterfaceUpdateSystemFixed : SystemBase
         Dependency.Complete();
 
         ComponentLookup<LocalToWorld> localToWorldLookup = SystemAPI.GetComponentLookup<LocalToWorld>();
+        ComponentLookup<ShipHardpointInstance> hardpointInstanceLookup = SystemAPI.GetComponentLookup<ShipHardpointInstance>();
         ComponentLookup<Gimbal> gimbalLookup = SystemAPI.GetComponentLookup<Gimbal>();
         foreach (PlayerUIAspectFixed player in SystemAPI.Query<PlayerUIAspectFixed>())
         {
@@ -36,16 +37,18 @@ public partial class UserInterfaceUpdateSystemFixed : SystemBase
             float avgAimDistance = 0.0f;
             for (int i = 0; i < player.ShipHardpoints.Length; i++)
             {
-                ShipHardpointBufferElement hardpoint = player.ShipHardpoints[i];
-                LocalToWorld l2w = localToWorldLookup[hardpoint.Self];
-                if (gimbalLookup.HasComponent(hardpoint.Self))
+                ShipHardpointReference hardpointReference = player.ShipHardpoints[i];
+                ShipHardpointInstance hardpointInstance = hardpointInstanceLookup[hardpointReference.Self];
+                
+                LocalToWorld l2w = localToWorldLookup[hardpointInstance.WeaponInstanceEntity];
+                if (gimbalLookup.HasComponent(hardpointInstance.WeaponInstanceEntity))
                 {
-                    l2w = localToWorldLookup[gimbalLookup[hardpoint.Self].GimbalEntity];
+                    l2w = localToWorldLookup[gimbalLookup[hardpointInstance.WeaponInstanceEntity].GimbalEntity];
                 }
-                Vector3 aimPositionWorld = l2w.Position + hardpoint.AimDistance * l2w.Forward;
+                Vector3 aimPositionWorld = l2w.Position + hardpointInstance.AimDistance * l2w.Forward;
                 playerUi.SetHardpointAim(i, aimPositionWorld);
                 
-                avgAimDistance += hardpoint.AimDistance;
+                avgAimDistance += hardpointInstance.AimDistance;
             }
 
             avgAimDistance /= player.ShipHardpoints.Length;

@@ -1,47 +1,59 @@
 using Unity.Entities;
 using UnityEngine;
 
-public struct ProjectileSource : IComponentData
+public struct ProjectileSourceData : IComponentData
 {
-    public Entity ProjectileWeaponEntity;
-    public Entity RelatedRigidbodyEntity;
     public float NextSpawnTime;
-    public bool IsFiring;
+    public Entity RelatedHardpoint;
 }
 
-class ProjectileSourceBaker : MonoBehaviour
+public struct ProjectileSourceConfiguration : IComponentData
 {
-    public ProjectileSourceConfigurationBaker projectileSourceConfiguration;
-    public Rigidbody RelatedRigidbody;
+    public Entity FireNode;
+    public Entity ProjectilePrefab;
+    public Entity ImpactEffectPrefab;
+    public float ProjectileSpeed;
+    public float ProjectileSpawnRate;
+    public float ProjectileLifetime;
+    public float ProjectileDamage;
+}
+
+public class ProjectileSourceBaker : MonoBehaviour
+{
+    public ShipHardpointReferenceBaker RelatedHardpoint;
+    public GameObject ProjectilePrefab;
+    public GameObject ImpactEffectPrefab;
+    public GameObject GimbalHierarchy;
+    public GameObject FireNode;
+    public float ProjectileSpeed = 250.0f;
+    public float ImpactDamage = 10.0f;
+    public float FireRate = 0.2f;
+    public float Lifetime = 3.0f;
     
     public class Baker : Baker<ProjectileSourceBaker>
     {
         public override void Bake(ProjectileSourceBaker authoring)
         {
             Entity mainEntity = GetEntity(TransformUsageFlags.None);
-            
-            Entity weaponEntity = Entity.Null;
-            if (authoring.projectileSourceConfiguration != null)
-            {
-                weaponEntity = GetEntity(authoring.projectileSourceConfiguration.gameObject, TransformUsageFlags.Dynamic);
-            }
-            
-            Entity rigidbodyEntity = Entity.Null;
-            if (authoring.RelatedRigidbody != null)
-            {
-                rigidbodyEntity = GetEntity(authoring.RelatedRigidbody.gameObject, TransformUsageFlags.Dynamic);
-            }
 
-            AddComponent(mainEntity, new ProjectileSource()
+            AddComponent(mainEntity, new ProjectileSourceData()
             {
-                ProjectileWeaponEntity = weaponEntity,
-                RelatedRigidbodyEntity = rigidbodyEntity,
-                NextSpawnTime = 0.0f
+                NextSpawnTime = 0.0f,
+                RelatedHardpoint = GetEntity(authoring.RelatedHardpoint.gameObject, TransformUsageFlags.Dynamic) 
             });
-            
+            AddComponent(mainEntity, new ProjectileSourceConfiguration()
+            {
+                FireNode = GetEntity(authoring.FireNode, TransformUsageFlags.Dynamic),
+                ProjectilePrefab = GetEntity(authoring.ProjectilePrefab, TransformUsageFlags.Dynamic),
+                ImpactEffectPrefab = GetEntity(authoring.ImpactEffectPrefab, TransformUsageFlags.Dynamic),
+                ProjectileDamage = authoring.ImpactDamage,
+                ProjectileSpeed = authoring.ProjectileSpeed,
+                ProjectileSpawnRate = authoring.FireRate,
+                ProjectileLifetime = authoring.Lifetime,
+            });
             AddComponent(mainEntity, new Gimbal()
             {
-                GimbalEntity = GetEntity(authoring.projectileSourceConfiguration.GimbalHierarchy, TransformUsageFlags.Dynamic)
+                GimbalEntity = GetEntity(authoring.GimbalHierarchy, TransformUsageFlags.Dynamic)
             });
         }
     }

@@ -85,10 +85,16 @@ public class PlayerManagedAccess : IComponentData
     public ManagedLocalPlayer ManagedLocalPlayer;
 }
 
-public struct ShipHardpointBufferElement : IBufferElementData
+public struct ShipHardpointReference : IBufferElementData
 {
-    public bool Enabled;
     public Entity Self;
-    public float AimDistance;
+}
+
+public struct ShipHardpointInstance : IComponentData
+{
+    public Entity RelatedRigidbodyEntity;
+    public Entity WeaponInstanceEntity;
+    public bool IsFiring;
+    public float AimDistance; 
     public float3 TargetLocalForward;
 }
