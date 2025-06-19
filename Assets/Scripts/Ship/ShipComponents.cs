@@ -18,7 +18,7 @@ public struct ThrusterSetup
     public float VelocityDamperDeceleration;
 }
 
-public struct PlayerData : IComponentData
+public struct ShipMovementData : IComponentData
 {
     public ThrusterSetup DefaultMovement;
     public ThrusterSetup ADSMovement;
@@ -31,7 +31,7 @@ public struct PlayerData : IComponentData
     public float BoostMaximumVelocity;
 }
 
-public struct PlayerBoosterState : IComponentData
+public struct ShipBoosterState : IComponentData
 {
     private float m_currentBoostTime;
     private bool m_boostRecharging;
@@ -78,11 +78,6 @@ public struct PlayerBoosterState : IComponentData
             }
         }
     }
-}
-
-public class PlayerManagedAccess : IComponentData
-{
-    public ManagedLocalPlayer ManagedLocalPlayer;
 }
 
 public struct ShipHardpointReference : IBufferElementData

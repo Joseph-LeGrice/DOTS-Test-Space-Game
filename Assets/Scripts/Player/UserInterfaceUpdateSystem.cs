@@ -9,7 +9,7 @@ using UnityEngine;
 public readonly partial struct PlayerUIAspect : IAspect
 {
     public readonly Entity Self;
-    public readonly RefRO<PlayerData> PlayerData;
+    public readonly RefRO<ShipMovementData> PlayerData;
     public readonly RefRO<PhysicsVelocity> PhysicsVelocity;
     public readonly DynamicBuffer<DetectedTarget> DetectedTargets;
 }

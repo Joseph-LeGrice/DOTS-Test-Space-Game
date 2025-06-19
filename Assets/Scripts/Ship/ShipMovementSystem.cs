@@ -5,11 +5,12 @@ using Unity.Physics.Extensions;
 using Unity.Transforms;
 using UnityEngine;
 
-public readonly partial struct PlayerAspect : IAspect
+public readonly partial struct ShipAspect : IAspect
 {
     public readonly Entity Self;
-    public readonly RefRW<PlayerData> PlayerData;
-    public readonly RefRW<PlayerBoosterState> PlayerBoostState;
+    public readonly RefRO<PlayerTag> PlayerTag;
+    public readonly RefRW<ShipMovementData> PlayerData;
+    public readonly RefRW<ShipBoosterState> PlayerBoostState;
     public readonly RefRW<PhysicsVelocity> Velocity;
     public readonly RefRW<PhysicsMass> PhysicsMass;
     public readonly RefRO<LocalToWorld> LocalToWorld;
@@ -17,11 +18,12 @@ public readonly partial struct PlayerAspect : IAspect
     public readonly DynamicBuffer<DetectedTarget> DetectedTargets;
 }
 
-partial class PlayerInputSystem : SystemBase
+partial class ShipMovementSystem : SystemBase
 {
     protected override void OnUpdate()
     {
-        foreach (PlayerAspect player in SystemAPI.Query<PlayerAspect>())
+        // TODO: Turn into generic ship controller- handle input elsewhere 
+        foreach (ShipAspect player in SystemAPI.Query<ShipAspect>())
         {
             PlayerManagedAccess managedAccess = SystemAPI.ManagedAPI.GetComponent<PlayerManagedAccess>(player.Self);
             InputHandler playerInput = managedAccess.ManagedLocalPlayer.GetPlayerInput();
@@ -57,7 +59,7 @@ partial class PlayerInputSystem : SystemBase
         }
     }
 
-    private void UpdateTargets(PlayerAspect player, InputHandler playerInput)
+    private void UpdateTargets(ShipAspect player, InputHandler playerInput)
     {
         var localToWorldLookup = SystemAPI.GetComponentLookup<LocalToWorld>();
         
@@ -116,25 +118,25 @@ partial class PlayerInputSystem : SystemBase
         return false;
     }
 
-    private float3 GetLinearVelocity(PlayerAspect player, PlayerManagedAccess managedAccess)
+    private float3 GetLinearVelocity(ShipAspect player, PlayerManagedAccess managedAccess)
     {
         InputHandler playerInput = managedAccess.ManagedLocalPlayer.GetPlayerInput();
-        PlayerData playerData = player.PlayerData.ValueRO;
-        PlayerBoosterState playerBoosters = player.PlayerBoostState.ValueRO;
+        ShipMovementData shipMovementData = player.PlayerData.ValueRO;
+        ShipBoosterState shipBoosters = player.PlayerBoostState.ValueRO;
 
-        ThrusterSetup thrusterSetup = playerData.DefaultMovement;
+        ThrusterSetup thrusterSetup = shipMovementData.DefaultMovement;
         if (playerInput.IsADS)
         {
-            thrusterSetup = playerData.ADSMovement;
+            thrusterSetup = shipMovementData.ADSMovement;
         }
         
         float3 acceleration = new float3();
-        float maximumVelocity = playerData.MaximumVelocity;
+        float maximumVelocity = shipMovementData.MaximumVelocity;
         
-        if (playerBoosters.IsBoosting())
+        if (shipBoosters.IsBoosting())
         {
-            acceleration.z = playerBoosters.GetBoostAcceleration(playerData.BoostAcceleration, playerData.BoostTime);
-            maximumVelocity = playerData.BoostMaximumVelocity;
+            acceleration.z = shipBoosters.GetBoostAcceleration(shipMovementData.BoostAcceleration, shipMovementData.BoostTime);
+            maximumVelocity = shipMovementData.BoostMaximumVelocity;
         }
         else
         {
@@ -179,15 +181,15 @@ partial class PlayerInputSystem : SystemBase
         return dampedComponent + likeness * targetDirection;
     }
     
-    private float3 GetAngularVelocity(PlayerAspect player, PlayerManagedAccess managedAccess)
+    private float3 GetAngularVelocity(ShipAspect player, PlayerManagedAccess managedAccess)
     {
         InputHandler playerInput = managedAccess.ManagedLocalPlayer.GetPlayerInput();
-        PlayerData playerData = player.PlayerData.ValueRO;
+        ShipMovementData shipMovementData = player.PlayerData.ValueRO;
         
-        ThrusterSetup thrusterSetup = playerData.DefaultMovement;
+        ThrusterSetup thrusterSetup = shipMovementData.DefaultMovement;
         if (playerInput.IsADS)
         {
-            thrusterSetup = playerData.ADSMovement;
+            thrusterSetup = shipMovementData.ADSMovement;
         }
         
         float3 angularAcceleration = float3.zero;

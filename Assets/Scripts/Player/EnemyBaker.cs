@@ -1,16 +1,8 @@
 using Unity.Entities;
 using UnityEngine;
 
-public struct PlayerTag : IComponentData
-{
-}
 
-public class PlayerManagedAccess : IComponentData
-{
-    public ManagedLocalPlayer ManagedLocalPlayer;
-}
-
-class PlayerBaker : MonoBehaviour
+class EnemyBaker : MonoBehaviour
 {
     public ThrusterSetup DefaultMovement;
     public ThrusterSetup ADSMovement;
@@ -30,7 +22,6 @@ class PlayerBaker : MonoBehaviour
         {
             Entity mainEntity = GetEntity(TransformUsageFlags.Dynamic);
             
-            AddComponent(mainEntity, new PlayerTag());
             AddComponent(mainEntity, new ShipMovementData()
             {
                 DefaultMovement = authoring.DefaultMovement,
@@ -41,10 +32,10 @@ class PlayerBaker : MonoBehaviour
                 BoostAcceleration = authoring.BoostAcceleration,
                 BoostMaximumVelocity = authoring.BoostMaximumVelocity,
             });
-            AddComponentObject(mainEntity, new PlayerManagedAccess()
-            {
-                ManagedLocalPlayer = ManagedSceneAccess.Instance.GetPlayer(),
-            });
+            // AddComponentObject(mainEntity, new PlayerManagedAccess()
+            // {
+            //     ManagedLocalPlayer = ManagedSceneAccess.Instance.GetPlayer(),
+            // });
             AddComponent<ShipBoosterState>(mainEntity);
             
             DynamicBuffer<ShipHardpointReference> shbe = AddBuffer<ShipHardpointReference>(mainEntity);

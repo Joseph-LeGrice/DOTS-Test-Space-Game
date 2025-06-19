@@ -5,7 +5,7 @@ public partial class CameraSyncSystem : SystemBase
 {
     protected override void OnUpdate()
     {
-        foreach (var (_, localToWorld, entity) in SystemAPI.Query<RefRO<PlayerData>, RefRO<LocalToWorld>>().WithEntityAccess())
+        foreach (var (_, localToWorld, entity) in SystemAPI.Query<RefRO<ShipMovementData>, RefRO<LocalToWorld>>().WithEntityAccess())
         { 
             PlayerManagedAccess pma = SystemAPI.ManagedAPI.GetComponent<PlayerManagedAccess>(entity);
             pma.ManagedLocalPlayer.UpdatePlayerPositionAndRotation(
