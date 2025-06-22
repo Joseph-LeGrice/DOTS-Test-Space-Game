@@ -8,6 +8,7 @@ using UnityEngine;
 
 public readonly partial struct PlayerUIAspect : IAspect
 {
+    public readonly RefRO<ShipInput> ShipInput;
     public readonly RefRO<ShipMovementData> PlayerData;
     public readonly RefRO<PhysicsVelocity> PhysicsVelocity;
     public readonly DynamicBuffer<DetectedTarget> DetectedTargets;
@@ -27,7 +28,7 @@ public partial class UserInterfaceUpdateSystem : SystemBase
             ManagedLocalPlayer managedLocalPlayer = managedAccess.ManagedLocalPlayer;
             LocalPlayerUserInterface playerUi = managedLocalPlayer.GetUserInterface();
             
-            if (!managedLocalPlayer.GetPlayerInput().IsADS)
+            if (!player.ShipInput.ValueRO.IsADS)
             {
                 var thrusterSetup = player.PlayerData.ValueRO.DefaultMovement;
             

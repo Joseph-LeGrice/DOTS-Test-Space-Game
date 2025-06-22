@@ -6,8 +6,6 @@ public class ManagedLocalPlayer : MonoBehaviour
     [SerializeField]
     private Transform m_playerTrackedTransform;
     [SerializeField]
-    private InputHandler m_playerInput;
-    [SerializeField]
     private LocalPlayerUserInterface m_userInterface;
     
     [SerializeField]
@@ -32,14 +30,15 @@ public class ManagedLocalPlayer : MonoBehaviour
         m_playerTrackedTransform.SetPositionAndRotation(position, rotation);
     }
 
+    public void SetADS(bool isADS)
+    {
+        m_mainCamera.SetActive(!isADS);
+        m_adsCamera.SetActive(isADS);
+    }
+    
     public Transform GetPlayerTrackedTransform()
     {
         return m_playerTrackedTransform;
-    }
-    
-    public InputHandler GetPlayerInput()
-    {
-        return m_playerInput;
     }
 
     public float GetLookSensitivity()
@@ -55,11 +54,5 @@ public class ManagedLocalPlayer : MonoBehaviour
     public float GetRollSensitivity()
     {
         return m_rollSensitivity;
-    }
-
-    private void Update()
-    {
-        m_mainCamera.SetActive(!m_playerInput.IsADS);
-        m_adsCamera.SetActive(m_playerInput.IsADS);
     }
 }
