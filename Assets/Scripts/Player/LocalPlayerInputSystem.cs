@@ -34,7 +34,7 @@ public partial class LocalPlayerInputSystem : SystemBase
     protected override void OnUpdate()
     {
         ComponentLookup<ShipInput> shipInputLookup = SystemAPI.GetComponentLookup<ShipInput>();
-        foreach (var localPlayer in SystemAPI.Query<RefRO<PlayerTag>>())
+        foreach (var (localPlayer, self) in SystemAPI.Query<RefRO<PlayerTag>>().WithEntityAccess())
         {
             RefRW<ShipInput> shipInput = shipInputLookup.GetRefRW(localPlayer.ValueRO.ControllingShip);
             shipInput.ValueRW.TargetDirection = m_Player_Movement.ReadValue<Vector3>();
@@ -43,7 +43,12 @@ public partial class LocalPlayerInputSystem : SystemBase
             shipInput.ValueRW.LookDelta = new float2(look.x, -look.y);
             
             shipInput.ValueRW.IsAttacking = m_Player_Attack.inProgress;
-            shipInput.ValueRW.IsADS = m_Player_ADS.triggered;
+            if (m_Player_ADS.triggered)
+            {
+                ManagedLocalPlayer managedLocalPlayer = SystemAPI.ManagedAPI.GetComponent<ManagedLocalPlayer>(self);
+                shipInput.ValueRW.IsADS = !shipInput.ValueRW.IsADS;
+                managedLocalPlayer.SetADS(shipInput.ValueRW.IsADS);
+            }
             shipInput.ValueRW.IsBoosting = m_Player_Boost.triggered;
             shipInput.ValueRW.TargetSelectAhead = m_Player_SelectAhead.triggered;
             if (m_Player_ToggleVelocityDampers.triggered)
