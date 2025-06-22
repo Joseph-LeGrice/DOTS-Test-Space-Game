@@ -78,13 +78,11 @@ public partial struct ProjectileUpdateSystem : ISystem
     [BurstCompile]
     public void OnUpdate(ref SystemState state)
     {
-        state.Dependency.Complete();
-        
         BeginSimulationEntityCommandBufferSystem.Singleton ecbSystem = SystemAPI.GetSingleton<BeginSimulationEntityCommandBufferSystem.Singleton>();
         EntityCommandBuffer ecbForDestroy = ecbSystem.CreateCommandBuffer(state.WorldUnmanaged);
         RefRW<PhysicsWorldSingleton> physicsWorld = SystemAPI.GetSingletonRW<PhysicsWorldSingleton>();
         
-        new ProjectileUpdate()
+        state.Dependency = new ProjectileUpdate()
         {
             DeltaTime = SystemAPI.Time.DeltaTime,
             m_ecbWriter = ecbForDestroy.AsParallelWriter(),
@@ -93,6 +91,6 @@ public partial struct ProjectileUpdateSystem : ISystem
             m_damageableLookup = SystemAPI.GetComponentLookup<Damageable>(),
             m_physicsVelocityLookup = SystemAPI.GetComponentLookup<PhysicsVelocity>(),
             m_physicsMassLookup = SystemAPI.GetComponentLookup<PhysicsMass>(),
-        }.ScheduleParallel();
+        }.ScheduleParallel(state.Dependency);
     }
 }

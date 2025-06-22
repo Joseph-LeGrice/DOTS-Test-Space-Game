@@ -11,7 +11,6 @@ public partial class GravityTetherVFXSystem : SystemBase
         var ecbSystem = SystemAPI.GetSingleton<BeginSimulationEntityCommandBufferSystem.Singleton>();
         EntityCommandBuffer ecb = ecbSystem.CreateCommandBuffer(EntityManager.WorldUnmanaged);
 
-        var playerData = SystemAPI.GetSingleton<ShipMovementData>();
         var localToWorldLookup = SystemAPI.GetComponentLookup<LocalToWorld>();
         
         foreach (var (gravityTetherRef, self) in SystemAPI.Query<RefRO<GravityTether>>().WithEntityAccess())

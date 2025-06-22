@@ -1,6 +1,25 @@
 using Unity.Entities;
 using Unity.Mathematics;
 
+public struct ShipInput : IComponentData
+{
+    public float3 TargetDirection;
+    public float2 LookDelta;
+    public bool IsAttacking;
+    public bool IsADS;
+    public bool IsBoosting;
+    public bool LinearDampersActive;
+    public bool RollDampersActive;
+    public float RollDirection;
+    public bool TargetSelectAhead;
+
+    public static ShipInput Default => new ShipInput()
+    {
+        LinearDampersActive = true,
+        RollDampersActive = true,
+    };
+}
+
 [System.Serializable]
 public struct ThrusterSetup
 {

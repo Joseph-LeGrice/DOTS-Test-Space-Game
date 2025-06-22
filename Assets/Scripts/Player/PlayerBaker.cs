@@ -3,6 +3,7 @@ using UnityEngine;
 
 public struct PlayerTag : IComponentData
 {
+    public Entity ControllingShip;
 }
 
 public class PlayerManagedAccess : IComponentData
@@ -12,53 +13,23 @@ public class PlayerManagedAccess : IComponentData
 
 class PlayerBaker : MonoBehaviour
 {
-    public ThrusterSetup DefaultMovement;
-    public ThrusterSetup ADSMovement;
-    
-    public float MaximumVelocity;
-    
-    public float BoostTime;
-    public float BoostRechargeTime;
-    public float BoostAcceleration;
-    public float BoostMaximumVelocity;
-    
-    public GameObject[] ShipHardpoints;
+    [SerializeField]
+    private ShipBaker ControllingShip;
     
     public class Baker : Baker<PlayerBaker>
     {
         public override void Bake(PlayerBaker authoring)
         {
-            Entity mainEntity = GetEntity(TransformUsageFlags.Dynamic);
+            Entity mainEntity = GetEntity(TransformUsageFlags.None);
             
-            AddComponent(mainEntity, new PlayerTag());
-            AddComponent(mainEntity, new ShipMovementData()
+            AddComponent(mainEntity, new PlayerTag()
             {
-                DefaultMovement = authoring.DefaultMovement,
-                ADSMovement = authoring.ADSMovement,
-                MaximumVelocity = authoring.MaximumVelocity,
-                BoostTime = authoring.BoostTime,
-                BoostRechargeTime = authoring.BoostRechargeTime,
-                BoostAcceleration = authoring.BoostAcceleration,
-                BoostMaximumVelocity = authoring.BoostMaximumVelocity,
+                ControllingShip = GetEntity(authoring.ControllingShip, TransformUsageFlags.Dynamic),
             });
             AddComponentObject(mainEntity, new PlayerManagedAccess()
             {
                 ManagedLocalPlayer = ManagedSceneAccess.Instance.GetPlayer(),
             });
-            AddComponent<ShipBoosterState>(mainEntity);
-            
-            DynamicBuffer<ShipHardpointReference> shbe = AddBuffer<ShipHardpointReference>(mainEntity);
-            foreach (GameObject sh in authoring.ShipHardpoints)
-            {
-                shbe.Add(new ShipHardpointReference()
-                {
-                    Self = GetEntity(sh, TransformUsageFlags.Dynamic),
-                });
-            }
-            
-            AddComponent<Targetable>(mainEntity);
-            AddComponent<TargetDetector>(mainEntity, new TargetDetector() { RangeSquared = Mathf.Pow(2500.0f, 2.0f)});
-            AddBuffer<DetectedTarget>(mainEntity);
         }
     }
 }

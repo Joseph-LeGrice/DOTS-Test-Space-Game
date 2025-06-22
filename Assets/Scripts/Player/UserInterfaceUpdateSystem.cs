@@ -8,7 +8,6 @@ using UnityEngine;
 
 public readonly partial struct PlayerUIAspect : IAspect
 {
-    public readonly Entity Self;
     public readonly RefRO<ShipMovementData> PlayerData;
     public readonly RefRO<PhysicsVelocity> PhysicsVelocity;
     public readonly DynamicBuffer<DetectedTarget> DetectedTargets;
@@ -20,19 +19,18 @@ public partial class UserInterfaceUpdateSystem : SystemBase
 {
     protected override void OnUpdate()
     {
-        Dependency.Complete();
-
         ComponentLookup<LocalToWorld> localToWorldLookup = SystemAPI.GetComponentLookup<LocalToWorld>();
-        foreach (PlayerUIAspect player in SystemAPI.Query<PlayerUIAspect>())
+        foreach (var (localPlayer, self) in SystemAPI.Query<RefRO<PlayerTag>>().WithEntityAccess())
         {
-            PlayerManagedAccess managedAccess = SystemAPI.ManagedAPI.GetComponent<PlayerManagedAccess>(player.Self);
-            ManagedLocalPlayer localPlayer = managedAccess.ManagedLocalPlayer;
-            LocalPlayerUserInterface playerUi = localPlayer.GetUserInterface();
+            PlayerUIAspect player = SystemAPI.GetAspect<PlayerUIAspect>(localPlayer.ValueRO.ControllingShip);
+            PlayerManagedAccess managedAccess = SystemAPI.ManagedAPI.GetComponent<PlayerManagedAccess>(self);
+            ManagedLocalPlayer managedLocalPlayer = managedAccess.ManagedLocalPlayer;
+            LocalPlayerUserInterface playerUi = managedLocalPlayer.GetUserInterface();
             
-            if (!localPlayer.GetPlayerInput().IsADS)
+            if (!managedLocalPlayer.GetPlayerInput().IsADS)
             {
                 var thrusterSetup = player.PlayerData.ValueRO.DefaultMovement;
-
+            
                 float2 accelerationXY = new float2(player.PhysicsVelocity.ValueRO.Angular.y,
                     -player.PhysicsVelocity.ValueRO.Angular.x);
                 float2 accelerationDirection = math.normalizesafe(accelerationXY);

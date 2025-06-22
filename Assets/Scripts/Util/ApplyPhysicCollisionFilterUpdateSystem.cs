@@ -48,7 +48,6 @@ public partial struct ApplyPhysicCollisionFilterUpdateSystem : ISystem
             ECB.RemoveComponent<RequestPhysicCollisionFilterUpdate>(entity);
         }
         
-        state.Dependency.Complete();
         ECB.Playback(state.EntityManager);
         ECB.Dispose();
     }

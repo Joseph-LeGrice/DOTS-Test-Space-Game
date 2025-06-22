@@ -8,7 +8,6 @@ using UnityEngine;
 
 public readonly partial struct PlayerUIAspectFixed : IAspect
 {
-    public readonly Entity Self;
     public readonly DynamicBuffer<ShipHardpointReference> ShipHardpoints;
 }
 
@@ -18,16 +17,15 @@ public partial class UserInterfaceUpdateSystemFixed : SystemBase
 {
     protected override void OnUpdate()
     {
-        Dependency.Complete();
-
         ComponentLookup<LocalToWorld> localToWorldLookup = SystemAPI.GetComponentLookup<LocalToWorld>();
         ComponentLookup<ShipHardpointInstance> hardpointInstanceLookup = SystemAPI.GetComponentLookup<ShipHardpointInstance>();
         ComponentLookup<Gimbal> gimbalLookup = SystemAPI.GetComponentLookup<Gimbal>();
-        foreach (PlayerUIAspectFixed player in SystemAPI.Query<PlayerUIAspectFixed>())
+        foreach (var (localPlayer, self) in SystemAPI.Query<RefRO<PlayerTag>>().WithEntityAccess())
         {
-            PlayerManagedAccess managedAccess = SystemAPI.ManagedAPI.GetComponent<PlayerManagedAccess>(player.Self);
-            ManagedLocalPlayer localPlayer = managedAccess.ManagedLocalPlayer;
-            LocalPlayerUserInterface playerUi = localPlayer.GetUserInterface();
+            PlayerUIAspectFixed player = SystemAPI.GetAspect<PlayerUIAspectFixed>(localPlayer.ValueRO.ControllingShip);
+            PlayerManagedAccess managedAccess = SystemAPI.ManagedAPI.GetComponent<PlayerManagedAccess>(self);
+            ManagedLocalPlayer managedLocalPlayer = managedAccess.ManagedLocalPlayer;
+            LocalPlayerUserInterface playerUi = managedLocalPlayer.GetUserInterface();
             
             if (!playerUi.HasCreated())
             {
@@ -53,7 +51,7 @@ public partial class UserInterfaceUpdateSystemFixed : SystemBase
 
             avgAimDistance /= player.ShipHardpoints.Length;
 
-            LocalToWorld shipLocalToWorld = localToWorldLookup[player.Self];
+            LocalToWorld shipLocalToWorld = localToWorldLookup[localPlayer.ValueRO.ControllingShip];
             Vector3 shipForwardWorld = shipLocalToWorld.Position + avgAimDistance * shipLocalToWorld.Forward;
             playerUi.SetShipAim(shipForwardWorld);
         }

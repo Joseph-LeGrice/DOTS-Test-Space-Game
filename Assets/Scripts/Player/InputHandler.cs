@@ -10,7 +10,7 @@ public class InputHandler : MonoBehaviour, InputSystem_Actions.IPlayerActions
     public bool IsADS { get; private set; }
     public bool IsBoosting { get; private set; }
     public bool LinearDampersActive { get; private set; } = true;
-    public bool AngularDampersActive { get; private set; } = false;
+    public bool RollDampersActive { get; private set; } = true;
     public float RollDirection { get; private set; }
     public bool TargetSelectAhead { get; private set; }
 

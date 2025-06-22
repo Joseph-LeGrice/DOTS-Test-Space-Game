@@ -8,7 +8,7 @@ using UnityEngine;
 public readonly partial struct ShipAspect : IAspect
 {
     public readonly Entity Self;
-    public readonly RefRO<PlayerTag> PlayerTag;
+    public readonly RefRO<ShipInput> ShipInput;
     public readonly RefRW<ShipMovementData> PlayerData;
     public readonly RefRW<ShipBoosterState> PlayerBoostState;
     public readonly RefRW<PhysicsVelocity> Velocity;
@@ -22,25 +22,21 @@ partial class ShipMovementSystem : SystemBase
 {
     protected override void OnUpdate()
     {
-        // TODO: Turn into generic ship controller- handle input elsewhere 
-        foreach (ShipAspect player in SystemAPI.Query<ShipAspect>())
+        foreach (ShipAspect shipAspect in SystemAPI.Query<ShipAspect>())
         {
-            PlayerManagedAccess managedAccess = SystemAPI.ManagedAPI.GetComponent<PlayerManagedAccess>(player.Self);
-            InputHandler playerInput = managedAccess.ManagedLocalPlayer.GetPlayerInput();
-            
-            foreach (ShipHardpointReference shipHardpoint in player.ShipHardpoints)
+            foreach (ShipHardpointReference shipHardpoint in shipAspect.ShipHardpoints)
             {
                 ShipHardpointInstance hardpoint = SystemAPI.GetComponent<ShipHardpointInstance>(shipHardpoint.Self);
-                hardpoint.IsFiring = playerInput.IsAttacking;
+                hardpoint.IsFiring = shipAspect.ShipInput.ValueRO.IsAttacking;
                 SystemAPI.SetComponent(shipHardpoint.Self, hardpoint);
             }
 
-            UpdateTargets(player, playerInput);
+            UpdateTargets(shipAspect);
 
-            player.PlayerBoostState.ValueRW.UpdateBoost(SystemAPI.Time.DeltaTime, player.PlayerData.ValueRO.BoostRechargeTime);
-            if (playerInput.IsBoosting)
+            shipAspect.PlayerBoostState.ValueRW.UpdateBoost(SystemAPI.Time.DeltaTime, shipAspect.PlayerData.ValueRO.BoostRechargeTime);
+            if (shipAspect.ShipInput.ValueRO.IsBoosting)
             {
-                player.PlayerBoostState.ValueRW.TryBoostPerformed(player.PlayerData.ValueRO.BoostTime);
+                shipAspect.PlayerBoostState.ValueRW.TryBoostPerformed(shipAspect.PlayerData.ValueRO.BoostTime);
             }
 
             // float angularVelocityModifier = 1.0f;
@@ -51,29 +47,29 @@ partial class ShipMovementSystem : SystemBase
             //     linearVelocityModifier = m_slowdown * (1.0f - attachedPhysicsMass.InverseMass) * SystemAPI.Time.DeltaTime;
             // }
 
-            float3 linearVelocity = GetLinearVelocity(player, managedAccess);
-            player.Velocity.ValueRW.Linear = linearVelocity;// - linearVelocityModifier;
+            float3 linearVelocity = GetLinearVelocity(shipAspect);
+            shipAspect.Velocity.ValueRW.Linear = linearVelocity;// - linearVelocityModifier;
 
-            float3 angularVelocity = GetAngularVelocity(player, managedAccess); // GetAngularVelocity(player, managedAccess);
-            player.Velocity.ValueRW.Angular = angularVelocity; // * angularVelocityModifier;
+            float3 angularVelocity = GetAngularVelocity(shipAspect); // GetAngularVelocity(player, managedAccess);
+            shipAspect.Velocity.ValueRW.Angular = angularVelocity; // * angularVelocityModifier;
         }
     }
 
-    private void UpdateTargets(ShipAspect player, InputHandler playerInput)
+    private void UpdateTargets(ShipAspect shipAspect) // TODO: Move to local player input system?
     {
         var localToWorldLookup = SystemAPI.GetComponentLookup<LocalToWorld>();
         
         float threshold = 0.99f;
         int bestTargetAhead = -1;
         float bestDot = 0.0f;
-        for (int i=0; i< player.DetectedTargets.Length; i++)
+        for (int i=0; i< shipAspect.DetectedTargets.Length; i++)
         {
-            DetectedTarget target = player.DetectedTargets[i];
+            DetectedTarget target = shipAspect.DetectedTargets[i];
             if (EntityManager.Exists(target.TargetableEntity))
             {
                 LocalToWorld targetTransform = localToWorldLookup[target.TargetableEntity];
-                float3 deltaNormalised = math.normalize(targetTransform.Position - player.LocalToWorld.ValueRO.Position);
-                float dot = math.dot(player.LocalToWorld.ValueRO.Forward, deltaNormalised);
+                float3 deltaNormalised = math.normalize(targetTransform.Position - shipAspect.LocalToWorld.ValueRO.Position);
+                float dot = math.dot(shipAspect.LocalToWorld.ValueRO.Forward, deltaNormalised);
                 if (dot > bestDot && dot >= threshold)
                 {
                     bestDot = dot;
@@ -82,12 +78,12 @@ partial class ShipMovementSystem : SystemBase
             }
         }
             
-        var detectedTargets = player.DetectedTargets;
-        for (int i = 0; i < player.DetectedTargets.Length; i++)
+        var detectedTargets = shipAspect.DetectedTargets;
+        for (int i = 0; i < shipAspect.DetectedTargets.Length; i++)
         {
-            var t = player.DetectedTargets[i];
+            var t = shipAspect.DetectedTargets[i];
             t.CanTargetAhead = i == bestTargetAhead;
-            if (playerInput.TargetSelectAhead)
+            if (shipAspect.ShipInput.ValueRO.TargetSelectAhead)
             {
                 if (i == bestTargetAhead)
                 {
@@ -118,14 +114,13 @@ partial class ShipMovementSystem : SystemBase
         return false;
     }
 
-    private float3 GetLinearVelocity(ShipAspect player, PlayerManagedAccess managedAccess)
+    private float3 GetLinearVelocity(ShipAspect shipAspect)
     {
-        InputHandler playerInput = managedAccess.ManagedLocalPlayer.GetPlayerInput();
-        ShipMovementData shipMovementData = player.PlayerData.ValueRO;
-        ShipBoosterState shipBoosters = player.PlayerBoostState.ValueRO;
+        ShipMovementData shipMovementData = shipAspect.PlayerData.ValueRO;
+        ShipBoosterState shipBoosters = shipAspect.PlayerBoostState.ValueRO;
 
         ThrusterSetup thrusterSetup = shipMovementData.DefaultMovement;
-        if (playerInput.IsADS)
+        if (shipAspect.ShipInput.ValueRO.IsADS)
         {
             thrusterSetup = shipMovementData.ADSMovement;
         }
@@ -140,7 +135,7 @@ partial class ShipMovementSystem : SystemBase
         }
         else
         {
-            float dir = playerInput.TargetDirection.z;
+            float dir = shipAspect.ShipInput.ValueRO.TargetDirection.z;
             if (dir > 0.0f)
             {
                 acceleration.z = thrusterSetup.ForwardThrustersAcceleration;
@@ -151,15 +146,15 @@ partial class ShipMovementSystem : SystemBase
             }
         }
 
-        acceleration.x = playerInput.TargetDirection.x * thrusterSetup.LateralThrustersAcceleration;
-        acceleration.y = playerInput.TargetDirection.y * thrusterSetup.LateralThrustersAcceleration;
+        acceleration.x = shipAspect.ShipInput.ValueRO.TargetDirection.x * thrusterSetup.LateralThrustersAcceleration;
+        acceleration.y = shipAspect.ShipInput.ValueRO.TargetDirection.y * thrusterSetup.LateralThrustersAcceleration;
         
-        LocalToWorld localToWorld = player.LocalToWorld.ValueRO;
-        float3 currentVelocityLocal = localToWorld.Value.InverseTransformDirection(player.Velocity.ValueRO.Linear);
+        LocalToWorld localToWorld = shipAspect.LocalToWorld.ValueRO;
+        float3 currentVelocityLocal = localToWorld.Value.InverseTransformDirection(shipAspect.Velocity.ValueRO.Linear);
         currentVelocityLocal += acceleration * SystemAPI.Time.DeltaTime;
         currentVelocityLocal = math.normalizesafe(currentVelocityLocal) * math.min(maximumVelocity, math.length(currentVelocityLocal));
 
-        if (playerInput.LinearDampersActive)
+        if (shipAspect.ShipInput.ValueRO.LinearDampersActive)
         {
             currentVelocityLocal = DampVelocity(currentVelocityLocal, acceleration, thrusterSetup.VelocityDamperDeceleration);
         }
@@ -181,47 +176,43 @@ partial class ShipMovementSystem : SystemBase
         return dampedComponent + likeness * targetDirection;
     }
     
-    private float3 GetAngularVelocity(ShipAspect player, PlayerManagedAccess managedAccess)
+    private float3 GetAngularVelocity(ShipAspect shipAspect)
     {
-        InputHandler playerInput = managedAccess.ManagedLocalPlayer.GetPlayerInput();
-        ShipMovementData shipMovementData = player.PlayerData.ValueRO;
+        ShipMovementData shipMovementData = shipAspect.PlayerData.ValueRO;
         
         ThrusterSetup thrusterSetup = shipMovementData.DefaultMovement;
-        if (playerInput.IsADS)
+        if (shipAspect.ShipInput.ValueRO.IsADS)
         {
             thrusterSetup = shipMovementData.ADSMovement;
         }
         
         float3 angularAcceleration = float3.zero;
         
-        if (!playerInput.IsADS)
+        if (!shipAspect.ShipInput.ValueRO.IsADS)
         {
-            float lookSensitivity = managedAccess.ManagedLocalPlayer.GetLookSensitivity();
-            float yawAngleAcceleration = lookSensitivity * playerInput.LookDelta.x;
+            float yawAngleAcceleration = shipAspect.ShipInput.ValueRO.LookDelta.x;
             yawAngleAcceleration = math.sign(yawAngleAcceleration) *
                                    math.min(math.abs(yawAngleAcceleration), thrusterSetup.MaxTurnAcceleration);
             angularAcceleration.y = math.radians(yawAngleAcceleration);
 
-            float pitchAngleAcceleration = lookSensitivity * playerInput.LookDelta.y;
+            float pitchAngleAcceleration = shipAspect.ShipInput.ValueRO.LookDelta.y;
             pitchAngleAcceleration = math.sign(pitchAngleAcceleration) *
                                      math.min(math.abs(pitchAngleAcceleration), thrusterSetup.MaxTurnAcceleration);
             angularAcceleration.x = math.radians(pitchAngleAcceleration);
         }
 
-        float rollSensitivity = managedAccess.ManagedLocalPlayer.GetRollSensitivity();
-        float rollAngleAcceleration = rollSensitivity * thrusterSetup.MaxRollAcceleration * playerInput.RollDirection;
+        float rollAngleAcceleration = thrusterSetup.MaxRollAcceleration * shipAspect.ShipInput.ValueRO.RollDirection;
         angularAcceleration.z = math.radians(rollAngleAcceleration);
         
-        float3 angularVelocity = player.Velocity.ValueRO.Angular;
+        float3 angularVelocity = shipAspect.Velocity.ValueRO.Angular;
 
-        if (playerInput.IsADS)
+        if (shipAspect.ShipInput.ValueRO.IsADS)
         {
-            float lookSensitivity = managedAccess.ManagedLocalPlayer.GetLookSensitivityADS();
-            float yawTargetVelocity = lookSensitivity * playerInput.LookDelta.x;
+            float yawTargetVelocity = shipAspect.ShipInput.ValueRO.LookDelta.x;
             yawTargetVelocity = math.sign(yawTargetVelocity) * math.min(math.abs(yawTargetVelocity), thrusterSetup.MaxTurnSpeed);
             angularVelocity.y = math.radians(yawTargetVelocity);
             
-            float pitchTargetVelocity = lookSensitivity * playerInput.LookDelta.y;
+            float pitchTargetVelocity = shipAspect.ShipInput.ValueRO.LookDelta.y;
             pitchTargetVelocity = math.sign(pitchTargetVelocity) * math.min(math.abs(pitchTargetVelocity), thrusterSetup.MaxTurnSpeed);
             angularVelocity.x = math.radians(pitchTargetVelocity);
         }
@@ -233,7 +224,7 @@ partial class ShipMovementSystem : SystemBase
         
         angularVelocity.z = math.sign(angularVelocity.z) * math.min(math.abs(angularVelocity.z), math.radians(thrusterSetup.MaxRollSpeed));
 
-        if (playerInput.AngularDampersActive)
+        if (shipAspect.ShipInput.ValueRO.RollDampersActive)
         {
             angularVelocity = DampAngularVelocity(angularVelocity, angularAcceleration, thrusterSetup.AngularDamperDeceleration);
         }

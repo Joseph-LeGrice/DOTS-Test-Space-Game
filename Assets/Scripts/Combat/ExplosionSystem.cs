@@ -53,7 +53,7 @@ partial struct ExplosionSystem : ISystem
                 {
                     float3 delta = distanceHit.Position - localToWorld.ValueRO.Position;
                     float t = 1.0f; //1.0f - (math.length(delta) / explosion.ValueRO.Radius); // TODO: Configure Falloff
-
+        
                     if (velocityLookup.HasComponent(distanceHit.Entity) && massLookup.HasComponent(distanceHit.Entity))
                     {
                         var localToWorldHit = localToWorldLookup[distanceHit.Entity];
@@ -76,7 +76,7 @@ partial struct ExplosionSystem : ISystem
                     }
                 }
             }
-
+        
             outHits.Dispose();
             ecb.RemoveComponent<Explosion>(self);
         }
