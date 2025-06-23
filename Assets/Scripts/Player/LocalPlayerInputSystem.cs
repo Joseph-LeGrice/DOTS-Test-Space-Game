@@ -1,5 +1,6 @@
 using Unity.Entities;
 using Unity.Mathematics;
+using Unity.Transforms;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
@@ -18,6 +19,9 @@ public partial class LocalPlayerInputSystem : SystemBase
     {
         base.OnStartRunning();
         
+        Cursor.visible = false;
+        Cursor.lockState = CursorLockMode.Confined;
+        
         InputActionMap playerActionMap = ManagedSceneAccess.Instance.GetInputActionAsset().FindActionMap("Player", throwIfNotFound: true);
         playerActionMap.Enable();
         
@@ -34,6 +38,9 @@ public partial class LocalPlayerInputSystem : SystemBase
     protected override void OnUpdate()
     {
         ComponentLookup<ShipInput> shipInputLookup = SystemAPI.GetComponentLookup<ShipInput>();
+        ComponentLookup<LocalToWorld> localToWorldLookup = SystemAPI.GetComponentLookup<LocalToWorld>();
+        BufferLookup<DetectedTarget> detectedTargetsLookup = SystemAPI.GetBufferLookup<DetectedTarget>();
+        
         foreach (var (localPlayer, self) in SystemAPI.Query<RefRO<PlayerTag>>().WithEntityAccess())
         {
             RefRW<ShipInput> shipInput = shipInputLookup.GetRefRW(localPlayer.ValueRO.ControllingShip);
@@ -57,6 +64,46 @@ public partial class LocalPlayerInputSystem : SystemBase
                 // shipInput.ValueRW.RollDampersActive = !shipInput.ValueRW.RollDampersActive;
             }
             shipInput.ValueRW.RollDirection = -m_Player_Roll.ReadValue<float>();
+
+            DynamicBuffer<DetectedTarget> detectedTargets = detectedTargetsLookup[localPlayer.ValueRO.ControllingShip];
+            LocalToWorld shipLocalToWorld = localToWorldLookup[localPlayer.ValueRO.ControllingShip];
+        
+            float threshold = 0.99f;
+            int bestTargetAhead = -1;
+            float bestDot = 0.0f;
+            for (int i=0; i< detectedTargets.Length; i++)
+            {
+                DetectedTarget target = detectedTargets[i];
+                if (EntityManager.Exists(target.TargetableEntity))
+                {
+                    LocalToWorld targetTransform = localToWorldLookup[target.TargetableEntity];
+                    float3 deltaNormalised = math.normalize(targetTransform.Position - shipLocalToWorld.Position);
+                    float dot = math.dot(shipLocalToWorld.Forward, deltaNormalised);
+                    if (dot > bestDot && dot >= threshold)
+                    {
+                        bestDot = dot;
+                        bestTargetAhead = i;
+                    }
+                }
+            }
+        
+            for (int i = 0; i < detectedTargets.Length; i++)
+            {
+                var t = detectedTargets[i];
+                t.CanTargetAhead = i == bestTargetAhead;
+                if (shipInput.ValueRO.TargetSelectAhead)
+                {
+                    if (i == bestTargetAhead)
+                    {
+                        t.IsSelected = !t.IsSelected;
+                    }
+                    else
+                    {
+                        t.IsSelected = false;
+                    }
+                }
+                detectedTargets[i] = t;
+            }
         }
     }
 

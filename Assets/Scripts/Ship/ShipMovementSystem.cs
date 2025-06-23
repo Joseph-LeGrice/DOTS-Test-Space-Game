@@ -15,7 +15,6 @@ public readonly partial struct ShipAspect : IAspect
     public readonly RefRW<PhysicsMass> PhysicsMass;
     public readonly RefRO<LocalToWorld> LocalToWorld;
     public readonly DynamicBuffer<ShipHardpointReference> ShipHardpoints;
-    public readonly DynamicBuffer<DetectedTarget> DetectedTargets;
 }
 
 partial class ShipMovementSystem : SystemBase
@@ -30,8 +29,6 @@ partial class ShipMovementSystem : SystemBase
                 hardpoint.IsFiring = shipAspect.ShipInput.ValueRO.IsAttacking;
                 SystemAPI.SetComponent(shipHardpoint.Self, hardpoint);
             }
-
-            UpdateTargets(shipAspect);
 
             shipAspect.PlayerBoostState.ValueRW.UpdateBoost(SystemAPI.Time.DeltaTime, shipAspect.PlayerData.ValueRO.BoostRechargeTime);
             if (shipAspect.ShipInput.ValueRO.IsBoosting)
@@ -52,49 +49,6 @@ partial class ShipMovementSystem : SystemBase
 
             float3 angularVelocity = GetAngularVelocity(shipAspect); // GetAngularVelocity(player, managedAccess);
             shipAspect.Velocity.ValueRW.Angular = angularVelocity; // * angularVelocityModifier;
-        }
-    }
-
-    private void UpdateTargets(ShipAspect shipAspect) // TODO: Move to local player input system?
-    {
-        var localToWorldLookup = SystemAPI.GetComponentLookup<LocalToWorld>();
-        
-        float threshold = 0.99f;
-        int bestTargetAhead = -1;
-        float bestDot = 0.0f;
-        for (int i=0; i< shipAspect.DetectedTargets.Length; i++)
-        {
-            DetectedTarget target = shipAspect.DetectedTargets[i];
-            if (EntityManager.Exists(target.TargetableEntity))
-            {
-                LocalToWorld targetTransform = localToWorldLookup[target.TargetableEntity];
-                float3 deltaNormalised = math.normalize(targetTransform.Position - shipAspect.LocalToWorld.ValueRO.Position);
-                float dot = math.dot(shipAspect.LocalToWorld.ValueRO.Forward, deltaNormalised);
-                if (dot > bestDot && dot >= threshold)
-                {
-                    bestDot = dot;
-                    bestTargetAhead = i;
-                }
-            }
-        }
-            
-        var detectedTargets = shipAspect.DetectedTargets;
-        for (int i = 0; i < shipAspect.DetectedTargets.Length; i++)
-        {
-            var t = shipAspect.DetectedTargets[i];
-            t.CanTargetAhead = i == bestTargetAhead;
-            if (shipAspect.ShipInput.ValueRO.TargetSelectAhead)
-            {
-                if (i == bestTargetAhead)
-                {
-                    t.IsSelected = !t.IsSelected;
-                }
-                else
-                {
-                    t.IsSelected = false;
-                }
-            }
-            detectedTargets[i] = t;
         }
     }
 
@@ -224,7 +178,7 @@ partial class ShipMovementSystem : SystemBase
         
         angularVelocity.z = math.sign(angularVelocity.z) * math.min(math.abs(angularVelocity.z), math.radians(thrusterSetup.MaxRollSpeed));
 
-        if (shipAspect.ShipInput.ValueRO.RollDampersActive)
+        if (shipAspect.ShipInput.ValueRO.AngularDampersActive)
         {
             angularVelocity = DampAngularVelocity(angularVelocity, angularAcceleration, thrusterSetup.AngularDamperDeceleration);
         }

@@ -1,0 +1,20 @@
+<ui:UXML xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" noNamespaceSchemaLocation="../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
+    <ui:Template name="ThrusterDisplay" src="project://database/Assets/UserInterface/HUD/ThrusterDisplay.uxml?fileID=9197481963319205126&amp;guid=e820687cb2a54634f81e4316cc7c7bf8&amp;type=3#ThrusterDisplay" />
+    <ui:VisualElement style="flex-grow: 0; flex-direction: row; flex-shrink: 0; right: 0; bottom: 0; position: absolute; height: 289px;">
+        <ui:VisualElement style="flex-grow: 1; justify-content: center;">
+            <ui:VisualElement style="flex-grow: 0; flex-wrap: nowrap; flex-direction: row; flex-shrink: 1;">
+                <ui:Label text="Health:" name="HealthLabel" style="flex-grow: 1; -unity-text-align: middle-left; font-size: 14px; color: rgb(0, 255, 0);" />
+                <ui:Label text="100%" enable-rich-text="false" name="HealthValue" style="align-content: flex-start; justify-content: flex-start; -unity-text-align: middle-left; color: rgb(0, 255, 0);" />
+            </ui:VisualElement>
+            <ui:VisualElement style="flex-grow: 0; flex-wrap: nowrap; flex-direction: row; flex-shrink: 1;">
+                <ui:Label text="Shields:" name="ShieldLabel" style="flex-grow: 1; -unity-text-align: middle-left; font-size: 14px; color: rgb(0, 255, 255);" />
+                <ui:Label text="100%" enable-rich-text="false" name="ShieldValue" style="align-content: flex-start; justify-content: flex-start; -unity-text-align: middle-left; color: rgb(0, 255, 255);" />
+            </ui:VisualElement>
+            <ui:VisualElement style="flex-grow: 0; flex-wrap: nowrap; flex-direction: row; flex-shrink: 1;">
+                <ui:Label text="Linear Dampers:" name="LinearDampersLabel" style="flex-grow: 1; -unity-text-align: middle-left; font-size: 14px; color: rgb(255, 255, 255);" />
+                <ui:Label text="OFF" enable-rich-text="false" name="LinearDampersValue" style="align-content: flex-start; justify-content: flex-start; -unity-text-align: middle-left; color: rgb(255, 0, 0);" />
+            </ui:VisualElement>
+        </ui:VisualElement>
+        <ui:Instance template="ThrusterDisplay" style="flex-shrink: 0; width: 196px;" />
+    </ui:VisualElement>
+</ui:UXML>

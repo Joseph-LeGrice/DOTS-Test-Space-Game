@@ -9,14 +9,14 @@ public struct ShipInput : IComponentData
     public bool IsADS;
     public bool IsBoosting;
     public bool LinearDampersActive;
-    public bool RollDampersActive;
+    public bool AngularDampersActive;
     public float RollDirection;
     public bool TargetSelectAhead;
 
     public static ShipInput Default => new ShipInput()
     {
         LinearDampersActive = true,
-        RollDampersActive = true,
+        AngularDampersActive = false,
     };
 }
 
