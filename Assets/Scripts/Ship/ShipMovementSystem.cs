@@ -9,12 +9,14 @@ public readonly partial struct ShipAspect : IAspect
 {
     public readonly Entity Self;
     public readonly RefRO<ShipInput> ShipInput;
-    public readonly RefRW<ShipMovementData> PlayerData;
+    public readonly RefRW<ShipMovementData> ShipMovementData;
     public readonly RefRW<ShipBoosterState> PlayerBoostState;
     public readonly RefRW<PhysicsVelocity> Velocity;
     public readonly RefRW<PhysicsMass> PhysicsMass;
+    public readonly RefRO<Damageable> Damageable;
     public readonly RefRO<LocalToWorld> LocalToWorld;
     public readonly DynamicBuffer<ShipHardpointReference> ShipHardpoints;
+    public readonly DynamicBuffer<DetectedTarget> DetectedTargets;
 }
 
 partial class ShipMovementSystem : SystemBase
@@ -30,10 +32,10 @@ partial class ShipMovementSystem : SystemBase
                 SystemAPI.SetComponent(shipHardpoint.Self, hardpoint);
             }
 
-            shipAspect.PlayerBoostState.ValueRW.UpdateBoost(SystemAPI.Time.DeltaTime, shipAspect.PlayerData.ValueRO.BoostRechargeTime);
+            shipAspect.PlayerBoostState.ValueRW.UpdateBoost(SystemAPI.Time.DeltaTime, shipAspect.ShipMovementData.ValueRO.BoostRechargeTime);
             if (shipAspect.ShipInput.ValueRO.IsBoosting)
             {
-                shipAspect.PlayerBoostState.ValueRW.TryBoostPerformed(shipAspect.PlayerData.ValueRO.BoostTime);
+                shipAspect.PlayerBoostState.ValueRW.TryBoostPerformed(shipAspect.ShipMovementData.ValueRO.BoostTime);
             }
 
             // float angularVelocityModifier = 1.0f;
@@ -70,7 +72,7 @@ partial class ShipMovementSystem : SystemBase
 
     private float3 GetLinearVelocity(ShipAspect shipAspect)
     {
-        ShipMovementData shipMovementData = shipAspect.PlayerData.ValueRO;
+        ShipMovementData shipMovementData = shipAspect.ShipMovementData.ValueRO;
         ShipBoosterState shipBoosters = shipAspect.PlayerBoostState.ValueRO;
 
         ThrusterSetup thrusterSetup = shipMovementData.DefaultMovement;
@@ -132,7 +134,7 @@ partial class ShipMovementSystem : SystemBase
     
     private float3 GetAngularVelocity(ShipAspect shipAspect)
     {
-        ShipMovementData shipMovementData = shipAspect.PlayerData.ValueRO;
+        ShipMovementData shipMovementData = shipAspect.ShipMovementData.ValueRO;
         
         ThrusterSetup thrusterSetup = shipMovementData.DefaultMovement;
         if (shipAspect.ShipInput.ValueRO.IsADS)

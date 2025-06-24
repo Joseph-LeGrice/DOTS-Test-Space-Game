@@ -4,6 +4,7 @@ using Unity.Transforms;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
+[UpdateInGroup(typeof(VariableRateSimulationSystemGroup))]
 public partial class LocalPlayerInputSystem : SystemBase
 {
     private InputAction m_Player_Movement;
@@ -14,6 +15,12 @@ public partial class LocalPlayerInputSystem : SystemBase
     private InputAction m_Player_Boost;
     private InputAction m_Player_ToggleVelocityDampers;
     private InputAction m_Player_SelectAhead;
+
+    protected override void OnCreate()
+    {
+        base.OnCreate();
+        RequireForUpdate<LocalToWorld>();
+    }
 
     protected override void OnStartRunning()
     {

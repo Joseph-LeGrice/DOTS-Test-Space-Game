@@ -13,6 +13,8 @@ public class LocalPlayerUserInterface : MonoBehaviour
     [SerializeField]
     private TurnAccelerationDisplay m_accelerationDisplay;
     [SerializeField]
+    private LocalPlayerHUD m_localPlayerHUD;
+    [SerializeField]
     private TargetDisplay m_targetDisplay;
     [SerializeField]
     private Transform m_shipAim;
@@ -33,6 +35,11 @@ public class LocalPlayerUserInterface : MonoBehaviour
         isVisible = position.z > 0.0f;
         // position.z = 50.0f;
         return position;
+    }
+
+    public LocalPlayerHUD GetHUD()
+    {
+        return m_localPlayerHUD;
     }
     
     public void SetShipAim(Vector3 worldPosition)

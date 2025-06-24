@@ -12,7 +12,7 @@ public readonly partial struct PlayerUIAspectFixed : IAspect
 }
 
 [UpdateInGroup(typeof(FixedStepSimulationSystemGroup))]
-[UpdateAfter(typeof(PhysicsSimulationGroup))]
+[UpdateAfter(typeof(PhysicsSystemGroup))]
 public partial class UserInterfaceUpdateSystemFixed : SystemBase
 {
     protected override void OnUpdate()

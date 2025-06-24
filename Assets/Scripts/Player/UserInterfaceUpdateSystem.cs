@@ -6,14 +6,6 @@ using Unity.Physics.Systems;
 using Unity.Transforms;
 using UnityEngine;
 
-public readonly partial struct PlayerUIAspect : IAspect
-{
-    public readonly RefRO<ShipInput> ShipInput;
-    public readonly RefRO<ShipMovementData> PlayerData;
-    public readonly RefRO<PhysicsVelocity> PhysicsVelocity;
-    public readonly DynamicBuffer<DetectedTarget> DetectedTargets;
-}
-
 [UpdateInGroup(typeof(LateSimulationSystemGroup))]
 [UpdateAfter(typeof(TargetSystem))]
 public partial class UserInterfaceUpdateSystem : SystemBase
@@ -23,17 +15,17 @@ public partial class UserInterfaceUpdateSystem : SystemBase
         ComponentLookup<LocalToWorld> localToWorldLookup = SystemAPI.GetComponentLookup<LocalToWorld>();
         foreach (var (localPlayer, self) in SystemAPI.Query<RefRO<PlayerTag>>().WithEntityAccess())
         {
-            PlayerUIAspect player = SystemAPI.GetAspect<PlayerUIAspect>(localPlayer.ValueRO.ControllingShip);
+            ShipAspect playerShip = SystemAPI.GetAspect<ShipAspect>(localPlayer.ValueRO.ControllingShip);
             PlayerManagedAccess managedAccess = SystemAPI.ManagedAPI.GetComponent<PlayerManagedAccess>(self);
             ManagedLocalPlayer managedLocalPlayer = managedAccess.ManagedLocalPlayer;
             LocalPlayerUserInterface playerUi = managedLocalPlayer.GetUserInterface();
             
-            if (!player.ShipInput.ValueRO.IsADS)
+            if (!playerShip.ShipInput.ValueRO.IsADS)
             {
-                var thrusterSetup = player.PlayerData.ValueRO.DefaultMovement;
+                var thrusterSetup = playerShip.ShipMovementData.ValueRO.DefaultMovement;
             
-                float2 accelerationXY = new float2(player.PhysicsVelocity.ValueRO.Angular.y,
-                    -player.PhysicsVelocity.ValueRO.Angular.x);
+                float2 accelerationXY = new float2(playerShip.Velocity.ValueRO.Angular.y,
+                    -playerShip.Velocity.ValueRO.Angular.x);
                 float2 accelerationDirection = math.normalizesafe(accelerationXY);
                 float accelerationNormalised = math.lengthsq(accelerationXY) /
                                                math.pow(math.radians(thrusterSetup.MaxTurnSpeed), 2.0f);
@@ -45,7 +37,7 @@ public partial class UserInterfaceUpdateSystem : SystemBase
             }
             
             List<TargetData> targetData = new List<TargetData>();
-            foreach (DetectedTarget dt in player.DetectedTargets)
+            foreach (DetectedTarget dt in playerShip.DetectedTargets)
             {
                 var l2wTarget = localToWorldLookup[dt.TargetableEntity];
                 targetData.Add(new TargetData()
@@ -56,6 +48,8 @@ public partial class UserInterfaceUpdateSystem : SystemBase
                 });
             }
             playerUi.SetTargets(targetData);
+
+            playerUi.GetHUD().UpdateHUD(ref playerShip);
         }
     }
 }

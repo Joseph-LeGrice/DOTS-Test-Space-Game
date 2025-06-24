@@ -23,6 +23,7 @@ class ShipBaker : MonoBehaviour
             Entity mainEntity = GetEntity(TransformUsageFlags.Dynamic);
             
             AddComponent<ShipInput>(mainEntity, ShipInput.Default);
+            AddComponent<Damageable>(mainEntity, Damageable.WithHealth(1000.0f));
             AddComponent(mainEntity, new ShipMovementData()
             {
                 DefaultMovement = authoring.DefaultMovement,
