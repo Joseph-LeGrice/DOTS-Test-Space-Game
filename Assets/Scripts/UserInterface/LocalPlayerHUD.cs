@@ -11,6 +11,8 @@ public class LocalPlayerHUD : MonoBehaviour
     [SerializeField]
     private UIDocument m_uiDocument;
 
+    private VisualElement m_thrusterDisplayRoot;
+    
     private Label m_healthValue;
     private Label m_shieldValue;
     private Label m_linearDampersValue;
@@ -31,6 +33,8 @@ public class LocalPlayerHUD : MonoBehaviour
         {
             m_thrusterValues[i] = m_uiDocument.rootVisualElement.Q("ThrusterValue" + i);
         }
+
+        m_thrusterDisplayRoot = m_uiDocument.rootVisualElement.Q("ThrusterDisplayRoot");
     }
 
     public void UpdateHUD(ref ShipAspect ship)
@@ -38,13 +42,12 @@ public class LocalPlayerHUD : MonoBehaviour
         m_healthValue.text = 100.0f * (ship.Damageable.ValueRO.CurrentHealth / ship.Damageable.ValueRO.MaxHealth) + "%";
         m_shieldValue.text = 100.0f * (ship.Damageable.ValueRO.CurrentHealth / ship.Damageable.ValueRO.MaxHealth) + "%";
 
+        float displayHeight = m_thrusterDisplayRoot.resolvedStyle.height;
         foreach (VisualElement thrusterCursor in m_thrusterCursors)
         {
-            StyleBackgroundPosition backgroundPositionY = thrusterCursor.style.backgroundPositionY;
-            BackgroundPosition value = backgroundPositionY.value;
-            value.offset.value = ((ship.ShipInput.ValueRO.TargetDirection.z + 1.0f) % 1.0f) * 100.0f;
-            backgroundPositionY.value = value;
-            thrusterCursor.style.backgroundPositionY = backgroundPositionY;
+            Vector3 translation = thrusterCursor.transform.position;
+            translation.y = -ship.ShipInput.ValueRO.TargetDirection.z * (displayHeight - thrusterCursor.resolvedStyle.height);
+            thrusterCursor.transform.position = translation;
         }
 
         float3 localVelocity = ship.LocalToWorld.ValueRO.Value.InverseTransformDirection(ship.Velocity.ValueRO.Linear);
