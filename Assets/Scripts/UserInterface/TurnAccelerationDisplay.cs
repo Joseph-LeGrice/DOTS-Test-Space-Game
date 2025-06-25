@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using Unity.Mathematics;
 using UnityEngine;
 
 public class TurnAccelerationDisplay : MonoBehaviour
@@ -46,27 +47,20 @@ public class TurnAccelerationDisplay : MonoBehaviour
         }
     }
 
-    public void SetAcceleration(Vector2 direction, float accelerationNormalised)
+    public void SetAngularThrottle(Vector2 angularThrottle)
     {
-        float diff = 1.0f / m_numberOfSprites;
-        
-        int count = Mathf.FloorToInt(accelerationNormalised / diff);
-        float remainder = accelerationNormalised % diff;
-        
+        float throttleSprite = m_numberOfSprites * math.cmax(math.abs(angularThrottle));
         for (int i = 0; i < m_numberOfSprites; i++)
         {
-            float a = 0.0f;
-            if (i <= count)
-            {
-                a = 1.0f;
-            }
-            else if (i == count + 1)
-            {
-                a = remainder / diff;
-            }
+            float a = Mathf.Clamp01(throttleSprite - i);
             m_createdSprites[i].color = new Color(m_uiColor.r, m_uiColor.g, m_uiColor.b, a);
         }
-        
-        transform.rotation = Quaternion.LookRotation(Vector3.forward, direction);
+
+        Vector3 direction = new Vector3(
+            angularThrottle.y,
+            -angularThrottle.x,
+            0.0f
+        );
+        transform.rotation = Quaternion.AngleAxis(Vector2.SignedAngle(Vector2.up, direction), Vector3.forward);
     }
 }

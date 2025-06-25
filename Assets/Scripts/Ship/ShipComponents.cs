@@ -5,7 +5,7 @@ public struct ShipInput : IComponentData
 {
     public float Throttle;
     public float2 StrafeThrusters;
-    public float2 LookDelta;
+    public float2 AngularThrottle;
     public bool IsAttacking;
     public bool IsADS;
     public bool IsBoosting;
@@ -17,7 +17,7 @@ public struct ShipInput : IComponentData
     public static ShipInput Default => new ShipInput()
     {
         LinearDampersActive = true,
-        AngularDampersActive = false,
+        AngularDampersActive = true,
     };
 }
 

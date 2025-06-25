@@ -48,7 +48,7 @@ public partial class LocalPlayerInputSystem : SystemBase
         ComponentLookup<LocalToWorld> localToWorldLookup = SystemAPI.GetComponentLookup<LocalToWorld>();
         BufferLookup<DetectedTarget> detectedTargetsLookup = SystemAPI.GetBufferLookup<DetectedTarget>();
         
-        foreach (var (localPlayer, self) in SystemAPI.Query<RefRO<PlayerTag>>().WithEntityAccess())
+        foreach (var (localPlayer, self) in SystemAPI.Query<RefRW<PlayerTag>>().WithEntityAccess())
         {
             PlayerManagedAccess managedLocalPlayer = SystemAPI.ManagedAPI.GetComponent<PlayerManagedAccess>(self);
             
@@ -59,10 +59,21 @@ public partial class LocalPlayerInputSystem : SystemBase
             throttle = math.clamp(throttle, -1.0f, 1.0f);
             shipInput.ValueRW.Throttle = throttle;
             
-            shipInput.ValueRW.StrafeThrusters = movementInput.xy; 
+            shipInput.ValueRW.StrafeThrusters = movementInput.xy;
+
+            float2 angularThrottleDelta = m_Player_Look.ReadValue<Vector2>();
+            angularThrottleDelta = new float2(-angularThrottleDelta.y, angularThrottleDelta.x);
+            angularThrottleDelta = angularThrottleDelta * managedLocalPlayer.ManagedLocalPlayer.GetLookSensitivity() * SystemAPI.Time.DeltaTime;
             
-            Vector2 look = m_Player_Look.ReadValue<Vector2>();
-            shipInput.ValueRW.LookDelta = new float2(look.x, -look.y);
+            float throttleDeadzone = managedLocalPlayer.ManagedLocalPlayer.GetThrottleDeadzone();
+            
+            float2 angularThrottleWithDeadzone = localPlayer.ValueRW.ThrottleMouseDeadzone + angularThrottleDelta;
+            angularThrottleWithDeadzone.x = math.sign(angularThrottleWithDeadzone.x) * math.min(math.abs(angularThrottleWithDeadzone.x), 1.0f + throttleDeadzone);
+            angularThrottleWithDeadzone.y = math.sign(angularThrottleWithDeadzone.y) * math.min(math.abs(angularThrottleWithDeadzone.y), 1.0f + throttleDeadzone);
+            localPlayer.ValueRW.ThrottleMouseDeadzone = angularThrottleWithDeadzone;
+
+            float2 nextAngularThrottle = math.sign(angularThrottleWithDeadzone) * (math.max(math.abs(angularThrottleWithDeadzone) - throttleDeadzone, 0.0f));
+            shipInput.ValueRW.AngularThrottle = nextAngularThrottle;
             
             shipInput.ValueRW.IsAttacking = m_Player_Attack.inProgress;
             if (m_Player_ADS.triggered)

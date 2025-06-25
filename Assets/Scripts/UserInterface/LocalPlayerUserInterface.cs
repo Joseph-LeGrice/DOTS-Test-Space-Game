@@ -54,9 +54,9 @@ public class LocalPlayerUserInterface : MonoBehaviour
         m_crosshair.GetDotTransform(hardpointIndex).position = uiPosition;
     }
 
-    public void SetAcceleration(Vector2 direction, float accelerationNormalised)
+    public void SetAngularThrottle(Vector2 angularThrottle)
     {
-        m_accelerationDisplay.SetAcceleration(direction, accelerationNormalised);
+        m_accelerationDisplay.SetAngularThrottle(angularThrottle);
     }
 
     public void SetTargets(List<TargetData> targetData)

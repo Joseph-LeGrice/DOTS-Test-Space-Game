@@ -211,7 +211,7 @@ MonoBehaviour:
     ReverseThrustersAcceleration: 75
     MaxTurnAcceleration: 100
     MaxTurnSpeed: 45
-    MaxRollAcceleration: 30
+    MaxRollAcceleration: 100
     MaxRollSpeed: 90
     AngularDamperDeceleration: 180
     VelocityDamperDeceleration: 150
@@ -219,9 +219,9 @@ MonoBehaviour:
     ForwardThrustersAcceleration: 37.5
     LateralThrustersAcceleration: 100
     ReverseThrustersAcceleration: 37.5
-    MaxTurnAcceleration: -1
+    MaxTurnAcceleration: 100
     MaxTurnSpeed: 30
-    MaxRollAcceleration: 30
+    MaxRollAcceleration: 100
     MaxRollSpeed: 90
     AngularDamperDeceleration: 360
     VelocityDamperDeceleration: 10

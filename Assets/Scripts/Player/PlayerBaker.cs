@@ -1,9 +1,11 @@
 using Unity.Entities;
+using Unity.Mathematics;
 using UnityEngine;
 
 public struct PlayerTag : IComponentData
 {
     public Entity ControllingShip;
+    public float2 ThrottleMouseDeadzone;
 }
 
 public class PlayerManagedAccess : IComponentData

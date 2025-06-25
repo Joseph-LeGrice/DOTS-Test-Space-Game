@@ -22,18 +22,11 @@ public partial class UserInterfaceUpdateSystem : SystemBase
             
             if (!playerShip.ShipInput.ValueRO.IsADS)
             {
-                var thrusterSetup = playerShip.ShipMovementData.ValueRO.DefaultMovement;
-            
-                float2 accelerationXY = new float2(playerShip.Velocity.ValueRO.Angular.y,
-                    -playerShip.Velocity.ValueRO.Angular.x);
-                float2 accelerationDirection = math.normalizesafe(accelerationXY);
-                float accelerationNormalised = math.lengthsq(accelerationXY) /
-                                               math.pow(math.radians(thrusterSetup.MaxTurnSpeed), 2.0f);
-                playerUi.SetAcceleration(accelerationDirection, accelerationNormalised);
+                playerUi.SetAngularThrottle(playerShip.ShipInput.ValueRO.AngularThrottle);
             }
             else
             {
-                playerUi.SetAcceleration(Vector2.up, 0.0f);
+                playerUi.SetAngularThrottle(Vector2.zero);
             }
             
             List<TargetData> targetData = new List<TargetData>();

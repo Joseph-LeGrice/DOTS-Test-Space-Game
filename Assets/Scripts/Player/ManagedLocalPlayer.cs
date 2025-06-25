@@ -21,6 +21,9 @@ public class ManagedLocalPlayer : MonoBehaviour
     private float m_rollSensitivity = 1.0f;
     [SerializeField]
     private float m_throttleAdjustSensitivity = 1.0f;
+    [SerializeField]
+    private float m_throttleDeadzone = 0.5f;
+    
     
     public LocalPlayerUserInterface GetUserInterface()
     {
@@ -61,5 +64,10 @@ public class ManagedLocalPlayer : MonoBehaviour
     public float GetThrottleSensitivity()
     {
         return m_throttleAdjustSensitivity;
+    }
+
+    public float GetThrottleDeadzone()
+    {
+        return m_throttleDeadzone;
     }
 }
