@@ -97,15 +97,35 @@ partial class ShipMovementSystem : SystemBase
             float targetVelocity = shipAspect.ShipInput.ValueRO.Throttle * shipAspect.ShipMovementData.ValueRO.MaximumVelocity;
             float vDelta = targetVelocity - currentVelocityLocal.z;
 
-            float maxAcceleration = thrusterSetup.ForwardThrustersAcceleration;
-            if (vDelta < 0.0f)
+            if (shipAspect.ShipInput.ValueRO.LinearDampersActive)
             {
-                maxAcceleration = -thrusterSetup.ReverseThrustersAcceleration;
-            }
+                float maxThrottleAcceleration = thrusterSetup.ForwardThrustersAcceleration;
+                if (vDelta < 0.0f)
+                {
+                    maxThrottleAcceleration = -thrusterSetup.ReverseThrustersAcceleration;
+                }
 
-            float lowerBound = 0.5f;
-            float upperBound = 5.0f;
-            acceleration.z = maxAcceleration * math.unlerp(lowerBound, upperBound, math.min(math.abs(vDelta), upperBound));
+                float maxVelocityDelta = math.abs(maxThrottleAcceleration) * SystemAPI.Time.DeltaTime;
+                float accelerationT = math.min(math.abs(vDelta) / maxVelocityDelta, 1.0f);
+                acceleration.z = accelerationT * maxThrottleAcceleration;
+            }
+            else
+            {
+                if (vDelta > 0.0f && targetVelocity > 0.0f)
+                {
+                    float maxThrottleAcceleration = thrusterSetup.ForwardThrustersAcceleration;
+                    float maxVelocityDelta = math.abs(maxThrottleAcceleration) * SystemAPI.Time.DeltaTime;
+                    float accelerationT = math.min(math.abs(vDelta) / maxVelocityDelta, 1.0f);
+                    acceleration.z = accelerationT * maxThrottleAcceleration;
+                }
+                else if (vDelta < 0.0f && targetVelocity < 0.0f)
+                {
+                    float maxThrottleAcceleration = -thrusterSetup.ReverseThrustersAcceleration;
+                    float maxVelocityDelta = math.abs(maxThrottleAcceleration) * SystemAPI.Time.DeltaTime;
+                    float accelerationT = math.min(math.abs(vDelta) / maxVelocityDelta, 1.0f);
+                    acceleration.z = accelerationT * maxThrottleAcceleration;
+                }
+            }
         }
 
         acceleration.x = shipAspect.ShipInput.ValueRO.StrafeThrusters.x * thrusterSetup.LateralThrustersAcceleration;
