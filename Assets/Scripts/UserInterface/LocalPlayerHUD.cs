@@ -46,7 +46,7 @@ public class LocalPlayerHUD : MonoBehaviour
         foreach (VisualElement thrusterCursor in m_thrusterCursors)
         {
             Vector3 translation = thrusterCursor.transform.position;
-            translation.y = -ship.ShipInput.ValueRO.TargetDirection.z * (displayHeight - thrusterCursor.resolvedStyle.height);
+            translation.y = -ship.ShipInput.ValueRO.Throttle * (displayHeight - thrusterCursor.resolvedStyle.height);
             thrusterCursor.transform.position = translation;
         }
 

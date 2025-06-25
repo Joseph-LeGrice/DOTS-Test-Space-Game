@@ -84,6 +84,9 @@ partial class ShipMovementSystem : SystemBase
         float3 acceleration = new float3();
         float maximumVelocity = shipMovementData.MaximumVelocity;
         
+        LocalToWorld localToWorld = shipAspect.LocalToWorld.ValueRO;
+        float3 currentVelocityLocal = localToWorld.Value.InverseTransformDirection(shipAspect.Velocity.ValueRO.Linear);
+        
         if (shipBoosters.IsBoosting())
         {
             acceleration.z = shipBoosters.GetBoostAcceleration(shipMovementData.BoostAcceleration, shipMovementData.BoostTime);
@@ -91,31 +94,33 @@ partial class ShipMovementSystem : SystemBase
         }
         else
         {
-            float dir = shipAspect.ShipInput.ValueRO.TargetDirection.z;
-            if (dir > 0.0f)
+            float targetVelocity = shipAspect.ShipInput.ValueRO.Throttle * shipAspect.ShipMovementData.ValueRO.MaximumVelocity;
+            float vDelta = targetVelocity - currentVelocityLocal.z;
+
+            float maxAcceleration = thrusterSetup.ForwardThrustersAcceleration;
+            if (vDelta < 0.0f)
             {
-                acceleration.z = thrusterSetup.ForwardThrustersAcceleration;
+                maxAcceleration = -thrusterSetup.ReverseThrustersAcceleration;
             }
-            else if (dir < 0.0f)
-            {
-                acceleration.z = -thrusterSetup.ReverseThrustersAcceleration;
-            }
+
+            float lowerBound = 0.5f;
+            float upperBound = 5.0f;
+            acceleration.z = maxAcceleration * math.unlerp(lowerBound, upperBound, math.min(math.abs(vDelta), upperBound));
         }
 
-        acceleration.x = shipAspect.ShipInput.ValueRO.TargetDirection.x * thrusterSetup.LateralThrustersAcceleration;
-        acceleration.y = shipAspect.ShipInput.ValueRO.TargetDirection.y * thrusterSetup.LateralThrustersAcceleration;
-        
-        LocalToWorld localToWorld = shipAspect.LocalToWorld.ValueRO;
-        float3 currentVelocityLocal = localToWorld.Value.InverseTransformDirection(shipAspect.Velocity.ValueRO.Linear);
-        currentVelocityLocal += acceleration * SystemAPI.Time.DeltaTime;
-        currentVelocityLocal = math.normalizesafe(currentVelocityLocal) * math.min(maximumVelocity, math.length(currentVelocityLocal));
+        acceleration.x = shipAspect.ShipInput.ValueRO.StrafeThrusters.x * thrusterSetup.LateralThrustersAcceleration;
+        acceleration.y = shipAspect.ShipInput.ValueRO.StrafeThrusters.y * thrusterSetup.LateralThrustersAcceleration;
+
+        float3 nextVelocityLocal = currentVelocityLocal;
+        nextVelocityLocal += acceleration * SystemAPI.Time.DeltaTime;
+        nextVelocityLocal = math.normalizesafe(nextVelocityLocal) * math.min(maximumVelocity, math.length(nextVelocityLocal));
 
         if (shipAspect.ShipInput.ValueRO.LinearDampersActive)
         {
-            currentVelocityLocal = DampVelocity(currentVelocityLocal, acceleration, thrusterSetup.VelocityDamperDeceleration);
+            nextVelocityLocal = DampVelocity(nextVelocityLocal, acceleration, thrusterSetup.VelocityDamperDeceleration);
         }
 
-        return localToWorld.Value.TransformDirection(currentVelocityLocal);
+        return localToWorld.Value.TransformDirection(nextVelocityLocal);
     }
     
     private float3 DampVelocity(float3 currentVelocity, float3 targetDirection, float velocityDampingDeceleration)
@@ -156,11 +161,16 @@ partial class ShipMovementSystem : SystemBase
                                      math.min(math.abs(pitchAngleAcceleration), thrusterSetup.MaxTurnAcceleration);
             angularAcceleration.x = math.radians(pitchAngleAcceleration);
         }
-
-        float rollAngleAcceleration = thrusterSetup.MaxRollAcceleration * shipAspect.ShipInput.ValueRO.RollDirection;
-        angularAcceleration.z = math.radians(rollAngleAcceleration);
         
         float3 angularVelocity = shipAspect.Velocity.ValueRO.Angular;
+
+        float targetRollSpeed = thrusterSetup.MaxRollSpeed * shipAspect.ShipInput.ValueRO.RollDirection;
+        float targetRollSpeedDelta = targetRollSpeed - angularVelocity.z;
+
+        float maxVelocityDelta = thrusterSetup.MaxRollAcceleration * SystemAPI.Time.DeltaTime;
+        float accelerationT = math.sign(targetRollSpeedDelta) * math.min(math.abs(targetRollSpeedDelta) / maxVelocityDelta, 1.0f);
+        float rollAngleAcceleration = accelerationT * thrusterSetup.MaxRollAcceleration;
+        angularAcceleration.z = math.radians(rollAngleAcceleration);
 
         if (shipAspect.ShipInput.ValueRO.IsADS)
         {

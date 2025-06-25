@@ -3,7 +3,8 @@ using Unity.Mathematics;
 
 public struct ShipInput : IComponentData
 {
-    public float3 TargetDirection;
+    public float Throttle;
+    public float2 StrafeThrusters;
     public float2 LookDelta;
     public bool IsAttacking;
     public bool IsADS;

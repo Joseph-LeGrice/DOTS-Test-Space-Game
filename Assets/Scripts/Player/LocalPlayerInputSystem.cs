@@ -50,8 +50,16 @@ public partial class LocalPlayerInputSystem : SystemBase
         
         foreach (var (localPlayer, self) in SystemAPI.Query<RefRO<PlayerTag>>().WithEntityAccess())
         {
+            PlayerManagedAccess managedLocalPlayer = SystemAPI.ManagedAPI.GetComponent<PlayerManagedAccess>(self);
+            
             RefRW<ShipInput> shipInput = shipInputLookup.GetRefRW(localPlayer.ValueRO.ControllingShip);
-            shipInput.ValueRW.TargetDirection = m_Player_Movement.ReadValue<Vector3>();
+            float3 movementInput = m_Player_Movement.ReadValue<Vector3>();
+            
+            float throttle = shipInput.ValueRW.Throttle + movementInput.z * managedLocalPlayer.ManagedLocalPlayer.GetThrottleSensitivity() * SystemAPI.Time.DeltaTime;
+            throttle = math.clamp(throttle, -1.0f, 1.0f);
+            shipInput.ValueRW.Throttle = throttle;
+            
+            shipInput.ValueRW.StrafeThrusters = movementInput.xy; 
             
             Vector2 look = m_Player_Look.ReadValue<Vector2>();
             shipInput.ValueRW.LookDelta = new float2(look.x, -look.y);
@@ -59,9 +67,8 @@ public partial class LocalPlayerInputSystem : SystemBase
             shipInput.ValueRW.IsAttacking = m_Player_Attack.inProgress;
             if (m_Player_ADS.triggered)
             {
-                ManagedLocalPlayer managedLocalPlayer = SystemAPI.ManagedAPI.GetComponent<ManagedLocalPlayer>(self);
                 shipInput.ValueRW.IsADS = !shipInput.ValueRW.IsADS;
-                managedLocalPlayer.SetADS(shipInput.ValueRW.IsADS);
+                managedLocalPlayer.ManagedLocalPlayer.SetADS(shipInput.ValueRW.IsADS);
             }
             shipInput.ValueRW.IsBoosting = m_Player_Boost.triggered;
             shipInput.ValueRW.TargetSelectAhead = m_Player_SelectAhead.triggered;
