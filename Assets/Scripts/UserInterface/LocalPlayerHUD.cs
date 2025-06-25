@@ -43,23 +43,35 @@ public class LocalPlayerHUD : MonoBehaviour
         m_shieldValue.text = 100.0f * (ship.Damageable.ValueRO.CurrentHealth / ship.Damageable.ValueRO.MaxHealth) + "%";
 
         float displayHeight = m_thrusterDisplayRoot.resolvedStyle.height;
+        float thrusterCursorT = ship.ShipInput.ValueRO.Throttle;
+        if (ship.ShipInput.ValueRO.Throttle < 0.0f)
+        {
+            thrusterCursorT += 1.0f;
+        }
+        
         foreach (VisualElement thrusterCursor in m_thrusterCursors)
         {
             Vector3 translation = thrusterCursor.transform.position;
-            translation.y = -ship.ShipInput.ValueRO.Throttle * (displayHeight - thrusterCursor.resolvedStyle.height);
+            translation.y = -thrusterCursorT * (displayHeight - thrusterCursor.resolvedStyle.height);
             thrusterCursor.transform.position = translation;
         }
 
         float3 localVelocity = ship.LocalToWorld.ValueRO.Value.InverseTransformDirection(ship.Velocity.ValueRO.Linear);
-        float t = localVelocity.z / ship.ShipMovementData.ValueRO.MaximumVelocity;
-        t = t * m_thrusterValues.Length;
+        float thrusterValueT = localVelocity.z / ship.ShipMovementData.ValueRO.MaximumVelocity;
+        thrusterValueT = thrusterValueT * m_thrusterValues.Length;
+        bool isReverse = thrusterValueT < 0.0f;
+        thrusterValueT = math.abs(thrusterValueT);
         
         for (int i = 0; i < m_thrusterValues.Length; i++)
         {
-            var tint = m_thrusterValues[i].style.unityBackgroundImageTintColor;
-            Color c = tint.value;
-            c.a = Mathf.Clamp(t - i, 0.0f, 1.0f);
-            tint.value = c;
+            var tint = m_thrusterValues[i].resolvedStyle.unityBackgroundImageTintColor;
+            float thrusterValueI = i;
+            if (isReverse)
+            {
+                thrusterValueI = m_thrusterValues.Length - i;
+            }
+            tint.a = Mathf.Clamp(thrusterValueT - thrusterValueI, 0.0f, 1.0f);
+
             m_thrusterValues[i].style.unityBackgroundImageTintColor = tint;
         }
     }
