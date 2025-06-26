@@ -74,5 +74,8 @@ public class LocalPlayerHUD : MonoBehaviour
 
             m_thrusterValues[i].style.unityBackgroundImageTintColor = tint;
         }
+        
+        m_linearDampersValue.text = ship.ShipInput.ValueRO.LinearDampersActive ? "ON" : "OFF";
+        m_linearDampersValue.style.color = ship.ShipInput.ValueRO.LinearDampersActive ? Color.forestGreen : Color.red;
     }
 }

@@ -3,6 +3,7 @@ using Unity.Mathematics;
 using Unity.Transforms;
 using UnityEngine;
 using UnityEngine.InputSystem;
+using UnityEngine.InputSystem.Controls;
 
 [UpdateInGroup(typeof(VariableRateSimulationSystemGroup))]
 public partial class LocalPlayerInputSystem : SystemBase
@@ -44,6 +45,8 @@ public partial class LocalPlayerInputSystem : SystemBase
 
     protected override void OnUpdate()
     {
+        InputSystem.Update();
+        
         ComponentLookup<ShipInput> shipInputLookup = SystemAPI.GetComponentLookup<ShipInput>();
         ComponentLookup<LocalToWorld> localToWorldLookup = SystemAPI.GetComponentLookup<LocalToWorld>();
         BufferLookup<DetectedTarget> detectedTargetsLookup = SystemAPI.GetBufferLookup<DetectedTarget>();
@@ -75,15 +78,15 @@ public partial class LocalPlayerInputSystem : SystemBase
             float2 nextAngularThrottle = math.sign(angularThrottleWithDeadzone) * (math.max(math.abs(angularThrottleWithDeadzone) - throttleDeadzone, 0.0f));
             shipInput.ValueRW.AngularThrottle = nextAngularThrottle;
             
-            shipInput.ValueRW.IsAttacking = m_Player_Attack.inProgress;
-            if (m_Player_ADS.triggered)
+            shipInput.ValueRW.IsAttacking = m_Player_Attack.IsPressed();
+            if (m_Player_ADS.WasPressedThisFrame())
             {
                 shipInput.ValueRW.IsADS = !shipInput.ValueRW.IsADS;
                 managedLocalPlayer.ManagedLocalPlayer.SetADS(shipInput.ValueRW.IsADS);
             }
-            shipInput.ValueRW.IsBoosting = m_Player_Boost.triggered;
-            shipInput.ValueRW.TargetSelectAhead = m_Player_SelectAhead.triggered;
-            if (m_Player_ToggleVelocityDampers.triggered)
+            shipInput.ValueRW.IsBoosting = m_Player_Boost.IsPressed();
+            shipInput.ValueRW.TargetSelectAhead = m_Player_SelectAhead.WasPressedThisFrame();
+            if (m_Player_ToggleVelocityDampers.WasPressedThisFrame())
             {
                 shipInput.ValueRW.LinearDampersActive = !shipInput.ValueRW.LinearDampersActive;
                 // shipInput.ValueRW.RollDampersActive = !shipInput.ValueRW.RollDampersActive;
