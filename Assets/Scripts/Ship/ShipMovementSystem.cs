@@ -170,6 +170,7 @@ partial class ShipMovementSystem : SystemBase
         float3 targetVelocity = float3.zero;
         targetVelocity.xy = shipAspect.ShipInput.ValueRO.AngularThrottle.xy * thrusterSetup.MaxTurnSpeed;
         targetVelocity.z = shipAspect.ShipInput.ValueRO.RollDirection * thrusterSetup.MaxRollSpeed;
+        targetVelocity = math.radians(targetVelocity);
         
         float3 currentVelocity = shipAspect.Velocity.ValueRO.Angular;
         float3 velocityDelta = targetVelocity - currentVelocity;
