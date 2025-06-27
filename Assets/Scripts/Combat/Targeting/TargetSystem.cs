@@ -20,6 +20,24 @@ public struct DetectedTarget : IBufferElementData
     public bool CanTargetAhead;
 }
 
+public static class TargetHelpers
+{
+    public static bool GetSelectedTarget(this DynamicBuffer<DetectedTarget> targetBuffer, ref SystemState state, out DetectedTarget selectedTarget)
+    {
+        foreach (DetectedTarget target in targetBuffer)
+        {
+            if (target.IsSelected && state.EntityManager.Exists(target.TargetableEntity))
+            {
+                selectedTarget = target;
+                return true;
+            }
+        }
+
+        selectedTarget = default;
+        return false;
+    }
+}
+
 [BurstCompile]
 [UpdateInGroup(typeof(LateSimulationSystemGroup))]
 public partial struct TargetSystem : ISystem

@@ -164,6 +164,51 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &1048829535
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1048829537}
+  - component: {fileID: 1048829536}
+  m_Layer: 0
+  m_Name: EnemyAI
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &1048829536
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1048829535}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ed341b21aa99a7b45a4188b9e3eff4da, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_enemyShip: {fileID: 1798137930}
+--- !u!4 &1048829537
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1048829535}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 3.17131, y: -13.27296, z: 3.39382}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1518708406
 GameObject:
   m_ObjectHideFlags: 0
@@ -245,6 +290,17 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1798137930 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 3851916723872251781, guid: d319db3af1c5f204196dd0b9bf436e84, type: 3}
+  m_PrefabInstance: {fileID: 2048177191}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a4ea47aeb49d02040887b6483334e00d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &2030789698
 GameObject:
   m_ObjectHideFlags: 0
@@ -303,7 +359,7 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 1037109658767662476, guid: d319db3af1c5f204196dd0b9bf436e84, type: 3}
       propertyPath: m_Name
-      value: DefaultShip
+      value: DefaultShip (Enemy)
       objectReference: {fileID: 0}
     - target: {fileID: 1037109658767662476, guid: d319db3af1c5f204196dd0b9bf436e84, type: 3}
       propertyPath: m_IsActive
@@ -375,7 +431,7 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 1037109658767662476, guid: d319db3af1c5f204196dd0b9bf436e84, type: 3}
       propertyPath: m_Name
-      value: DefaultShip
+      value: DefaultShip (Player)
       objectReference: {fileID: 0}
     - target: {fileID: 1037109658767662476, guid: d319db3af1c5f204196dd0b9bf436e84, type: 3}
       propertyPath: m_IsActive
@@ -434,4 +490,5 @@ SceneRoots:
   - {fileID: 1518708408}
   - {fileID: 223435048}
   - {fileID: 6835058525488777420}
+  - {fileID: 1048829537}
   - {fileID: 2048177191}

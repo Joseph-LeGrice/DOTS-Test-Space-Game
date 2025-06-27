@@ -27,7 +27,7 @@ public partial struct ShipHardpointGimbalingSystem : ISystem
         
         foreach (var (shipHardpointBuffer, targetBuffer, self) in SystemAPI.Query<DynamicBuffer<ShipHardpointReference>, DynamicBuffer<DetectedTarget>>().WithEntityAccess())
         {
-            if (GetSelectedTarget(ref state, targetBuffer, out DetectedTarget selectedTarget))
+            if (targetBuffer.GetSelectedTarget(ref state, out DetectedTarget selectedTarget))
             {
                 LocalToWorld l2wTarget = localToWorldLookup[selectedTarget.TargetableEntity];
                 
@@ -114,20 +114,5 @@ public partial struct ShipHardpointGimbalingSystem : ISystem
                 }
             }
         }
-    }
-
-    private bool GetSelectedTarget(ref SystemState state, DynamicBuffer<DetectedTarget> targetBuffer, out DetectedTarget selectedTarget)
-    {
-        foreach (DetectedTarget target in targetBuffer)
-        {
-            if (target.IsSelected && state.EntityManager.Exists(target.TargetableEntity))
-            {
-                selectedTarget = target;
-                return true;
-            }
-        }
-
-        selectedTarget = default;
-        return false;
     }
 }
