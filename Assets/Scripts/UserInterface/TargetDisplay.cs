@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -13,33 +14,23 @@ public class TargetDisplay : MonoBehaviour
     [SerializeField]
     private GameObject m_prefab;
 
-    private List<TargetInstance> m_createdTargets = new List<TargetInstance>();
-    
+    private GameObjectPool m_targetPool;
+
+    private void Awake()
+    {
+        m_targetPool = new GameObjectPool(m_prefab, gameObject.layer, transform, 5);
+    }
+
     public void UpdateTargets(List<TargetData> targets)
     {
-        int diff = targets.Count - m_createdTargets.Count;
-
-        int toAdd = Mathf.Max(diff, 0);
-        for (int i = 0; i < toAdd; i++)
-        {
-            GameObject instance = Instantiate(m_prefab, transform);
-            instance.layer = gameObject.layer;
-            
-            m_createdTargets.Add(instance.GetComponent<TargetInstance>());
-        }
-        
-        int toRemove = Mathf.Abs(Mathf.Min(diff, 0));
-        for (int i = 0; i < toRemove; i++)
-        {
-            Destroy(m_createdTargets[m_createdTargets.Count - 1].gameObject);
-            m_createdTargets.RemoveAt(m_createdTargets.Count - 1);
-        }
-
+        m_targetPool.SetActiveObjectCount(targets.Count);
+        var activeTargets = m_targetPool.GetCurrentActiveObjects();
         for (int i = 0; i < targets.Count; i++)
         {
-            m_createdTargets[i].SetSelected(targets[i].IsTargeting);
-            m_createdTargets[i].SetCanTargetAhead(targets[i].CanTargetAhead);
-            m_createdTargets[i].transform.position = targets[i].Position;
+            TargetInstance ti = activeTargets[i].GetComponent<TargetInstance>();
+            ti.SetSelected(targets[i].IsTargeting);
+            ti.SetCanTargetAhead(targets[i].CanTargetAhead);
+            ti.transform.position = targets[i].Position;
         }
     }
 }
