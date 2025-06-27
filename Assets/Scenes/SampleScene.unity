@@ -1091,7 +1091,9 @@ MonoBehaviour:
   m_displayRadius: 1.25
   m_radiusSetup:
   - m_range: 0
-    m_radiusBreakpoint: 0
+    m_radiusBreakpoint: 0.1
+  - m_range: 250
+    m_radiusBreakpoint: 0.35
   - m_range: 500
     m_radiusBreakpoint: 0.5
   - m_range: 1000
