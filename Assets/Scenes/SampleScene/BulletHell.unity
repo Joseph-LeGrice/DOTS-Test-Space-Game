@@ -305,6 +305,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: DefaultShip
       objectReference: {fileID: 0}
+    - target: {fileID: 1037109658767662476, guid: d319db3af1c5f204196dd0b9bf436e84, type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 7289321641637035752, guid: d319db3af1c5f204196dd0b9bf436e84, type: 3}
       propertyPath: m_LocalPosition.x
       value: 0
@@ -372,6 +376,10 @@ PrefabInstance:
     - target: {fileID: 1037109658767662476, guid: d319db3af1c5f204196dd0b9bf436e84, type: 3}
       propertyPath: m_Name
       value: DefaultShip
+      objectReference: {fileID: 0}
+    - target: {fileID: 1037109658767662476, guid: d319db3af1c5f204196dd0b9bf436e84, type: 3}
+      propertyPath: m_IsActive
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 7289321641637035752, guid: d319db3af1c5f204196dd0b9bf436e84, type: 3}
       propertyPath: m_LocalPosition.x
