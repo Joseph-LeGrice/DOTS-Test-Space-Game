@@ -85,7 +85,7 @@ public class LocalPlayerUserInterface : MonoBehaviour
 
     public void Initialize(int shipHardpointsLength, float detectionRangeSquared)
     {
-        m_radar.SetMaxDetectionRange(detectionRangeSquared);
+        m_radar.SetMaxDetectionRange(Mathf.Sqrt(detectionRangeSquared));
         m_accelerationDisplay.Initialise(m_uiColor);
         m_crosshair.RefreshCrosshairs(shipHardpointsLength, m_uiColor);
         m_initialised = true;

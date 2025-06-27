@@ -1088,7 +1088,14 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c8f23c7c40c833f44be2c9c984e228bd, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  m_displayRadius: 2.5
+  m_displayRadius: 1.25
+  m_radiusSetup:
+  - m_range: 0
+    m_radiusBreakpoint: 0
+  - m_range: 500
+    m_radiusBreakpoint: 0.5
+  - m_range: 1000
+    m_radiusBreakpoint: 0.75
   m_markerPrefab: {fileID: 5382073961994271179, guid: 12c5d8a2695e35147a148b56b9e6c72d, type: 3}
   m_markerParent: {fileID: 2129590473}
 --- !u!1 &755626830
