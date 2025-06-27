@@ -2,13 +2,6 @@ using System;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class TargetData
-{
-    public bool IsTargeting;
-    public bool CanTargetAhead;
-    public Vector3 Position;
-}
-
 public class TargetDisplay : MonoBehaviour
 {
     [SerializeField]
@@ -23,14 +16,32 @@ public class TargetDisplay : MonoBehaviour
 
     public void UpdateTargets(List<TargetData> targets)
     {
-        m_targetPool.SetActiveObjectCount(targets.Count);
+        int visibleTargets = 0;
+        foreach (TargetData td in targets)
+        {
+            if (td.IsVisibleOnScreen)
+            {
+                visibleTargets++;
+            }
+        }
+        m_targetPool.SetActiveObjectCount(visibleTargets);
+        
         var activeTargets = m_targetPool.GetCurrentActiveObjects();
         for (int i = 0; i < targets.Count; i++)
         {
-            TargetInstance ti = activeTargets[i].GetComponent<TargetInstance>();
-            ti.SetSelected(targets[i].IsTargeting);
-            ti.SetCanTargetAhead(targets[i].CanTargetAhead);
-            ti.transform.position = targets[i].Position;
+            TargetData td = targets[i];
+            if (td.IsVisibleOnScreen)
+            {
+                TargetInstance ti = activeTargets[i].GetComponent<TargetInstance>();
+                ti.SetSelected(td.IsTargeting);
+                ti.SetCanTargetAhead(td.CanTargetAhead);
+                ti.transform.position = td.UIPosition;
+            }
         }
+    }
+
+    private void OnDestroy()
+    {
+        m_targetPool.Dispose();
     }
 }

@@ -17,6 +17,7 @@ public readonly partial struct ShipAspect : IAspect
     public readonly RefRO<LocalToWorld> LocalToWorld;
     public readonly DynamicBuffer<ShipHardpointReference> ShipHardpoints;
     public readonly DynamicBuffer<DetectedTarget> DetectedTargets;
+    public readonly RefRO<TargetDetector> TargetDetector;
 }
 
 partial class ShipMovementSystem : SystemBase

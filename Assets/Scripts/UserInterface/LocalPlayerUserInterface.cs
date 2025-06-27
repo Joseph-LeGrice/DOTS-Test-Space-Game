@@ -2,6 +2,15 @@ using System.Collections.Generic;
 using Unity.Physics.GraphicsIntegration;
 using UnityEngine;
 
+public class TargetData
+{
+    public bool IsTargeting;
+    public bool CanTargetAhead;
+    public Vector3 WorldPosition;
+    public Vector3 UIPosition;
+    public bool IsVisibleOnScreen;
+}
+
 public class LocalPlayerUserInterface : MonoBehaviour
 {
     [SerializeField]
@@ -16,6 +25,8 @@ public class LocalPlayerUserInterface : MonoBehaviour
     private LocalPlayerHUD m_localPlayerHUD;
     [SerializeField]
     private TargetDisplay m_targetDisplay;
+    [SerializeField]
+    private Radar m_radar;
     [SerializeField]
     private Transform m_shipAim;
     [SerializeField]
@@ -59,22 +70,22 @@ public class LocalPlayerUserInterface : MonoBehaviour
         m_accelerationDisplay.SetAngularThrottle(angularThrottle);
     }
 
-    public void SetTargets(List<TargetData> targetData)
+    public void SetTargets(ManagedLocalPlayer localPlayer, List<TargetData> targetData)
     {
         List<TargetData> newTargets = new List<TargetData>();
         foreach (TargetData td in targetData)
         {
-            td.Position = GetUIPosition(td.Position, out bool isVisible);
-            if (isVisible)
-            {
-                newTargets.Add(td);
-            }
+            td.UIPosition = GetUIPosition(td.WorldPosition, out bool isVisibleOnScreen);
+            td.IsVisibleOnScreen = isVisibleOnScreen;
+            newTargets.Add(td);
         }
         m_targetDisplay.UpdateTargets(newTargets);
+        m_radar.UpdateTargets(localPlayer, newTargets);
     }
 
-    public void Initialize(int shipHardpointsLength)
+    public void Initialize(int shipHardpointsLength, float detectionRangeSquared)
     {
+        m_radar.SetMaxDetectionRange(detectionRangeSquared);
         m_accelerationDisplay.Initialise(m_uiColor);
         m_crosshair.RefreshCrosshairs(shipHardpointsLength, m_uiColor);
         m_initialised = true;

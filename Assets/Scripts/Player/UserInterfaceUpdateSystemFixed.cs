@@ -1,15 +1,7 @@
-using System.Collections.Generic;
 using Unity.Entities;
-using Unity.Mathematics;
-using Unity.Physics;
 using Unity.Physics.Systems;
 using Unity.Transforms;
 using UnityEngine;
-
-public readonly partial struct PlayerUIAspectFixed : IAspect
-{
-    public readonly DynamicBuffer<ShipHardpointReference> ShipHardpoints;
-}
 
 [UpdateInGroup(typeof(FixedStepSimulationSystemGroup))]
 [UpdateAfter(typeof(PhysicsSystemGroup))]
@@ -22,20 +14,20 @@ public partial class UserInterfaceUpdateSystemFixed : SystemBase
         ComponentLookup<Gimbal> gimbalLookup = SystemAPI.GetComponentLookup<Gimbal>();
         foreach (var (localPlayer, self) in SystemAPI.Query<RefRO<PlayerTag>>().WithEntityAccess())
         {
-            PlayerUIAspectFixed player = SystemAPI.GetAspect<PlayerUIAspectFixed>(localPlayer.ValueRO.ControllingShip);
+            ShipAspect playerShip = SystemAPI.GetAspect<ShipAspect>(localPlayer.ValueRO.ControllingShip);
             PlayerManagedAccess managedAccess = SystemAPI.ManagedAPI.GetComponent<PlayerManagedAccess>(self);
             ManagedLocalPlayer managedLocalPlayer = managedAccess.ManagedLocalPlayer;
             LocalPlayerUserInterface playerUi = managedLocalPlayer.GetUserInterface();
             
             if (!playerUi.HasCreated())
             {
-                playerUi.Initialize(player.ShipHardpoints.Length);
+                playerUi.Initialize(playerShip.ShipHardpoints.Length, playerShip.TargetDetector.ValueRO.RangeSquared);
             }
 
             float avgAimDistance = 0.0f;
-            for (int i = 0; i < player.ShipHardpoints.Length; i++)
+            for (int i = 0; i < playerShip.ShipHardpoints.Length; i++)
             {
-                ShipHardpointReference hardpointReference = player.ShipHardpoints[i];
+                ShipHardpointReference hardpointReference = playerShip.ShipHardpoints[i];
                 ShipHardpointInstance hardpointInstance = hardpointInstanceLookup[hardpointReference.Self];
                 
                 LocalToWorld l2w = localToWorldLookup[hardpointInstance.WeaponInstanceEntity];
@@ -49,7 +41,7 @@ public partial class UserInterfaceUpdateSystemFixed : SystemBase
                 avgAimDistance += hardpointInstance.AimDistance;
             }
 
-            avgAimDistance /= player.ShipHardpoints.Length;
+            avgAimDistance /= playerShip.ShipHardpoints.Length;
 
             LocalToWorld shipLocalToWorld = localToWorldLookup[localPlayer.ValueRO.ControllingShip];
             Vector3 shipForwardWorld = shipLocalToWorld.Position + avgAimDistance * shipLocalToWorld.Forward;

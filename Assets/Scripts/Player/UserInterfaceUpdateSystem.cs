@@ -36,11 +36,11 @@ public partial class UserInterfaceUpdateSystem : SystemBase
                 targetData.Add(new TargetData()
                 {
                     IsTargeting = dt.IsSelected,
-                    Position = l2wTarget.Position,
+                    WorldPosition = l2wTarget.Position,
                     CanTargetAhead = dt.CanTargetAhead,
                 });
             }
-            playerUi.SetTargets(targetData);
+            playerUi.SetTargets(managedLocalPlayer, targetData);
 
             playerUi.GetHUD().UpdateHUD(ref playerShip);
         }
