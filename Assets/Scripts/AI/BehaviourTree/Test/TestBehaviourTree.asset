@@ -16,7 +16,9 @@ MonoBehaviour:
   - rid: 7690121350700859511
   - rid: 7690121350700859512
   - rid: 7690121350700859513
-  m_nextNodeReference: 3
+  - rid: 7690121350700859530
+  - rid: 7690121350700859531
+  m_nextNodeReference: 5
   references:
     version: 2
     RefIds:
@@ -38,3 +40,15 @@ MonoBehaviour:
         m_nodeReference: 2
         m_currentActionIndex: 0
         m_actionNodes: 
+    - rid: 7690121350700859530
+      type: {class: BehaviourTreeSequentialNode, ns: , asm: behaviourtree}
+      data:
+        m_nodeReference: 3
+        m_currentActionIndex: 0
+        m_actionNodes: 
+    - rid: 7690121350700859531
+      type: {class: BehaviourTreeConditionalNode, ns: , asm: behaviourtree}
+      data:
+        m_nodeReference: 4
+        m_conditionalNode: 0
+        m_actionNode: 0
