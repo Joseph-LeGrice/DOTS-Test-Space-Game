@@ -49,7 +49,7 @@ public class BehaviourTreeEditorWindow : EditorWindow
         
         var nodeListView = root.Q<ListView>("NodeList");
         nodeListView.dataSource = this;
-        nodeListView.makeItem = 
+        // nodeListView.makeItem = 
         
         rootVisualElement.Add(root);
     }
