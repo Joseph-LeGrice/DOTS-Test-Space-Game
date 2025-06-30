@@ -1,21 +1,29 @@
 using UnityEngine;
 
-public class BehaviourTreeConditionalNode : BehaviourTreeActionNode
+[System.Serializable]
+public class BehaviourTreeConditionalNode : BehaviourTreeNode
 {
     [SerializeField]
-    private BehaviourTreeConditionNode m_conditionalNode;
+    private int m_conditionalNode;
     [SerializeField]
-    private BehaviourTreeActionNode m_actionNode;
+    private int m_actionNode;
     
-    public override BehaviourActionResult DoAction(ref BehaviourTreeBlackboard blackboard)
+    public override BehaviourActionResult DoAction(BehaviourTree behaviourTree)
     {
-        if (m_conditionalNode.IsValid(ref blackboard))
+        var result = behaviourTree.GetNode(m_conditionalNode).DoAction(behaviourTree);
+        
+        if (result == BehaviourActionResult.Success)
         {
-            return m_actionNode.DoAction(ref blackboard);
+            return behaviourTree.GetNode(m_actionNode).DoAction(behaviourTree);
         }
         else
         {
             return BehaviourActionResult.Failure;
         }
+    }
+
+    public override BurstableBehaviourTreeNode GetBurstable()
+    {
+        return new BurstableBehaviourTreeNode();
     }
 }
