@@ -36,4 +36,19 @@ public class BehaviourTreeSequentialNode : BehaviourTreeNode
     {
         return new BurstableBehaviourTreeNode();
     }
+
+    public override string GetNodeName()
+    {
+        return "Sequential Node";
+    }
+
+    public override bool AcceptsConnectionIn()
+    {
+        return true;
+    }
+
+    public override bool AcceptsConnectionOut()
+    {
+        return true;
+    }
 }

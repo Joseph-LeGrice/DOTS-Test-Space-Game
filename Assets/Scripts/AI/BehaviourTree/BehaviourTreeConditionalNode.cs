@@ -26,4 +26,19 @@ public class BehaviourTreeConditionalNode : BehaviourTreeNode
     {
         return new BurstableBehaviourTreeNode();
     }
+
+    public override string GetNodeName()
+    {
+        return "Conditional Node";
+    }
+
+    public override bool AcceptsConnectionIn()
+    {
+        return true;
+    }
+
+    public override bool AcceptsConnectionOut()
+    {
+        return true;
+    }
 }

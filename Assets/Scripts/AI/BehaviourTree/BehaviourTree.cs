@@ -12,10 +12,15 @@ public enum BehaviourActionResult
 [System.Serializable]
 public abstract class BehaviourTreeNode
 {
+    [SerializeField]
     public int m_nodeReference;
     
     public abstract BehaviourActionResult DoAction(BehaviourTree behaviourTree);
     public abstract BurstableBehaviourTreeNode GetBurstable();
+
+    public abstract string GetNodeName();
+    public abstract bool AcceptsConnectionIn();
+    public abstract bool AcceptsConnectionOut();
 }
 
 [CreateAssetMenu(menuName = "BehaviourTree Asset")]

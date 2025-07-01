@@ -2,11 +2,12 @@ using System;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEditor;
+using UnityEditor.UIElements;
 using UnityEngine.UIElements;
 
 public class BehaviourTreeEditorWindow : EditorWindow
 {
-    private SerializedObject m_behaviourTree;
+    private static SerializedObject s_behaviourTree;
     
     [System.Serializable]
     public class BehaviourNodeTypeData
@@ -27,14 +28,10 @@ public class BehaviourTreeEditorWindow : EditorWindow
     
     public static void Open(SerializedObject behaviourTree)
     {
-        // This method is called when the user selects the menu item in the Editor.
+        s_behaviourTree = behaviourTree;
+        
         BehaviourTreeEditorWindow wnd = GetWindow<BehaviourTreeEditorWindow>();
         wnd.titleContent = new GUIContent("Behaviour Tree Editor");
-        wnd.m_behaviourTree = behaviourTree;
-
-        // Limit size of the window.
-        wnd.minSize = new Vector2(450, 200);
-        wnd.maxSize = new Vector2(1920, 720);
     }
     
     public void CreateGUI()
@@ -43,15 +40,32 @@ public class BehaviourTreeEditorWindow : EditorWindow
         m_allNodeTypes.Add(BehaviourNodeTypeData.Create<BehaviourTreeSequentialNode>());
         m_allNodeTypes.Add(BehaviourNodeTypeData.Create<BehaviourTreeConditionalNode>());
         
-        var visualTree = AssetDatabase.LoadAssetAtPath<VisualTreeAsset>(AssetDatabase.GUIDToAssetPath("afeeeff658b12d94f90257e46d6165f7"));
-        var root = visualTree.Instantiate();
-        root.style.height = new StyleLength(new Length(100.0f, LengthUnit.Percent));
+        VisualTreeAsset visualTree = AssetDatabase.LoadAssetAtPath<VisualTreeAsset>(AssetDatabase.GUIDToAssetPath("afeeeff658b12d94f90257e46d6165f7"));
+        visualTree.CloneTree(rootVisualElement);
         
-        var nodeListView = root.Q<ListView>("NodeList");
-        nodeListView.dataSource = this;
-        // nodeListView.makeItem = 
-        
-        rootVisualElement.Add(root);
+        VisualTreeAsset nodeButton = AssetDatabase.LoadAssetAtPath<VisualTreeAsset>(AssetDatabase.GUIDToAssetPath("be27b30f9d53faf40969f3e569078b6b"));
+        ListView nodeListView = rootVisualElement.Q<ListView>("NodeList");
+        nodeListView.itemsSource = m_allNodeTypes;
+        nodeListView.makeItem = nodeButton.CloneTree; 
+        nodeListView.bindItem = BindCreateNodeButton; 
+        nodeListView.RefreshItems();
+
+        s_behaviourTree.Update();
+        VisualElement nodeRoot = rootVisualElement.Q<VisualElement>("NodeInstanceRoot");
+        SerializedProperty allNodes = s_behaviourTree.FindProperty("m_allNodes");
+        for (int i=0; i<allNodes.arraySize; i++)
+        {
+            SerializedProperty node = allNodes.GetArrayElementAtIndex(i);
+            BehaviourTreeNodeView treeNodeViewInstance = new BehaviourTreeNodeView();
+            treeNodeViewInstance.SetNode(node);
+            nodeRoot.Add(treeNodeViewInstance);
+        }
+    }
+
+    private void BindCreateNodeButton(VisualElement button, int i)
+    {
+        button.Q<Button>().text = m_allNodeTypes[i].NodeName;
+        // ((Button)button).RegisterCallback();
     }
 
     private void AddNew<T>() where T : BehaviourTreeNode, new()
