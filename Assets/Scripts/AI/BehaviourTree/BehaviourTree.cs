@@ -13,8 +13,10 @@ public enum BehaviourActionResult
 public abstract class BehaviourTreeNode
 {
     [SerializeField]
+    [BehaviourNodeReference]
     public int m_nodeReference;
     [SerializeField]
+    [HideInInspector]
     public Vector2 m_nodePosition;
     
     public abstract BehaviourActionResult DoAction(BehaviourTree behaviourTree);

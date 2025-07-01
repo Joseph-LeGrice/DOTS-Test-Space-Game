@@ -4,8 +4,10 @@ using UnityEngine;
 public class BehaviourTreeConditionalNode : BehaviourTreeNode
 {
     [SerializeField]
+    [BehaviourNodeReference]
     private int m_conditionalNode;
     [SerializeField]
+    [BehaviourNodeReference]
     private int m_actionNode;
     
     public override BehaviourActionResult DoAction(BehaviourTree behaviourTree)

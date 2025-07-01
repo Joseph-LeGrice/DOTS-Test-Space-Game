@@ -5,8 +5,10 @@ using UnityEngine;
 public class BehaviourTreeSequentialNode : BehaviourTreeNode
 {
     [SerializeField]
+    [HideInInspector]
     private int m_currentActionIndex;
     [SerializeField]
+    [BehaviourNodeReference]
     private List<int> m_actionNodes;
     
     public override BehaviourActionResult DoAction(BehaviourTree behaviourTree)

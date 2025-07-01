@@ -8,53 +8,42 @@ public class BehaviourTreeNodeView : VisualElement
 {
     private int m_nodeIndex;
     private SerializedObject m_behaviourTree;
+    
+    private Label m_title;
     private VisualElement m_connectionInElement;
     private VisualElement m_contentElement;
-    private VisualElement m_connectionOutElement;
-
+    
     public BehaviourTreeNodeView()
     {
+        style.position = Position.Absolute;
         style.backgroundColor = Color.aquamarine;
         style.borderTopColor = style.borderBottomColor = style.borderLeftColor = style.borderRightColor = Color.black;
         style.borderTopWidth = style.borderBottomWidth = style.borderLeftWidth = style.borderRightWidth = 2.0f;
-        style.flexGrow = 0.0f;
-        style.flexShrink = 1.0f;
+        style.flexGrow = 1.0f;
+        style.flexShrink = 0.0f;
         style.width = new Length(256.0f, LengthUnit.Pixel);
-        style.height = new Length(256.0f, LengthUnit.Pixel);
 
-        m_connectionInElement = new VisualElement();
-        m_connectionInElement.style.backgroundColor = Color.red;
+        VisualElement headerElement = new VisualElement();
+        headerElement.style.flexDirection = FlexDirection.Row;
+
+        float connectorMargin = 8.0f;
+        m_connectionInElement = new ConnectorPointView();
+        m_connectionInElement.style.marginLeft = connectorMargin;
+        m_connectionInElement.style.marginRight = connectorMargin;
+        headerElement.Add(m_connectionInElement);
         
-        m_connectionInElement.style.flexGrow= 0.0f;
-        m_connectionInElement.style.flexShrink = 0.0f;
-        m_connectionInElement.style.width = 32.0f;
-        m_connectionInElement.style.height = 16.0f;
+        m_title = new Label();
+        m_title.style.color = Color.black;
+        m_title.style.flexGrow = 0.0f;
+        headerElement.Add(m_title);
         
-        m_connectionInElement.style.position = Position.Relative;
-        m_connectionInElement.style.alignSelf = Align.Center;
-        m_connectionInElement.style.top = 0.0f;
-        
-        hierarchy.Add(m_connectionInElement);
+        hierarchy.Add(headerElement);
 
         m_contentElement = new VisualElement();
-        m_contentElement.style.flexShrink = 1.0f;
-        m_contentElement.style.flexGrow = 0.0f;
+        m_contentElement.style.flexShrink = 0.0f;
+        m_contentElement.style.flexGrow = 1.0f;
         
         hierarchy.Add(m_contentElement);
-        
-        m_connectionOutElement = new VisualElement();
-        m_connectionOutElement.style.backgroundColor = Color.red;
-        
-        m_connectionOutElement.style.flexGrow= 0.0f;
-        m_connectionOutElement.style.flexShrink = 0.0f;
-        m_connectionOutElement.style.width = 32.0f;
-        m_connectionOutElement.style.height = 16.0f;
-        
-        m_connectionOutElement.style.position = Position.Relative;
-        m_connectionOutElement.style.alignSelf = Align.Center;
-        m_connectionOutElement.style.bottom = 0.0f;
-        
-        hierarchy.Add(m_connectionOutElement);
         
         this.AddManipulator(new MouseDragManipulator());
     }
@@ -74,19 +63,19 @@ public class BehaviourTreeNodeView : VisualElement
 
         transform.position = node.m_nodePosition;
         m_connectionInElement.visible = node.AcceptsConnectionIn();
-        m_connectionOutElement.visible = node.AcceptsConnectionOut();
 
-        Label title = new Label(node.GetNodeName());
-        title.style.color = Color.black;
-        title.style.flexGrow = 0.0f;
-        m_contentElement.Add(title);
+        m_title.text = node.GetNodeName();
         
-        foreach (SerializedProperty childProperty in nodeSerialized)
-        {
-            var field = new PropertyField(childProperty, childProperty.name);
-            field.Bind(m_behaviourTree);
-            m_contentElement.Add(field);
-        }
+        var field = new PropertyField(nodeSerialized);
+        field.Bind(m_behaviourTree);
+        m_contentElement.Add(field);
+        
+        // foreach (SerializedProperty childProperty in nodeSerialized)
+        // {
+        //     var field = new PropertyField(childProperty, childProperty.name);
+        //     field.Bind(m_behaviourTree);
+        //     m_contentElement.Add(field);
+        // }
     }
 
     public void SetPosition(Vector2 newPosition)
