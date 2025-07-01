@@ -14,6 +14,8 @@ public abstract class BehaviourTreeNode
 {
     [SerializeField]
     public int m_nodeReference;
+    [SerializeField]
+    public Vector2 m_nodePosition;
     
     public abstract BehaviourActionResult DoAction(BehaviourTree behaviourTree);
     public abstract BurstableBehaviourTreeNode GetBurstable();

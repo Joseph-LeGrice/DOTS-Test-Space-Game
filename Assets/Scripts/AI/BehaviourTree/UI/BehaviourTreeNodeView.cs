@@ -1,13 +1,17 @@
 using UnityEditor;
+using UnityEditor.Experimental.GraphView;
 using UnityEditor.UIElements;
 using UnityEngine;
 using UnityEngine.UIElements;
 
 public class BehaviourTreeNodeView : VisualElement
 {
+    private int m_nodeIndex;
+    private SerializedObject m_behaviourTree;
     private VisualElement m_connectionInElement;
     private VisualElement m_contentElement;
     private VisualElement m_connectionOutElement;
+
     public BehaviourTreeNodeView()
     {
         style.backgroundColor = Color.aquamarine;
@@ -16,7 +20,7 @@ public class BehaviourTreeNodeView : VisualElement
         style.flexGrow = 0.0f;
         style.flexShrink = 1.0f;
         style.width = new Length(256.0f, LengthUnit.Pixel);
-        // style.height = new Length(128.0f, LengthUnit.Pixel);
+        style.height = new Length(256.0f, LengthUnit.Pixel);
 
         m_connectionInElement = new VisualElement();
         m_connectionInElement.style.backgroundColor = Color.red;
@@ -51,12 +55,24 @@ public class BehaviourTreeNodeView : VisualElement
         m_connectionOutElement.style.bottom = 0.0f;
         
         hierarchy.Add(m_connectionOutElement);
+        
+        this.AddManipulator(new MouseDragManipulator());
     }
 
-    public void SetNode(SerializedProperty nodeSerialized)
+    private SerializedProperty GetNode()
     {
+        return m_behaviourTree.FindProperty("m_allNodes").GetArrayElementAtIndex(m_nodeIndex);
+    }
+
+    public void SetNode(SerializedObject behaviourTree, int i)
+    {
+        m_nodeIndex = i;
+        m_behaviourTree = behaviourTree;
+        
+        SerializedProperty nodeSerialized = GetNode();
         BehaviourTreeNode node = (BehaviourTreeNode)nodeSerialized.managedReferenceValue;
 
+        transform.position = node.m_nodePosition;
         m_connectionInElement.visible = node.AcceptsConnectionIn();
         m_connectionOutElement.visible = node.AcceptsConnectionOut();
 
@@ -68,8 +84,19 @@ public class BehaviourTreeNodeView : VisualElement
         foreach (SerializedProperty childProperty in nodeSerialized)
         {
             var field = new PropertyField(childProperty, childProperty.name);
-            field.Bind(nodeSerialized.serializedObject);
+            field.Bind(m_behaviourTree);
             m_contentElement.Add(field);
+        }
+    }
+
+    public void SetPosition(Vector2 newPosition)
+    {
+        SerializedProperty nodeSerialized = GetNode();
+        if (nodeSerialized != null)
+        {
+            nodeSerialized.serializedObject.Update();
+            nodeSerialized.FindPropertyRelative("m_nodePosition").vector2Value = newPosition;
+            nodeSerialized.serializedObject.ApplyModifiedProperties();
         }
     }
 }

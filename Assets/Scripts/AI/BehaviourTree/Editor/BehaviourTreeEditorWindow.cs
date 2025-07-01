@@ -55,9 +55,8 @@ public class BehaviourTreeEditorWindow : EditorWindow
         SerializedProperty allNodes = s_behaviourTree.FindProperty("m_allNodes");
         for (int i=0; i<allNodes.arraySize; i++)
         {
-            SerializedProperty node = allNodes.GetArrayElementAtIndex(i);
             BehaviourTreeNodeView treeNodeViewInstance = new BehaviourTreeNodeView();
-            treeNodeViewInstance.SetNode(node);
+            treeNodeViewInstance.SetNode(s_behaviourTree, i);
             nodeRoot.Add(treeNodeViewInstance);
         }
     }
