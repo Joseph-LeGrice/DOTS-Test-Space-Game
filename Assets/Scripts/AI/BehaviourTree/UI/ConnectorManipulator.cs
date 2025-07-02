@@ -52,7 +52,7 @@ public class ConnectorManipulator : MouseManipulator
     {
         if (m_isDragging)
         {
-            m_behaviourTreeWindow.GetLinePreview().SetTargetPosition(evt.mousePosition);
+            m_behaviourTreeWindow.GetLinePreview().SetTargetPosition(evt.mousePosition);// + new Vector2(0, -m_behaviourTreeWindow.worldBound.y));
         }
     }
 }

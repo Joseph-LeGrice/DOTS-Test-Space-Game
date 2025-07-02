@@ -24,7 +24,8 @@ public class ConnectorLinePreview
 
     public void ActivateView(VisualElement from)
     {
-        m_targetElement.transform.position = from.worldBound.center + m_offset;
+        m_targetElement.style.top = from.worldBound.center.y + m_offset.y;
+        m_targetElement.style.left = from.worldBound.center.x + m_offset.x;
         m_connectorLine.visible = true;
         m_connectorLine.SetFromTo(from, m_targetElement);
         m_connectorLine.MarkDirtyRepaint();
@@ -32,7 +33,8 @@ public class ConnectorLinePreview
     
     public void SetTargetPosition(Vector2 position)
     {
-        m_targetElement.transform.position = position + m_offset;
+        m_targetElement.style.top = position.y + m_offset.y;
+        m_targetElement.style.left = position.x + m_offset.x;
         m_connectorLine.MarkDirtyRepaint();
     }
 
@@ -43,6 +45,7 @@ public class ConnectorLinePreview
 
     public void SetOffset(Vector2 offset)
     {
+        m_offset = offset;
         m_connectorLine.SetOffset(offset);
     }
 }
