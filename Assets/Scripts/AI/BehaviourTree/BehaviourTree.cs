@@ -13,7 +13,7 @@ public enum BehaviourActionResult
 public abstract class BehaviourTreeNode
 {
     [SerializeField]
-    [BehaviourNodeReference]
+    [BehaviourNodeReference(true)]
     public int m_nodeReference;
     [SerializeField]
     [HideInInspector]
@@ -42,16 +42,21 @@ public class BehaviourTree : BlobAssetScriptableObject<BurstableBehaviourTree>
         // return GetNode(i).DoAction(this);
     }
     
-    public BehaviourTreeNode GetNode(int i)
+    public BehaviourTreeNode GetNode(int nodeReference)
     {
         foreach (BehaviourTreeNode n in m_allNodes)
         {
-            if (n.m_nodeReference == i)
+            if (n.m_nodeReference == nodeReference)
             {
                 return n;
             }
         }
         return null;
+    }
+    
+    public IReadOnlyList<BehaviourTreeNode> GetNodes()
+    {
+        return m_allNodes;
     }
 
     protected override void PopulateBlob(IBaker baker, BlobBuilder builder, ref BurstableBehaviourTree blobData)

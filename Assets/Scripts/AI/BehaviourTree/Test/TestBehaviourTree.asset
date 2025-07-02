@@ -26,21 +26,21 @@ MonoBehaviour:
       type: {class: BehaviourTreeSequentialNode, ns: , asm: behaviourtree}
       data:
         m_nodeReference: 0
-        m_nodePosition: {x: 723, y: 107}
+        m_nodePosition: {x: 963, y: 196}
         m_currentActionIndex: 0
         m_actionNodes: 
     - rid: 7690121350700859512
       type: {class: BehaviourTreeConditionalNode, ns: , asm: behaviourtree}
       data:
         m_nodeReference: 1
-        m_nodePosition: {x: 229, y: 124}
+        m_nodePosition: {x: 592, y: 108}
         m_conditionalNode: 0
         m_actionNode: -11
     - rid: 7690121350700859513
       type: {class: BehaviourTreeSequentialNode, ns: , asm: behaviourtree}
       data:
         m_nodeReference: 2
-        m_nodePosition: {x: 127, y: 253}
+        m_nodePosition: {x: 594, y: 277}
         m_currentActionIndex: 0
         m_actionNodes: 
     - rid: 7690121350700859530
@@ -54,6 +54,6 @@ MonoBehaviour:
       type: {class: BehaviourTreeConditionalNode, ns: , asm: behaviourtree}
       data:
         m_nodeReference: 4
-        m_nodePosition: {x: 244, y: 487}
-        m_conditionalNode: 0
-        m_actionNode: 0
+        m_nodePosition: {x: 1009, y: 352}
+        m_conditionalNode: 1
+        m_actionNode: 2

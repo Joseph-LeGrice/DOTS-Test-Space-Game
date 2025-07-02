@@ -50,6 +50,8 @@ public class MouseDragManipulator : MouseManipulator
             Vector2 newPosition = (Vector2)target.transform.position + evt.mouseDelta;
             target.transform.position = newPosition;
             evt.StopPropagation();
+            
+            ((BehaviourTreeNodeView)target).GetBehaviourTreeWindow().RepaintConnectors();
         }
     }
 }

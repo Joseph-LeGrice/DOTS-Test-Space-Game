@@ -4,9 +4,20 @@ using UnityEngine.UIElements;
 
 public class ConnectorLineView : VisualElement
 {
-    public ConnectorLineView()
+    private VisualElement m_fromNode;
+    private VisualElement m_toNode;
+    
+    public ConnectorLineView(VisualElement from, VisualElement to)
     {
-        this.generateVisualContent = this.generateVisualContent + new Action<MeshGenerationContext>(this.OnGenerateVisualContent);
+        m_fromNode = from;
+        m_toNode = to;
+        style.position = Position.Absolute;
+        style.flexGrow = 0.0f;
+        style.flexShrink = 0.0f;
+        style.height = new Length(100.0f, LengthUnit.Percent);
+        style.width = new Length(100.0f, LengthUnit.Percent);
+        pickingMode = PickingMode.Ignore;
+        generateVisualContent += OnGenerateVisualContent;
     }
 
     private void OnGenerateVisualContent(MeshGenerationContext mgc)
@@ -46,5 +57,18 @@ public class ConnectorLineView : VisualElement
         // for (int index = 1; (long) index < (long) count; ++index)
         //     painter2D.LineTo(this.m_RenderPoints[index]);
         // painter2D.Stroke();
+        
+        Painter2D painter2D = mgc.painter2D;
+        painter2D.BeginPath();
+        painter2D.strokeColor = Color.white;
+        painter2D.lineWidth = 2.0f;
+        
+        painter2D.MoveTo(m_fromNode.worldBound.position);
+        painter2D.LineTo(m_toNode.worldBound.position);
+        
+        painter2D.Stroke();
+        painter2D.ClosePath();
+        Debug.Log(m_fromNode.transform.position + " -- " + 
+                  m_toNode.transform.position);
     }
 }

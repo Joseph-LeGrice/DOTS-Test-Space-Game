@@ -1,20 +1,24 @@
-using UnityEditor;
-using UnityEditor.Experimental.GraphView;
-using UnityEditor.UIElements;
+using System;
+using System.Collections.Generic;
+using System.Reflection;
 using UnityEngine;
 using UnityEngine.UIElements;
 
 public class BehaviourTreeNodeView : VisualElement
 {
+    private BehaviourTreeWindow m_behaviourTreeWindow;
     private int m_nodeIndex;
-    private SerializedObject m_behaviourTree;
     
     private Label m_title;
-    private VisualElement m_connectionInElement;
+    private ConnectorPointView m_connectionInElement;
     private VisualElement m_contentElement;
     
-    public BehaviourTreeNodeView()
+    private Dictionary<string, VisualElement> m_fieldElementLookup = new Dictionary<string, VisualElement>();
+    
+    public BehaviourTreeNodeView(BehaviourTreeWindow window, int nodeArrayIndex)
     {
+        m_behaviourTreeWindow = window;
+        
         style.position = Position.Absolute;
         style.backgroundColor = Color.aquamarine;
         style.borderTopColor = style.borderBottomColor = style.borderLeftColor = style.borderRightColor = Color.black;
@@ -27,7 +31,7 @@ public class BehaviourTreeNodeView : VisualElement
         headerElement.style.flexDirection = FlexDirection.Row;
 
         float connectorMargin = 8.0f;
-        m_connectionInElement = new ConnectorPointView();
+        m_connectionInElement = new ConnectorPointView(true);
         m_connectionInElement.style.marginLeft = connectorMargin;
         m_connectionInElement.style.marginRight = connectorMargin;
         headerElement.Add(m_connectionInElement);
@@ -46,46 +50,60 @@ public class BehaviourTreeNodeView : VisualElement
         hierarchy.Add(m_contentElement);
         
         this.AddManipulator(new MouseDragManipulator());
-    }
-
-    private SerializedProperty GetNode()
-    {
-        return m_behaviourTree.FindProperty("m_allNodes").GetArrayElementAtIndex(m_nodeIndex);
-    }
-
-    public void SetNode(SerializedObject behaviourTree, int i)
-    {
-        m_nodeIndex = i;
-        m_behaviourTree = behaviourTree;
         
-        SerializedProperty nodeSerialized = GetNode();
-        BehaviourTreeNode node = (BehaviourTreeNode)nodeSerialized.managedReferenceValue;
-
+        // ---
+        
+        m_nodeIndex = nodeArrayIndex;
+        
+        BehaviourTreeNode node = GetNode();
         transform.position = node.m_nodePosition;
         m_connectionInElement.visible = node.AcceptsConnectionIn();
 
         m_title.text = node.GetNodeName();
-        
-        var field = new PropertyField(nodeSerialized);
-        field.Bind(m_behaviourTree);
-        m_contentElement.Add(field);
-        
-        // foreach (SerializedProperty childProperty in nodeSerialized)
-        // {
-        //     var field = new PropertyField(childProperty, childProperty.name);
-        //     field.Bind(m_behaviourTree);
-        //     m_contentElement.Add(field);
-        // }
+
+        FieldInfo[] nodeFields = node.GetType().GetFields(BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public);
+        foreach (FieldInfo childProperty in nodeFields)
+        {
+            var nodeReference = (BehaviourNodeReferenceAttribute)Attribute.GetCustomAttribute(childProperty, typeof(BehaviourNodeReferenceAttribute));
+            if (nodeReference != null)
+            {
+                var field = new ConnectorPointView(childProperty.Name, nodeReference.ConnectsIn);
+                m_contentElement.Add(field);
+                m_fieldElementLookup[childProperty.Name] = field;
+            }
+            // var field = new PropertyField(childProperty, childProperty.name);
+            // field.Bind(m_behaviourTreeWindow.GetSerializedBehaviourTree());
+            // m_contentElement.Add(field);
+            // m_fieldElementLookup[childProperty.name] = field;
+        }
+    }
+
+    public BehaviourTreeWindow GetBehaviourTreeWindow()
+    {
+        return m_behaviourTreeWindow;
+    }
+
+    public VisualElement GetConnectionInElement()
+    {
+        return m_connectionInElement.GetConnectorPoint();
+    }
+
+    public VisualElement GetConnectionOutElement(string fieldName)
+    {
+        return m_fieldElementLookup[fieldName].Q<ConnectorPointView>().GetConnectorPoint();
+    }
+
+    private BehaviourTreeNode GetNode()
+    {
+        return m_behaviourTreeWindow.GetSerializedBehaviourTree().GetNodes()[m_nodeIndex];
     }
 
     public void SetPosition(Vector2 newPosition)
     {
-        SerializedProperty nodeSerialized = GetNode();
-        if (nodeSerialized != null)
+        BehaviourTreeNode node = GetNode();
+        if (node != null)
         {
-            nodeSerialized.serializedObject.Update();
-            nodeSerialized.FindPropertyRelative("m_nodePosition").vector2Value = newPosition;
-            nodeSerialized.serializedObject.ApplyModifiedProperties();
+            node.m_nodePosition = newPosition;
         }
     }
 }
