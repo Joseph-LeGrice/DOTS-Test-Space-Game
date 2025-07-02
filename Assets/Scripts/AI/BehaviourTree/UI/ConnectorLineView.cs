@@ -6,6 +6,7 @@ public class ConnectorLineView : VisualElement
 {
     private VisualElement m_fromNode;
     private VisualElement m_toNode;
+    private Vector2 m_screenOffset;
     
     public ConnectorLineView(VisualElement from, VisualElement to)
     {
@@ -63,12 +64,17 @@ public class ConnectorLineView : VisualElement
         painter2D.strokeColor = Color.white;
         painter2D.lineWidth = 2.0f;
         
-        painter2D.MoveTo(m_fromNode.worldBound.position);
-        painter2D.LineTo(m_toNode.worldBound.position);
+        painter2D.MoveTo(m_fromNode.worldBound.center + m_screenOffset);
+        painter2D.LineTo(m_toNode.worldBound.center + m_screenOffset);
+        // painter2D.MoveTo(m_fromNode.);
+        // painter2D.LineTo(m_toNode.localBound.center);
         
         painter2D.Stroke();
         painter2D.ClosePath();
-        Debug.Log(m_fromNode.transform.position + " -- " + 
-                  m_toNode.transform.position);
+    }
+
+    public void SetOffset(Vector2 offset)
+    {
+        m_screenOffset = offset;
     }
 }

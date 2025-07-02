@@ -30,10 +30,7 @@ public class BehaviourTreeNodeView : VisualElement
         VisualElement headerElement = new VisualElement();
         headerElement.style.flexDirection = FlexDirection.Row;
 
-        float connectorMargin = 8.0f;
         m_connectionInElement = new ConnectorPointView(true);
-        m_connectionInElement.style.marginLeft = connectorMargin;
-        m_connectionInElement.style.marginRight = connectorMargin;
         headerElement.Add(m_connectionInElement);
         
         m_title = new Label();

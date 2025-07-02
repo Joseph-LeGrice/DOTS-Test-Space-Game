@@ -11,10 +11,7 @@ public class ConnectorPointView : VisualElement
         float size = 8.0f;
         float lineThickness = 2.0f;
         
-        style.flexGrow = 1.0f;
-        style.flexShrink = 1.0f;
         style.flexDirection = FlexDirection.Row;
-        style.height = new Length(size, LengthUnit.Pixel);
         
         m_nameLabel = new Label();
         m_nameLabel.style.flexGrow = 1.0f;
@@ -24,12 +21,13 @@ public class ConnectorPointView : VisualElement
         
         m_connectorPoint = new VisualElement();
         m_connectorPoint.name = "ConnectorPointView";
-        m_connectorPoint.style.paddingRight = 8.0f;
         
         m_connectorPoint.style.flexGrow = 0.0f;
         m_connectorPoint.style.flexShrink = 0.0f;
-        // connectorPoint.style.alignSelf = Align.Center;
-        m_connectorPoint.style.width = style.height = size;
+        m_connectorPoint.style.marginLeft = 8.0f;
+        m_connectorPoint.style.marginRight = 8.0f;
+        m_connectorPoint.style.alignSelf = Align.Center;
+        m_connectorPoint.style.width = m_connectorPoint.style.height = size;
         m_connectorPoint.style.borderTopColor = m_connectorPoint.style.borderBottomColor =
             m_connectorPoint.style.borderRightColor = m_connectorPoint.style.borderLeftColor = Color.grey;
         m_connectorPoint.style.borderTopWidth = m_connectorPoint.style.borderBottomWidth =

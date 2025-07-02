@@ -27,26 +27,33 @@ public class BehaviourTreeWindow : VisualElement
     public BehaviourTreeWindow(BehaviourTree behaviourTree)
     {
         m_behaviourTree = behaviourTree;
-        
+
         m_allNodeTypes = new List<BehaviourNodeTypeData>();
         m_allNodeTypes.Add(BehaviourNodeTypeData.Create<BehaviourTreeSequentialNode>());
         m_allNodeTypes.Add(BehaviourNodeTypeData.Create<BehaviourTreeConditionalNode>());
-        
+
         style.height = new Length(100.0f, LengthUnit.Percent);
 
         VisualTreeAsset visualTree = Resources.Load<VisualTreeAsset>("BehaviourTreeEditor");
         visualTree.CloneTree(this);
-        
+
         VisualTreeAsset nodeButton = Resources.Load<VisualTreeAsset>("BehaviourTreeNodeButton");
         ListView nodeListView = this.Q<ListView>("NodeList");
         nodeListView.itemsSource = m_allNodeTypes;
-        nodeListView.makeItem = nodeButton.CloneTree; 
-        nodeListView.bindItem = BindCreateNodeButton; 
+        nodeListView.makeItem = nodeButton.CloneTree;
+        nodeListView.bindItem = BindCreateNodeButton;
         nodeListView.RefreshItems();
 
+        RegisterCallback<GeometryChangedEvent>(OnGeometryChanged);
+        RegisterCallback<AttachToPanelEvent>(OnAttachToPanel);
+        // TODO: Drag / zoom handler
+    }
+    
+    private void OnAttachToPanel(AttachToPanelEvent evt)
+    {
         VisualElement nodeRoot = this.Q<VisualElement>("NodeInstanceRoot");
         var allNodes = m_behaviourTree.GetNodes();
-        for (int i=0; i<allNodes.Count; i++)
+        for (int i = 0; i < allNodes.Count; i++)
         {
             BehaviourTreeNode node = allNodes[i];
             BehaviourTreeNodeView treeNodeViewInstance = new BehaviourTreeNodeView(this, i);
@@ -54,7 +61,6 @@ public class BehaviourTreeWindow : VisualElement
             m_nodeViewLookup[node.m_nodeReference] = treeNodeViewInstance;
         }
         
-        // Create all connections
         for (int i = 0; i < allNodes.Count; i++)
         {
             var sourceNode = allNodes[i];
@@ -79,10 +85,6 @@ public class BehaviourTreeWindow : VisualElement
                 }
             }
         }
-        
-        RegisterCallback<GeometryChangedEvent>(OnGeometryChanged);
-        
-        // TODO: Drag / zoom handler
     }
 
     public BehaviourTree GetSerializedBehaviourTree()
@@ -99,6 +101,7 @@ public class BehaviourTreeWindow : VisualElement
     {
         foreach (ConnectorLineView clv in m_allConnectors)
         {
+            clv.SetOffset(new Vector2(0, -worldBound.y));
             clv.MarkDirtyRepaint();
         }
     }
