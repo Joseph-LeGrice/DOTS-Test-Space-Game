@@ -6,7 +6,7 @@ public class ConnectorPointView : VisualElement
     private Label m_nameLabel;
     private VisualElement m_connectorPoint;
     
-    public ConnectorPointView(bool connectsIn)
+    public ConnectorPointView(BehaviourTreeWindow behaviourTreeWindow, bool connectsIn)
     {
         float size = 8.0f;
         float lineThickness = 2.0f;
@@ -20,8 +20,6 @@ public class ConnectorPointView : VisualElement
         Add(m_nameLabel);
         
         m_connectorPoint = new VisualElement();
-        m_connectorPoint.name = "ConnectorPointView";
-        
         m_connectorPoint.style.flexGrow = 0.0f;
         m_connectorPoint.style.flexShrink = 0.0f;
         m_connectorPoint.style.marginLeft = 8.0f;
@@ -35,12 +33,12 @@ public class ConnectorPointView : VisualElement
         m_connectorPoint.style.borderTopLeftRadius = m_connectorPoint.style.borderTopRightRadius =
             m_connectorPoint.style.borderBottomLeftRadius = m_connectorPoint.style.borderBottomRightRadius = size;
         
-        m_connectorPoint.AddManipulator(new ConnectorManipulator());
+        m_connectorPoint.AddManipulator(new ConnectorManipulator(behaviourTreeWindow));
         
         Add(m_connectorPoint);
     }
     
-    public ConnectorPointView(string label, bool connectsIn) : this(connectsIn)
+    public ConnectorPointView(BehaviourTreeWindow behaviourTreeWindow, string label, bool connectsIn) : this(behaviourTreeWindow, connectsIn)
     {
         m_nameLabel.text = label;
         m_nameLabel.enabledSelf = true;

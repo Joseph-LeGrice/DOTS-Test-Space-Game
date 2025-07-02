@@ -4,7 +4,6 @@ using UnityEngine.UIElements;
 public class MouseDragManipulator : MouseManipulator
 {
     private bool m_isDragging;
-    private Vector2 m_mouseOffset;
     
     protected override void RegisterCallbacksOnTarget()
     {
@@ -25,7 +24,6 @@ public class MouseDragManipulator : MouseManipulator
         if (!m_isDragging)
         {
             m_isDragging = true;
-            m_mouseOffset = evt.localMousePosition;
             evt.StopPropagation();
             target.CaptureMouse();
         }

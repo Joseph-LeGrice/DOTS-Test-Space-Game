@@ -20,9 +20,10 @@ public class BehaviourTreeWindow : VisualElement
     }
     
     private BehaviourTree m_behaviourTree;
+    private ConnectorLinePreview m_linePreview;
     private List<BehaviourNodeTypeData> m_allNodeTypes;
     private Dictionary<int, BehaviourTreeNodeView> m_nodeViewLookup = new Dictionary<int, BehaviourTreeNodeView>();
-    private List<ConnectorLineView> m_allConnectors = new List<ConnectorLineView>();
+    private List<ConnectorLine> m_allConnectors = new List<ConnectorLine>();
 
     public BehaviourTreeWindow(BehaviourTree behaviourTree)
     {
@@ -33,7 +34,7 @@ public class BehaviourTreeWindow : VisualElement
         m_allNodeTypes.Add(BehaviourNodeTypeData.Create<BehaviourTreeConditionalNode>());
 
         style.height = new Length(100.0f, LengthUnit.Percent);
-
+        
         VisualTreeAsset visualTree = Resources.Load<VisualTreeAsset>("BehaviourTreeEditor");
         visualTree.CloneTree(this);
 
@@ -48,6 +49,11 @@ public class BehaviourTreeWindow : VisualElement
         RegisterCallback<AttachToPanelEvent>(OnAttachToPanel);
         // TODO: Drag / zoom handler
     }
+
+    public ConnectorLinePreview GetLinePreview()
+    {
+        return m_linePreview;
+    }
     
     private void OnAttachToPanel(AttachToPanelEvent evt)
     {
@@ -60,6 +66,8 @@ public class BehaviourTreeWindow : VisualElement
             nodeRoot.Add(treeNodeViewInstance);
             m_nodeViewLookup[node.m_nodeReference] = treeNodeViewInstance;
         }
+        
+        m_linePreview = new ConnectorLinePreview(nodeRoot);
         
         for (int i = 0; i < allNodes.Count; i++)
         {
@@ -99,11 +107,12 @@ public class BehaviourTreeWindow : VisualElement
 
     public void RepaintConnectors()
     {
-        foreach (ConnectorLineView clv in m_allConnectors)
+        foreach (ConnectorLine clv in m_allConnectors)
         {
             clv.SetOffset(new Vector2(0, -worldBound.y));
             clv.MarkDirtyRepaint();
         }
+        m_linePreview.SetOffset(new Vector2(0, -worldBound.y));
     }
 
     private void CreateConnector(int sourceReference, int targetReference, string connectionOutId)
@@ -112,7 +121,7 @@ public class BehaviourTreeWindow : VisualElement
             m_nodeViewLookup.TryGetValue(targetReference, out BehaviourTreeNodeView targetNodeView))
         {
             VisualElement nodeRoot = this.Q<VisualElement>("NodeInstanceRoot");
-            ConnectorLineView newConnection = new ConnectorLineView(
+            ConnectorLine newConnection = new ConnectorLine(
                 sourceNodeView.GetConnectionOutElement(connectionOutId),
                 targetNodeView.GetConnectionInElement()
             );

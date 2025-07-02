@@ -30,7 +30,7 @@ public class BehaviourTreeNodeView : VisualElement
         VisualElement headerElement = new VisualElement();
         headerElement.style.flexDirection = FlexDirection.Row;
 
-        m_connectionInElement = new ConnectorPointView(true);
+        m_connectionInElement = new ConnectorPointView(m_behaviourTreeWindow, true);
         headerElement.Add(m_connectionInElement);
         
         m_title = new Label();
@@ -64,7 +64,7 @@ public class BehaviourTreeNodeView : VisualElement
             var nodeReference = (BehaviourNodeReferenceAttribute)Attribute.GetCustomAttribute(childProperty, typeof(BehaviourNodeReferenceAttribute));
             if (nodeReference != null)
             {
-                var field = new ConnectorPointView(childProperty.Name, nodeReference.ConnectsIn);
+                var field = new ConnectorPointView(m_behaviourTreeWindow, childProperty.Name, nodeReference.ConnectsIn);
                 m_contentElement.Add(field);
                 m_fieldElementLookup[childProperty.Name] = field;
             }

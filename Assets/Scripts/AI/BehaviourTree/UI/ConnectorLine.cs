@@ -2,16 +2,14 @@ using System;
 using UnityEngine;
 using UnityEngine.UIElements;
 
-public class ConnectorLineView : VisualElement
+public class ConnectorLine : VisualElement
 {
     private VisualElement m_fromNode;
     private VisualElement m_toNode;
     private Vector2 m_screenOffset;
-    
-    public ConnectorLineView(VisualElement from, VisualElement to)
+
+    public ConnectorLine()
     {
-        m_fromNode = from;
-        m_toNode = to;
         style.position = Position.Absolute;
         style.flexGrow = 0.0f;
         style.flexShrink = 0.0f;
@@ -20,7 +18,19 @@ public class ConnectorLineView : VisualElement
         pickingMode = PickingMode.Ignore;
         generateVisualContent += OnGenerateVisualContent;
     }
+    
+    public ConnectorLine(VisualElement from, VisualElement to) : this()
+    {
+        m_fromNode = from;
+        m_toNode = to;
+    }
 
+    public void SetFromTo(VisualElement from, VisualElement to)
+    {
+        m_fromNode = from;
+        m_toNode = to;
+    }
+    
     private void OnGenerateVisualContent(MeshGenerationContext mgc)
     {
         // if (this.edgeWidth <= 0)
@@ -66,8 +76,6 @@ public class ConnectorLineView : VisualElement
         
         painter2D.MoveTo(m_fromNode.worldBound.center + m_screenOffset);
         painter2D.LineTo(m_toNode.worldBound.center + m_screenOffset);
-        // painter2D.MoveTo(m_fromNode.);
-        // painter2D.LineTo(m_toNode.localBound.center);
         
         painter2D.Stroke();
         painter2D.ClosePath();

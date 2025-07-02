@@ -5,7 +5,13 @@ public class ConnectorManipulator : MouseManipulator
 {
     private bool m_isDragging;
     private Vector2 m_mouseOffset;
-    
+    private readonly BehaviourTreeWindow m_behaviourTreeWindow;
+
+    public ConnectorManipulator(BehaviourTreeWindow behaviourTreeWindow)
+    {
+        m_behaviourTreeWindow = behaviourTreeWindow;
+    }
+        
     protected override void RegisterCallbacksOnTarget()
     {
         target.RegisterCallback<MouseUpEvent>(OnUp);
@@ -27,6 +33,7 @@ public class ConnectorManipulator : MouseManipulator
             m_isDragging = true;
             evt.StopPropagation();
             target.CaptureMouse();
+            m_behaviourTreeWindow.GetLinePreview().ActivateView(target);
         }
     }
     
@@ -37,6 +44,7 @@ public class ConnectorManipulator : MouseManipulator
             m_isDragging = false;
             target.ReleaseMouse();
             evt.StopPropagation();
+            m_behaviourTreeWindow.GetLinePreview().DeactivateView();
         }
     }
     
@@ -44,6 +52,7 @@ public class ConnectorManipulator : MouseManipulator
     {
         if (m_isDragging)
         {
+            m_behaviourTreeWindow.GetLinePreview().SetTargetPosition(evt.mousePosition);
         }
     }
 }
