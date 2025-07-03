@@ -59,7 +59,7 @@ public class BehaviourTreeNodeView : VisualElement
         foreach (FieldInfo childProperty in nodeFields)
         {
             var nodeReference = (BehaviourNodeReferenceAttribute)Attribute.GetCustomAttribute(childProperty, typeof(BehaviourNodeReferenceAttribute));
-            if (nodeReference != null)
+            if (nodeReference != null && !nodeReference.ConnectsIn)
             {
                 var field = new ConnectorPointView(m_behaviourTreeWindow.GetConnectorStateHandler(), childProperty.Name, nodeReference.ConnectsIn);
                 field.dataSource = node;

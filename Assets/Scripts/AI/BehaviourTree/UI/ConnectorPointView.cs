@@ -18,6 +18,7 @@ public class ConnectorPointView : VisualElement
         style.flexDirection = FlexDirection.Row;
         
         m_nameLabel = new Label();
+        m_nameLabel.style.color = Color.black;
         m_nameLabel.style.flexGrow = 1.0f;
         m_nameLabel.style.flexShrink= 1.0f;
         m_nameLabel.enabledSelf = false;
