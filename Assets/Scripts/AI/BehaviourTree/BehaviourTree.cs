@@ -1,6 +1,8 @@
+using System;
 using System.Collections.Generic;
 using Unity.Entities;
 using UnityEngine;
+using UnityEngine.UIElements;
 
 public enum BehaviourActionResult
 {
@@ -10,7 +12,7 @@ public enum BehaviourActionResult
 };
 
 [System.Serializable]
-public abstract class BehaviourTreeNode
+public abstract class BehaviourTreeNode : INotifyBindablePropertyChanged 
 {
     [SerializeField]
     [BehaviourNodeReference(true)]
@@ -19,12 +21,19 @@ public abstract class BehaviourTreeNode
     [HideInInspector]
     public Vector2 m_nodePosition;
     
+    public event EventHandler<BindablePropertyChangedEventArgs> propertyChanged;
+    
     public abstract BehaviourActionResult DoAction(BehaviourTree behaviourTree);
     public abstract BurstableBehaviourTreeNode GetBurstable();
 
     public abstract string GetNodeName();
     public abstract bool AcceptsConnectionIn();
     public abstract bool AcceptsConnectionOut();
+
+    public void NotifyPropertyChanged(string property)
+    {
+        propertyChanged?.Invoke(this, new BindablePropertyChangedEventArgs(property));
+    }
 }
 
 [CreateAssetMenu(menuName = "BehaviourTree Asset")]
@@ -54,7 +63,7 @@ public class BehaviourTree : BlobAssetScriptableObject<BurstableBehaviourTree>
         return null;
     }
     
-    public IReadOnlyList<BehaviourTreeNode> GetNodes()
+    public IList<BehaviourTreeNode> GetNodes()
     {
         return m_allNodes;
     }

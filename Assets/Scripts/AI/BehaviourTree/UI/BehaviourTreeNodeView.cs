@@ -124,4 +124,9 @@ public class BehaviourTreeNodeView : VisualElement
             node.m_nodePosition = newPosition;
         }
     }
+
+    public void Refresh()
+    {
+        throw new NotImplementedException();
+    }
 }

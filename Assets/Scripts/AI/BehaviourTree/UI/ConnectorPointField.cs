@@ -26,14 +26,16 @@ public class ConnectorPointField : VisualElement
         m_connectorStateHandler = connectorStateHandler;
         m_isList = typeof(IEnumerable<System.Int32>).IsAssignableFrom(field.FieldType);
         
-        RegisterCallback<AttachToPanelEvent>(OnAttachToPanel);  
+        RegisterCallback<AttachToPanelEvent>(OnAttachToPanel);
     }
 
     private void OnAttachToPanel(AttachToPanelEvent evt)
     {
         if (m_isList)
         {
-            // TODO: Buttons for adding/removing arra elements (or an intfield)
+            var container = new VisualElement();
+            container.style.flexDirection = FlexDirection.Column;
+            Add(container);
             
             DataSourceContext thisDataSource = GetHierarchicalDataSourceContext();
             PropertyContainer.TryGetValue(thisDataSource.dataSource, thisDataSource.dataSourcePath, out IEnumerable<int> idList);
@@ -41,12 +43,29 @@ public class ConnectorPointField : VisualElement
             int i = 0;
             foreach (var _ in idList)
             {
+                
+                var connectorPointContainer = new VisualElement();
+                connectorPointContainer.style.flexDirection = FlexDirection.Row;
+                connectorPointContainer.dataSourcePath = PropertyPath.FromIndex(i);
+                
+                int ii = i;
+                var removeButton = new Button();
+                removeButton.text = "-";
+                removeButton.RegisterCallback<ClickEvent, int>(RemoveConnectorElement, ii);
+                connectorPointContainer.Add(removeButton);
+                
                 var connectorPoint = new ConnectorPoint(m_connectorStateHandler, false);
-                connectorPoint.dataSourcePath = PropertyPath.FromIndex(i);
-                Add(connectorPoint);
+                connectorPointContainer.Add(connectorPoint);
                 m_connectorPoints.Add(connectorPoint);
+                
+                container.Add(connectorPointContainer);
+                
                 i++;
             }
+            
+            var addButton = new Button(AddConnectorElement);
+            addButton.text = "+";
+            container.Add(addButton);
         }
         else
         {
@@ -54,6 +73,42 @@ public class ConnectorPointField : VisualElement
             Add(connectorPoint);
             m_connectorPoints.Add(connectorPoint);
         }
+    }
+
+    private void AddConnectorElement()
+    {
+        DataSourceContext thisDataSource = GetHierarchicalDataSourceContext();
+        if (PropertyContainer.TryGetValue(thisDataSource.dataSource, thisDataSource.dataSourcePath,
+                out IList<int> idList))
+        {
+            idList.Add(-1);
+            PropertyContainer.SetValue(thisDataSource.dataSource, thisDataSource.dataSourcePath, idList);
+        }
+        else if (PropertyContainer.TryGetValue(thisDataSource.dataSource, thisDataSource.dataSourcePath,
+                     out int[] idArray))
+        {
+            Debug.LogError("TODO");
+        }
+        
+        m_connectorStateHandler.GetRootWindow().RefreshNode((BehaviourTreeNode)GetHierarchicalDataSourceContext().dataSource);
+    }
+
+    private void RemoveConnectorElement(ClickEvent evt, int i)
+    {
+        DataSourceContext thisDataSource = GetHierarchicalDataSourceContext();
+        if (PropertyContainer.TryGetValue(thisDataSource.dataSource, thisDataSource.dataSourcePath,
+                out IList<int> idList))
+        {
+            idList.RemoveAt(i);
+            PropertyContainer.SetValue(thisDataSource.dataSource, thisDataSource.dataSourcePath, idList);
+        }
+        else if (PropertyContainer.TryGetValue(thisDataSource.dataSource, thisDataSource.dataSourcePath,
+                out int[] idArray))
+        {
+            Debug.LogError("TODO");
+        }
+        
+        m_connectorStateHandler.GetRootWindow().RefreshNode((BehaviourTreeNode)GetHierarchicalDataSourceContext().dataSource);
     }
 
     public VisualElement GetConnector(int i)

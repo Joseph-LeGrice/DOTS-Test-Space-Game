@@ -60,6 +60,19 @@ public class BehaviourTreeWindow : VisualElement
         return m_behaviourTree;
     }
 
+    public void RefreshNode(BehaviourTreeNode node)
+    {
+        m_nodeViewLookup[node.m_nodeReference].RemoveFromHierarchy();
+        
+        int i = m_behaviourTree.GetNodes().IndexOf(node);
+        BehaviourTreeNodeView treeNodeViewInstance = new BehaviourTreeNodeView(this, i);
+        VisualElement nodeRoot = this.Q<VisualElement>("NodeInstanceRoot");
+        nodeRoot.Add(treeNodeViewInstance);
+        m_nodeViewLookup[node.m_nodeReference] = treeNodeViewInstance;
+        
+        RefreshConnectors();
+    }
+    
     public void RefreshConnectors()
     {
         foreach (ConnectorLine connectorLine in m_allConnectors)

@@ -44,6 +44,11 @@ public class ConnectorStateHandler
         }
     }
 
+    public BehaviourTreeWindow GetRootWindow()
+    {
+        return m_rootWindow;
+    }
+
     public ConnectorPoint GetTargetConnector()
     {
         return m_targetConnector;
