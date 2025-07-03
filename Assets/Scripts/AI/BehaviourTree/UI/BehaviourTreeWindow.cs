@@ -79,13 +79,15 @@ public class BehaviourTreeWindow : VisualElement
                     var targetValue = sourceField.GetValue(sourceNode);
                     if (targetValue is int)
                     {
-                        CreateConnector(sourceNode.m_nodeReference, (int)targetValue, sourceField.Name);
+                        CreateConnector(sourceNode.m_nodeReference, (int)targetValue, sourceField.Name, 0);
                     }
                     else if (targetValue is IEnumerable<int>)
                     {
+                        int connectionOutIndex = 0;
                         foreach (int targetValueReference in (IEnumerable<int>)targetValue)
                         {
-                            CreateConnector(sourceNode.m_nodeReference, targetValueReference, sourceField.Name); // Need a new identifier for sourceField.Name that includes array element
+                            CreateConnector(sourceNode.m_nodeReference, targetValueReference, sourceField.Name, connectionOutIndex);
+                            connectionOutIndex++;
                         }
                     }
                 }
@@ -123,14 +125,14 @@ public class BehaviourTreeWindow : VisualElement
         }
     }
 
-    private void CreateConnector(int sourceReference, int targetReference, string connectionOutId)
+    private void CreateConnector(int sourceReference, int targetReference, string connectionOutId, int connectionOutIndex)
     {
         if (m_nodeViewLookup.TryGetValue(sourceReference, out BehaviourTreeNodeView sourceNodeView) &&
             m_nodeViewLookup.TryGetValue(targetReference, out BehaviourTreeNodeView targetNodeView))
         {
             VisualElement nodeRoot = this.Q<VisualElement>("NodeInstanceRoot");
             ConnectorLine newConnection = new ConnectorLine(
-                sourceNodeView.GetConnectionOutElement(connectionOutId),
+                sourceNodeView.GetConnectionOutElement(connectionOutId, connectionOutIndex),
                 targetNodeView.GetConnectionInElement()
             );
             nodeRoot.Add(newConnection);

@@ -6,9 +6,9 @@ public class ConnectorManipulator : MouseManipulator
     private bool m_isDragging;
     private Vector2 m_mouseOffset;
     private readonly ConnectorStateHandler m_connectorStateHandler;
-    private ConnectorPointView m_relatedConnector;
+    private ConnectorPoint m_relatedConnector;
 
-    public ConnectorManipulator(ConnectorStateHandler connectorStateHandler, ConnectorPointView connector)
+    public ConnectorManipulator(ConnectorStateHandler connectorStateHandler, ConnectorPoint connector)
     {
         m_connectorStateHandler = connectorStateHandler;
         m_relatedConnector = connector;

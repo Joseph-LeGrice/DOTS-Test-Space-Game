@@ -7,8 +7,8 @@ public class ConnectorStateHandler
 
     private BehaviourTreeWindow m_rootWindow;
     
-    private ConnectorPointView m_sourceConnector;
-    private ConnectorPointView m_targetConnector;
+    private ConnectorPoint m_sourceConnector;
+    private ConnectorPoint m_targetConnector;
     
     private ConnectorLine m_previewConnectorLine;
     private VisualElement m_dummyTargetElement;
@@ -36,7 +36,7 @@ public class ConnectorStateHandler
         return m_isActive;
     }
 
-    public void SetTargetConnector(ConnectorPointView targetConnector)
+    public void SetTargetConnector(ConnectorPoint targetConnector)
     {
         if (targetConnector == null || targetConnector.ConnectsIn())
         {
@@ -44,19 +44,19 @@ public class ConnectorStateHandler
         }
     }
 
-    public ConnectorPointView GetTargetConnector()
+    public ConnectorPoint GetTargetConnector()
     {
         return m_targetConnector;
     }
     
-    public void ActivateView(ConnectorPointView sourceConnector)
+    public void ActivateView(ConnectorPoint sourceConnector)
     {
         m_isActive = true;
         m_sourceConnector = sourceConnector;
-        m_dummyTargetElement.style.top = sourceConnector.GetConnectorPoint().worldBound.center.y + m_previewConnectorLine.GetScreenOffset().y;
-        m_dummyTargetElement.style.left = sourceConnector.GetConnectorPoint().worldBound.center.x + m_previewConnectorLine.GetScreenOffset().x;
+        m_dummyTargetElement.style.top = sourceConnector.worldBound.center.y + m_previewConnectorLine.GetScreenOffset().y;
+        m_dummyTargetElement.style.left = sourceConnector.worldBound.center.x + m_previewConnectorLine.GetScreenOffset().x;
         m_previewConnectorLine.visible = true;
-        m_previewConnectorLine.SetFromTo(sourceConnector.GetConnectorPoint(), m_dummyTargetElement);
+        m_previewConnectorLine.SetFromTo(sourceConnector, m_dummyTargetElement);
         m_previewConnectorLine.MarkDirtyRepaint();
     }
     
@@ -64,8 +64,8 @@ public class ConnectorStateHandler
     {
         if (m_targetConnector != null)
         {
-            m_dummyTargetElement.style.top = m_targetConnector.GetConnectorPoint().worldBound.center.y + m_previewConnectorLine.GetScreenOffset().y;
-            m_dummyTargetElement.style.left = m_targetConnector.GetConnectorPoint().worldBound.center.x + m_previewConnectorLine.GetScreenOffset().x;
+            m_dummyTargetElement.style.top = m_targetConnector.worldBound.center.y + m_previewConnectorLine.GetScreenOffset().y;
+            m_dummyTargetElement.style.left = m_targetConnector.worldBound.center.x + m_previewConnectorLine.GetScreenOffset().x;
         }
         else
         {
