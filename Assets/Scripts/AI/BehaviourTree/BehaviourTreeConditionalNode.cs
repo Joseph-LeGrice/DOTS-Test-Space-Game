@@ -9,6 +9,11 @@ public class BehaviourTreeConditionalNode : BehaviourTreeNode
     [SerializeField]
     [BehaviourNodeReference]
     private int m_actionNode;
+
+    public override string GetNodeName()
+    {
+        return "Conditional Node";
+    }
     
     public override BehaviourActionResult DoAction(BehaviourTree behaviourTree)
     {
@@ -27,11 +32,6 @@ public class BehaviourTreeConditionalNode : BehaviourTreeNode
     public override BurstableBehaviourTreeNode GetBurstable()
     {
         return new BurstableBehaviourTreeNode();
-    }
-
-    public override string GetNodeName()
-    {
-        return "Conditional Node";
     }
 
     public override bool AcceptsConnectionIn()

@@ -22,17 +22,29 @@ public abstract class BehaviourTreeNode : INotifyBindablePropertyChanged
     public Vector2 m_nodePosition;
     
     public event EventHandler<BindablePropertyChangedEventArgs> propertyChanged;
-    
-    public abstract BehaviourActionResult DoAction(BehaviourTree behaviourTree);
-    public abstract BurstableBehaviourTreeNode GetBurstable();
-
-    public abstract string GetNodeName();
-    public abstract bool AcceptsConnectionIn();
-    public abstract bool AcceptsConnectionOut();
 
     public void NotifyPropertyChanged(string property)
     {
         propertyChanged?.Invoke(this, new BindablePropertyChangedEventArgs(property));
+    }
+    
+    public abstract string GetNodeName();
+    public abstract BehaviourActionResult DoAction(BehaviourTree behaviourTree);
+
+    public virtual BurstableBehaviourTreeNode GetBurstable()
+    {
+        Debug.LogWarning("Node not currently burstable");
+        return default(BurstableBehaviourTreeNode);
+    }
+
+    public virtual bool AcceptsConnectionIn()
+    {
+        return true;
+    }
+
+    public virtual bool AcceptsConnectionOut()
+    {
+        return false;
     }
 }
 

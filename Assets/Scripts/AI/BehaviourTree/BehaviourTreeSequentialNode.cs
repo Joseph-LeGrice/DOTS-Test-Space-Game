@@ -5,11 +5,11 @@ using UnityEngine;
 public class BehaviourTreeSequentialNode : BehaviourTreeNode
 {
     [SerializeField]
-    [HideInInspector]
-    private int m_currentActionIndex;
-    [SerializeField]
     [BehaviourNodeReference]
     private List<int> m_actionNodes;
+    [SerializeField]
+    [HideInInspector]
+    private int m_currentActionIndex; // This is state..
     
     public override BehaviourActionResult DoAction(BehaviourTree behaviourTree)
     {
