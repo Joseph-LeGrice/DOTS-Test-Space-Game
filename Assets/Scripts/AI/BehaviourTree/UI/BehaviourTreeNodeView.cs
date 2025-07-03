@@ -68,32 +68,47 @@ public class BehaviourTreeNodeView : VisualElement
                 m_contentElement.Add(field);
                 m_fieldElementLookup[childProperty.Name] = field;
             }
-            
-            //TODO: Support all other types, do some ugly switching for the types
-            switch (childProperty.FieldType.Name)
+            else
             {
-                default:
-                    break;
-                case "int":
-                    CreateField<IntegerField, int>();
-                    break;
-                case "string":
-                    CreateField<TextField, string>();
-                    break;
+                if (Attribute.GetCustomAttribute(childProperty, typeof(HideInInspector)) != null)
+                {
+                    continue;
+                }
+                
+                switch (childProperty.FieldType.Name)
+                {
+                    default:
+                        Debug.LogError("Property type \"" + childProperty.FieldType.Name + "\" not yet supported!");
+                        break;
+                    case "Int32":
+                        InitField(new IntegerField(), childProperty);
+                        break;
+                    case "string":
+                        InitField(new TextField(), childProperty);
+                        break;
+                    case "Vector2":
+                        InitField(new Vector2Field(), childProperty);
+                        break;
+                    case "Single":
+                        InitField(new FloatField(), childProperty);
+                        break;
+                }
             }
         }
         
         this.AddManipulator(new MouseDragManipulator());
     }
 
-    private void CreateField<TField, TType>() where TField : BaseField<TType>
+    private void InitField<T>(BaseField<T> field, FieldInfo childProperty)
     {
-        //TODO: Create a BaseField with generics and bind it to the correct field
-        
-        // var field = new PropertyField(childProperty, childProperty.name);
-        // field.Bind(m_behaviourTreeWindow.GetSerializedBehaviourTree());
-        // m_contentElement.Add(field);
-        // m_fieldElementLookup[childProperty.name] = field;
+        field.style.color = Color.black;
+        field.SetBinding(nameof(field.value), new DataBinding
+        {
+            dataSource = GetNode(),
+            dataSourcePath = PropertyPath.FromName(childProperty.Name)
+        });
+        field.label = childProperty.Name;
+        m_contentElement.Add(field);
     }
 
     public BehaviourTreeWindow GetBehaviourTreeWindow()
@@ -123,10 +138,5 @@ public class BehaviourTreeNodeView : VisualElement
         {
             node.m_nodePosition = newPosition;
         }
-    }
-
-    public void Refresh()
-    {
-        throw new NotImplementedException();
     }
 }
