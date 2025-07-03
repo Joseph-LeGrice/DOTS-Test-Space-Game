@@ -20,7 +20,7 @@ public class BehaviourTreeWindow : VisualElement
     }
     
     private BehaviourTree m_behaviourTree;
-    private ConnectorLinePreview m_linePreview;
+    private ConnectorStateHandler m_connectorStateHandler;
     private List<BehaviourNodeTypeData> m_allNodeTypes;
     private Dictionary<int, BehaviourTreeNodeView> m_nodeViewLookup = new Dictionary<int, BehaviourTreeNodeView>();
     private List<ConnectorLine> m_allConnectors = new List<ConnectorLine>();
@@ -50,28 +50,26 @@ public class BehaviourTreeWindow : VisualElement
         // TODO: Drag / zoom handler
     }
 
-    public ConnectorLinePreview GetLinePreview()
+    public ConnectorStateHandler GetConnectorStateHandler()
     {
-        return m_linePreview;
+        return m_connectorStateHandler;
     }
-    
-    private void OnAttachToPanel(AttachToPanelEvent evt)
+
+    public BehaviourTree GetSerializedBehaviourTree()
     {
-        VisualElement nodeRoot = this.Q<VisualElement>("NodeInstanceRoot");
-        var allNodes = m_behaviourTree.GetNodes();
-        for (int i = 0; i < allNodes.Count; i++)
+        return m_behaviourTree;
+    }
+
+    public void RefreshConnectors()
+    {
+        foreach (ConnectorLine connectorLine in m_allConnectors)
         {
-            BehaviourTreeNode node = allNodes[i];
-            BehaviourTreeNodeView treeNodeViewInstance = new BehaviourTreeNodeView(this, i);
-            nodeRoot.Add(treeNodeViewInstance);
-            m_nodeViewLookup[node.m_nodeReference] = treeNodeViewInstance;
+            connectorLine.RemoveFromHierarchy();
         }
+        m_allConnectors.Clear();
         
-        m_linePreview = new ConnectorLinePreview(nodeRoot);
-        
-        for (int i = 0; i < allNodes.Count; i++)
+        foreach (var sourceNode in m_behaviourTree.GetNodes())
         {
-            var sourceNode = allNodes[i];
             var sourceNodeFields = sourceNode.GetType().GetFields(BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public);
             foreach (FieldInfo sourceField in sourceNodeFields)
             {
@@ -94,10 +92,22 @@ public class BehaviourTreeWindow : VisualElement
             }
         }
     }
-
-    public BehaviourTree GetSerializedBehaviourTree()
+    
+    private void OnAttachToPanel(AttachToPanelEvent evt)
     {
-        return m_behaviourTree;
+        VisualElement nodeRoot = this.Q<VisualElement>("NodeInstanceRoot");
+        m_connectorStateHandler = new ConnectorStateHandler(this);
+        
+        var allNodes = m_behaviourTree.GetNodes();
+        for (int i = 0; i < allNodes.Count; i++)
+        {
+            BehaviourTreeNode node = allNodes[i];
+            BehaviourTreeNodeView treeNodeViewInstance = new BehaviourTreeNodeView(this, i);
+            nodeRoot.Add(treeNodeViewInstance);
+            m_nodeViewLookup[node.m_nodeReference] = treeNodeViewInstance;
+        }
+        
+        RefreshConnectors();
     }
 
     private void OnGeometryChanged(GeometryChangedEvent evt)
@@ -109,10 +119,8 @@ public class BehaviourTreeWindow : VisualElement
     {
         foreach (ConnectorLine clv in m_allConnectors)
         {
-            clv.SetOffset(new Vector2(0, -worldBound.y));
             clv.MarkDirtyRepaint();
         }
-        m_linePreview.SetOffset(new Vector2(0, -worldBound.y));
     }
 
     private void CreateConnector(int sourceReference, int targetReference, string connectionOutId)

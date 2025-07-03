@@ -5,15 +5,19 @@ public class ConnectorManipulator : MouseManipulator
 {
     private bool m_isDragging;
     private Vector2 m_mouseOffset;
-    private readonly BehaviourTreeWindow m_behaviourTreeWindow;
+    private readonly ConnectorStateHandler m_connectorStateHandler;
+    private ConnectorPointView m_relatedConnector;
 
-    public ConnectorManipulator(BehaviourTreeWindow behaviourTreeWindow)
+    public ConnectorManipulator(ConnectorStateHandler connectorStateHandler, ConnectorPointView connector)
     {
-        m_behaviourTreeWindow = behaviourTreeWindow;
+        m_connectorStateHandler = connectorStateHandler;
+        m_relatedConnector = connector;
     }
         
     protected override void RegisterCallbacksOnTarget()
     {
+        target.RegisterCallback<MouseEnterEvent>(OnEnter);
+        target.RegisterCallback<MouseLeaveEvent>(OnLeave);
         target.RegisterCallback<MouseUpEvent>(OnUp);
         target.RegisterCallback<MouseDownEvent>(OnDown);
         target.RegisterCallback<MouseMoveEvent>(OnMove);
@@ -21,11 +25,29 @@ public class ConnectorManipulator : MouseManipulator
 
     protected override void UnregisterCallbacksFromTarget()
     {
+        target.UnregisterCallback<MouseEnterEvent>(OnEnter);
+        target.UnregisterCallback<MouseLeaveEvent>(OnLeave);
         target.UnregisterCallback<MouseUpEvent>(OnUp);
         target.UnregisterCallback<MouseDownEvent>(OnDown);
         target.UnregisterCallback<MouseMoveEvent>(OnMove);
     }
 
+    private void OnEnter(MouseEnterEvent evt)
+    {
+        if (!m_isDragging && m_connectorStateHandler.IsActive())
+        {
+            m_connectorStateHandler.SetTargetConnector(m_relatedConnector);
+        }
+    }
+
+    private void OnLeave(MouseLeaveEvent evt)
+    {
+        if (!m_isDragging && m_connectorStateHandler.GetTargetConnector() == m_relatedConnector)
+        {
+            m_connectorStateHandler.SetTargetConnector(null);
+        }
+    }
+    
     private void OnDown(MouseDownEvent evt)
     {
         if (!m_isDragging)
@@ -33,7 +55,7 @@ public class ConnectorManipulator : MouseManipulator
             m_isDragging = true;
             evt.StopPropagation();
             target.CaptureMouse();
-            m_behaviourTreeWindow.GetLinePreview().ActivateView(target);
+            m_connectorStateHandler.ActivateView(m_relatedConnector);
         }
     }
     
@@ -44,7 +66,7 @@ public class ConnectorManipulator : MouseManipulator
             m_isDragging = false;
             target.ReleaseMouse();
             evt.StopPropagation();
-            m_behaviourTreeWindow.GetLinePreview().DeactivateView();
+            m_connectorStateHandler.DeactivateView();
         }
     }
     
@@ -52,7 +74,7 @@ public class ConnectorManipulator : MouseManipulator
     {
         if (m_isDragging)
         {
-            m_behaviourTreeWindow.GetLinePreview().SetTargetPosition(evt.mousePosition);// + new Vector2(0, -m_behaviourTreeWindow.worldBound.y));
+            m_connectorStateHandler.SetTargetPosition(evt.mousePosition);
         }
     }
 }

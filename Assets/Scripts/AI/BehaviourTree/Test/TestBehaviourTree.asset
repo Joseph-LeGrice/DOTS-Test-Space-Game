@@ -26,7 +26,7 @@ MonoBehaviour:
       type: {class: BehaviourTreeSequentialNode, ns: , asm: behaviourtree}
       data:
         m_nodeReference: 0
-        m_nodePosition: {x: 963, y: 196}
+        m_nodePosition: {x: 901, y: 196}
         m_currentActionIndex: 0
         m_actionNodes: 
     - rid: 7690121350700859512
@@ -53,7 +53,7 @@ MonoBehaviour:
     - rid: 7690121350700859531
       type: {class: BehaviourTreeConditionalNode, ns: , asm: behaviourtree}
       data:
-        m_nodeReference: 4
-        m_nodePosition: {x: 1009, y: 352}
+        m_nodeReference: 3
+        m_nodePosition: {x: 209, y: 144}
         m_conditionalNode: 1
         m_actionNode: 2

@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Reflection;
+using Unity.Properties;
 using UnityEngine;
 using UnityEngine.UIElements;
 
@@ -18,6 +19,7 @@ public class BehaviourTreeNodeView : VisualElement
     public BehaviourTreeNodeView(BehaviourTreeWindow window, int nodeArrayIndex)
     {
         m_behaviourTreeWindow = window;
+        m_nodeIndex = nodeArrayIndex;
         
         style.position = Position.Absolute;
         style.backgroundColor = Color.aquamarine;
@@ -30,10 +32,17 @@ public class BehaviourTreeNodeView : VisualElement
         VisualElement headerElement = new VisualElement();
         headerElement.style.flexDirection = FlexDirection.Row;
 
-        m_connectionInElement = new ConnectorPointView(m_behaviourTreeWindow, true);
+        BehaviourTreeNode node = GetNode();
+        transform.position = node.m_nodePosition;
+        
+        m_connectionInElement = new ConnectorPointView(m_behaviourTreeWindow.GetConnectorStateHandler(), true);
+        m_connectionInElement.dataSource = node;
+        m_connectionInElement.dataSourcePath = PropertyPath.FromName(nameof(BehaviourTreeNode.m_nodeReference));
+        m_connectionInElement.visible = node.AcceptsConnectionIn();
         headerElement.Add(m_connectionInElement);
         
         m_title = new Label();
+        m_title.text = node.GetNodeName();
         m_title.style.color = Color.black;
         m_title.style.flexGrow = 0.0f;
         headerElement.Add(m_title);
@@ -46,25 +55,15 @@ public class BehaviourTreeNodeView : VisualElement
         
         hierarchy.Add(m_contentElement);
         
-        this.AddManipulator(new MouseDragManipulator());
-        
-        // ---
-        
-        m_nodeIndex = nodeArrayIndex;
-        
-        BehaviourTreeNode node = GetNode();
-        transform.position = node.m_nodePosition;
-        m_connectionInElement.visible = node.AcceptsConnectionIn();
-
-        m_title.text = node.GetNodeName();
-
         FieldInfo[] nodeFields = node.GetType().GetFields(BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public);
         foreach (FieldInfo childProperty in nodeFields)
         {
             var nodeReference = (BehaviourNodeReferenceAttribute)Attribute.GetCustomAttribute(childProperty, typeof(BehaviourNodeReferenceAttribute));
             if (nodeReference != null)
             {
-                var field = new ConnectorPointView(m_behaviourTreeWindow, childProperty.Name, nodeReference.ConnectsIn);
+                var field = new ConnectorPointView(m_behaviourTreeWindow.GetConnectorStateHandler(), childProperty.Name, nodeReference.ConnectsIn);
+                field.dataSource = node;
+                field.dataSourcePath = PropertyPath.FromName(childProperty.Name);
                 m_contentElement.Add(field);
                 m_fieldElementLookup[childProperty.Name] = field;
             }
@@ -73,6 +72,8 @@ public class BehaviourTreeNodeView : VisualElement
             // m_contentElement.Add(field);
             // m_fieldElementLookup[childProperty.name] = field;
         }
+        
+        this.AddManipulator(new MouseDragManipulator());
     }
 
     public BehaviourTreeWindow GetBehaviourTreeWindow()

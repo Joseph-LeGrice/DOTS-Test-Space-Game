@@ -1,13 +1,17 @@
+using Unity.Properties;
 using UnityEngine;
 using UnityEngine.UIElements;
 
 public class ConnectorPointView : VisualElement
 {
+    private bool m_connectsIn;
     private Label m_nameLabel;
     private VisualElement m_connectorPoint;
     
-    public ConnectorPointView(BehaviourTreeWindow behaviourTreeWindow, bool connectsIn)
+    public ConnectorPointView(ConnectorStateHandler connectorStateHandler, bool connectsIn)
     {
+        m_connectsIn = connectsIn;
+        
         float size = 8.0f;
         float lineThickness = 2.0f;
         
@@ -33,12 +37,12 @@ public class ConnectorPointView : VisualElement
         m_connectorPoint.style.borderTopLeftRadius = m_connectorPoint.style.borderTopRightRadius =
             m_connectorPoint.style.borderBottomLeftRadius = m_connectorPoint.style.borderBottomRightRadius = size;
         
-        m_connectorPoint.AddManipulator(new ConnectorManipulator(behaviourTreeWindow));
+        m_connectorPoint.AddManipulator(new ConnectorManipulator(connectorStateHandler, this));
         
         Add(m_connectorPoint);
     }
     
-    public ConnectorPointView(BehaviourTreeWindow behaviourTreeWindow, string label, bool connectsIn) : this(behaviourTreeWindow, connectsIn)
+    public ConnectorPointView(ConnectorStateHandler connectorStateHandler, string label, bool connectsIn) : this(connectorStateHandler, connectsIn)
     {
         m_nameLabel.text = label;
         m_nameLabel.enabledSelf = true;
@@ -47,5 +51,22 @@ public class ConnectorPointView : VisualElement
     public VisualElement GetConnectorPoint()
     {
         return m_connectorPoint;
+    }
+
+    public bool ConnectsIn()
+    {
+        return m_connectsIn;
+    }
+
+    public void ConnectTo(ConnectorPointView targetConnector)
+    {
+        if (targetConnector.ConnectsIn())
+        {
+            var targetDataSource = targetConnector.GetHierarchicalDataSourceContext();
+            PropertyContainer.TryGetValue(targetDataSource.dataSource, targetDataSource.dataSourcePath, out int targetId);
+
+            var thisDataSource = GetHierarchicalDataSourceContext();
+            PropertyContainer.SetValue(thisDataSource.dataSource, thisDataSource.dataSourcePath, targetId);
+        }
     }
 }
