@@ -43,7 +43,7 @@ public class BehaviourTreeWindow : VisualElement
             {
                 if (m_contextMenu == null)
                 {
-                    m_contextMenu = new AddNodeContextMenu();
+                    m_contextMenu = new AddNodeContextMenu(this);
                     VisualElement nodeRoot = this.Q<VisualElement>("NodeContextMenu");
                     nodeRoot.Add(m_contextMenu);
                 }
@@ -53,8 +53,7 @@ public class BehaviourTreeWindow : VisualElement
             }
             else if (mouseUpEvent.button == 0 && m_contextMenu != null)
             {
-                m_contextMenu.RemoveFromHierarchy();
-                m_contextMenu = null;
+                CloseContextMenu();
             }
         }
 
@@ -69,6 +68,15 @@ public class BehaviourTreeWindow : VisualElement
     public BehaviourTree GetSerializedBehaviourTree()
     {
         return m_behaviourTree;
+    }
+
+    public void CloseContextMenu()
+    {
+        if (m_contextMenu != null)
+        {
+            m_contextMenu.RemoveFromHierarchy();
+            m_contextMenu = null;
+        }
     }
 
     public void RefreshNode(BehaviourTreeNode node)
