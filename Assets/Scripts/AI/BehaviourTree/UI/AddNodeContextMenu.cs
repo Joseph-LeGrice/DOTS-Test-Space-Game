@@ -2,7 +2,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UIElements;
 
-public class AddNodeContextMenu : VisualElement
+public static class NodeTypes
 {
     public class BehaviourNodeTypeData
     {
@@ -16,27 +16,36 @@ public class AddNodeContextMenu : VisualElement
             };
         }
     }
+        
+    private static List<BehaviourNodeTypeData> s_allNodeTypes;
+    public static List<BehaviourNodeTypeData> AllNodeTypes => s_allNodeTypes;
     
-    private List<BehaviourNodeTypeData> m_allNodeTypes;
+    static NodeTypes()
+    {
+        s_allNodeTypes = new List<BehaviourNodeTypeData>();
+        //TODO: Use reflection to get all types
+        s_allNodeTypes.Add(BehaviourNodeTypeData.Create<BehaviourTreeSequentialNode>());
+        s_allNodeTypes.Add(BehaviourNodeTypeData.Create<BehaviourTreeConditionalNode>());
+    }
+}
+
+public class AddNodeContextMenu : VisualElement
+{
     
     public AddNodeContextMenu()
     {
-        m_allNodeTypes = new List<BehaviourNodeTypeData>();
-        m_allNodeTypes.Add(BehaviourNodeTypeData.Create<BehaviourTreeSequentialNode>());
-        m_allNodeTypes.Add(BehaviourNodeTypeData.Create<BehaviourTreeConditionalNode>());
-        
         VisualTreeAsset nodeButton = Resources.Load<VisualTreeAsset>("BehaviourTreeNodeButton");
-        ListView nodeListView = this.Q<ListView>("NodeList");
-        nodeListView.itemsSource = m_allNodeTypes;
+        ListView nodeListView = new ListView();
+        nodeListView.itemsSource = NodeTypes.AllNodeTypes;
         nodeListView.makeItem = nodeButton.CloneTree;
         nodeListView.bindItem = BindCreateNodeButton;
         nodeListView.RefreshItems();
+        Add(nodeListView);
     }
-    
     
     private void BindCreateNodeButton(VisualElement button, int i)
     {
-        button.Q<Button>().text = m_allNodeTypes[i].NodeName;
+        button.Q<Button>().text = NodeTypes.AllNodeTypes[i].NodeName;
         // ((Button)button).RegisterCallback();
     }
 

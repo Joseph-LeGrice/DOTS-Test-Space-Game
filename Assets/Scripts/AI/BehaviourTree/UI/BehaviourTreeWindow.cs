@@ -11,6 +11,8 @@ public class BehaviourTreeWindow : VisualElement
     private ConnectorStateHandler m_connectorStateHandler;
     private Dictionary<int, BehaviourTreeNodeView> m_nodeViewLookup = new Dictionary<int, BehaviourTreeNodeView>();
     private List<ConnectorLine> m_allConnectors = new List<ConnectorLine>();
+    private AddNodeContextMenu m_contextMenu;
+    private int m_pressedButton = -1;
 
     public BehaviourTreeWindow(BehaviourTree behaviourTree)
     {
@@ -20,11 +22,43 @@ public class BehaviourTreeWindow : VisualElement
         VisualTreeAsset visualTree = Resources.Load<VisualTreeAsset>("BehaviourTreeEditor");
         visualTree.CloneTree(this);
 
+        RegisterCallback<MouseUpEvent>(OnClickUp);
+        RegisterCallback<MouseDownEvent>(OnClickDown);
         RegisterCallback<GeometryChangedEvent>(OnGeometryChanged);
         RegisterCallback<AttachToPanelEvent>(OnAttachToPanel);
         
         // TODO: Drag / zoom handler
-        // TODO: AddNodeContextMenu open / close handler
+    }
+
+    private void OnClickDown(MouseDownEvent mouseDownEvent)
+    {
+        m_pressedButton = mouseDownEvent.button;
+    }
+    
+    private void OnClickUp(MouseUpEvent mouseUpEvent)
+    {
+        if (m_pressedButton == mouseUpEvent.button)
+        {
+            if (mouseUpEvent.button == 1)
+            {
+                if (m_contextMenu == null)
+                {
+                    m_contextMenu = new AddNodeContextMenu();
+                    VisualElement nodeRoot = this.Q<VisualElement>("NodeContextMenu");
+                    nodeRoot.Add(m_contextMenu);
+                }
+
+                m_contextMenu.style.top = mouseUpEvent.localMousePosition.y;
+                m_contextMenu.style.left = mouseUpEvent.localMousePosition.x;
+            }
+            else if (mouseUpEvent.button == 0 && m_contextMenu != null)
+            {
+                m_contextMenu.RemoveFromHierarchy();
+                m_contextMenu = null;
+            }
+        }
+
+        m_pressedButton = -1;
     }
 
     public ConnectorStateHandler GetConnectorStateHandler()
@@ -120,12 +154,12 @@ public class BehaviourTreeWindow : VisualElement
         if (m_nodeViewLookup.TryGetValue(sourceReference, out BehaviourTreeNodeView sourceNodeView) &&
             m_nodeViewLookup.TryGetValue(targetReference, out BehaviourTreeNodeView targetNodeView))
         {
-            VisualElement nodeRoot = this.Q<VisualElement>("NodeInstanceRoot");
+            VisualElement connectorLineRoot = this.Q<VisualElement>("NodeConnectorLines");
             ConnectorLine newConnection = new ConnectorLine(
                 sourceNodeView.GetConnectionOutElement(connectionOutId, connectionOutIndex),
                 targetNodeView.GetConnectionInElement()
             );
-            nodeRoot.Add(newConnection);
+            connectorLineRoot.Add(newConnection);
             m_allConnectors.Add(newConnection);
         }
     }
