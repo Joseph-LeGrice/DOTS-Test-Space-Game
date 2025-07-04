@@ -12,7 +12,6 @@ public class BehaviourTreeWindow : VisualElement
     private Dictionary<int, BehaviourTreeNodeView> m_nodeViewLookup = new Dictionary<int, BehaviourTreeNodeView>();
     private List<ConnectorLine> m_allConnectors = new List<ConnectorLine>();
     private AddNodeContextMenu m_contextMenu;
-    private int m_pressedButton = -1;
 
     public BehaviourTreeWindow(BehaviourTree behaviourTree)
     {
@@ -22,42 +21,11 @@ public class BehaviourTreeWindow : VisualElement
         VisualTreeAsset visualTree = Resources.Load<VisualTreeAsset>("BehaviourTreeEditor");
         visualTree.CloneTree(this);
 
-        RegisterCallback<MouseUpEvent>(OnClickUp);
-        RegisterCallback<MouseDownEvent>(OnClickDown);
         RegisterCallback<GeometryChangedEvent>(OnGeometryChanged);
         RegisterCallback<AttachToPanelEvent>(OnAttachToPanel);
         
+        this.AddManipulator(new AddNodeContextMenuManipulator(this));
         // TODO: Drag / zoom handler
-    }
-
-    private void OnClickDown(MouseDownEvent mouseDownEvent)
-    {
-        m_pressedButton = mouseDownEvent.button;
-    }
-    
-    private void OnClickUp(MouseUpEvent mouseUpEvent)
-    {
-        if (m_pressedButton == mouseUpEvent.button)
-        {
-            if (mouseUpEvent.button == 1)
-            {
-                if (m_contextMenu == null)
-                {
-                    m_contextMenu = new AddNodeContextMenu(this);
-                    VisualElement nodeRoot = this.Q<VisualElement>("NodeContextMenu");
-                    nodeRoot.Add(m_contextMenu);
-                }
-
-                m_contextMenu.style.top = mouseUpEvent.localMousePosition.y;
-                m_contextMenu.style.left = mouseUpEvent.localMousePosition.x;
-            }
-            else if (mouseUpEvent.button == 0 && m_contextMenu != null)
-            {
-                CloseContextMenu();
-            }
-        }
-
-        m_pressedButton = -1;
     }
 
     public ConnectorStateHandler GetConnectorStateHandler()
@@ -70,6 +38,19 @@ public class BehaviourTreeWindow : VisualElement
         return m_behaviourTree;
     }
 
+    public void OpenContextMenu(Vector2 position)
+    {
+        if (m_contextMenu == null)
+        {
+            m_contextMenu = new AddNodeContextMenu(this);
+            VisualElement nodeRoot = this.Q<VisualElement>("NodeContextMenu");
+            nodeRoot.Add(m_contextMenu);
+        }
+
+        m_contextMenu.style.top = position.y;
+        m_contextMenu.style.left = position.x;
+    }
+    
     public void CloseContextMenu()
     {
         if (m_contextMenu != null)
