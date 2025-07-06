@@ -16,7 +16,7 @@ public abstract class BehaviourTreeNode : INotifyBindablePropertyChanged
 {
     [SerializeField]
     [BehaviourNodeReference(true)]
-    public int m_nodeReference;
+    public int m_nodeReference = -1;
     [SerializeField]
     [HideInInspector]
     public Vector2 m_nodePosition;
@@ -55,7 +55,7 @@ public class BehaviourTree : BlobAssetScriptableObject<BurstableBehaviourTree>
     [SerializeReference]
     private List<BehaviourTreeNode> m_allNodes;
     [SerializeField]
-    private int m_nextNodeReference;
+    private int m_nextNodeReference = 1;
 
     public int Execute(int i)
     {

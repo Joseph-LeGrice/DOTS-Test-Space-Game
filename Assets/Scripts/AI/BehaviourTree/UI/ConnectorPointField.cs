@@ -44,7 +44,6 @@ public class ConnectorPointField : VisualElement
                 int i = 0;
                 foreach (var _ in idList)
                 {
-
                     var connectorPointContainer = new VisualElement();
                     connectorPointContainer.style.flexDirection = FlexDirection.Row;
                     connectorPointContainer.dataSourcePath = PropertyPath.FromIndex(i);
