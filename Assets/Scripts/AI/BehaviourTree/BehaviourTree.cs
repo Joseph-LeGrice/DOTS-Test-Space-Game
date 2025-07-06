@@ -80,6 +80,13 @@ public class BehaviourTree : BlobAssetScriptableObject<BurstableBehaviourTree>
         return m_allNodes;
     }
 
+    public void AddNode(BehaviourTreeNode node)
+    {
+        node.m_nodeReference = m_nextNodeReference;
+        m_nextNodeReference++;
+        m_allNodes.Add(node);
+    }
+
     protected override void PopulateBlob(IBaker baker, BlobBuilder builder, ref BurstableBehaviourTree blobData)
     {
     }

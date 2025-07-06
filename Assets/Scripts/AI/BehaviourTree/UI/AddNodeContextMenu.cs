@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UIElements;
@@ -7,12 +8,14 @@ public static class NodeTypes
     public class BehaviourNodeTypeData
     {
         public string NodeName;
+        public Type NodeType;
 
         public static BehaviourNodeTypeData Create<T>() where T : BehaviourTreeNode
         {
             return new BehaviourNodeTypeData()
             {
-                NodeName = typeof(T).Name
+                NodeName = typeof(T).Name,
+                NodeType = typeof(T)
             };
         }
     }
@@ -42,8 +45,6 @@ public class AddNodeContextMenu : VisualElement
         style.borderTopWidth = style.borderLeftWidth = style.borderBottomWidth = style.borderRightWidth = 2.0f;
         style.borderTopColor = style.borderLeftColor = style.borderBottomColor = style.borderRightColor = Color.white;
         style.backgroundColor = Color.black;
-        
-        // m_nodeButton
         
         ListView nodeListView = new ListView();
         nodeListView.itemsSource = NodeTypes.AllNodeTypes;
@@ -86,24 +87,11 @@ public class AddNodeContextMenu : VisualElement
     private void AddNew(ClickEvent evt, VisualElement source)
     {
         int i = (int)source.userData;
-        Debug.Log("Create new: " + NodeTypes.AllNodeTypes[i].NodeName);
+        var instance = (BehaviourTreeNode)Activator.CreateInstance(NodeTypes.AllNodeTypes[i].NodeType);
+        instance.m_nodePosition = new Vector2(style.left.value.value, style.top.value.value);
+        m_rootWindow.GetSerializedBehaviourTree().AddNode(instance);
         m_rootWindow.CloseContextMenu();
-        
         evt.StopPropagation();
-
-        // serializedObject.Update();
-        // SerializedProperty nextNodeReference = serializedObject.FindProperty("m_nextNodeReference");
-        // T newInstance = new T
-        // {
-        //     m_nodeReference = nextNodeReference.intValue
-        // };
-        // nextNodeReference.intValue = nextNodeReference.intValue + 1;
-        //
-        // SerializedProperty allNodes = serializedObject.FindProperty("m_allNodes");
-        // allNodes.InsertArrayElementAtIndex(allNodes.arraySize);
-        // var nodeElement = allNodes.GetArrayElementAtIndex(allNodes.arraySize - 1);
-        // nodeElement.managedReferenceValue = newInstance;
-        //
-        // serializedObject.ApplyModifiedProperties();
+        m_rootWindow.RefreshAll();
     }
 }

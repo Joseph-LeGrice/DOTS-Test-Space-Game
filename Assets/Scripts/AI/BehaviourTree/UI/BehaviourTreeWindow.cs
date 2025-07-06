@@ -16,10 +16,13 @@ public class BehaviourTreeWindow : VisualElement
     public BehaviourTreeWindow(BehaviourTree behaviourTree)
     {
         m_behaviourTree = behaviourTree;
+        
         style.height = new Length(100.0f, LengthUnit.Percent);
         
         VisualTreeAsset visualTree = Resources.Load<VisualTreeAsset>("BehaviourTreeEditor");
         visualTree.CloneTree(this);
+
+        m_connectorStateHandler = new ConnectorStateHandler(this);
 
         RegisterCallback<GeometryChangedEvent>(OnGeometryChanged);
         RegisterCallback<AttachToPanelEvent>(OnAttachToPanel);
@@ -36,6 +39,28 @@ public class BehaviourTreeWindow : VisualElement
     public BehaviourTree GetSerializedBehaviourTree()
     {
         return m_behaviourTree;
+    }
+
+    public void RefreshAll()
+    {
+        foreach (var nodeView in m_nodeViewLookup.Values)
+        {
+            nodeView.RemoveFromHierarchy();
+        }
+        m_nodeViewLookup.Clear();
+        
+        VisualElement nodeRoot = this.Q<VisualElement>("NodeInstanceRoot");
+        
+        var allNodes = m_behaviourTree.GetNodes();
+        for (int i = 0; i < allNodes.Count; i++)
+        {
+            BehaviourTreeNode node = allNodes[i];
+            BehaviourTreeNodeView treeNodeViewInstance = new BehaviourTreeNodeView(this, i);
+            nodeRoot.Add(treeNodeViewInstance);
+            m_nodeViewLookup[node.m_nodeReference] = treeNodeViewInstance;
+        }
+        
+        RefreshConnectors();
     }
 
     public void OpenContextMenu(Vector2 position)
@@ -110,19 +135,7 @@ public class BehaviourTreeWindow : VisualElement
     
     private void OnAttachToPanel(AttachToPanelEvent evt)
     {
-        VisualElement nodeRoot = this.Q<VisualElement>("NodeInstanceRoot");
-        m_connectorStateHandler = new ConnectorStateHandler(this);
-        
-        var allNodes = m_behaviourTree.GetNodes();
-        for (int i = 0; i < allNodes.Count; i++)
-        {
-            BehaviourTreeNode node = allNodes[i];
-            BehaviourTreeNodeView treeNodeViewInstance = new BehaviourTreeNodeView(this, i);
-            nodeRoot.Add(treeNodeViewInstance);
-            m_nodeViewLookup[node.m_nodeReference] = treeNodeViewInstance;
-        }
-        
-        RefreshConnectors();
+        RefreshAll();
     }
 
     private void OnGeometryChanged(GeometryChangedEvent evt)

@@ -38,31 +38,33 @@ public class ConnectorPointField : VisualElement
             Add(container);
             
             DataSourceContext thisDataSource = GetHierarchicalDataSourceContext();
-            PropertyContainer.TryGetValue(thisDataSource.dataSource, thisDataSource.dataSourcePath, out IEnumerable<int> idList);
-            
-            int i = 0;
-            foreach (var _ in idList)
+            if (PropertyContainer.TryGetValue(thisDataSource.dataSource, thisDataSource.dataSourcePath,
+                    out IEnumerable<int> idList))
             {
-                
-                var connectorPointContainer = new VisualElement();
-                connectorPointContainer.style.flexDirection = FlexDirection.Row;
-                connectorPointContainer.dataSourcePath = PropertyPath.FromIndex(i);
-                
-                int ii = i;
-                var removeButton = new Button();
-                removeButton.text = "-";
-                removeButton.RegisterCallback<ClickEvent, int>(RemoveConnectorElement, ii);
-                connectorPointContainer.Add(removeButton);
-                
-                var connectorPoint = new ConnectorPoint(m_connectorStateHandler, false);
-                connectorPointContainer.Add(connectorPoint);
-                m_connectorPoints.Add(connectorPoint);
-                
-                container.Add(connectorPointContainer);
-                
-                i++;
+                int i = 0;
+                foreach (var _ in idList)
+                {
+
+                    var connectorPointContainer = new VisualElement();
+                    connectorPointContainer.style.flexDirection = FlexDirection.Row;
+                    connectorPointContainer.dataSourcePath = PropertyPath.FromIndex(i);
+
+                    int ii = i;
+                    var removeButton = new Button();
+                    removeButton.text = "-";
+                    removeButton.RegisterCallback<ClickEvent, int>(RemoveConnectorElement, ii);
+                    connectorPointContainer.Add(removeButton);
+
+                    var connectorPoint = new ConnectorPoint(m_connectorStateHandler, false);
+                    connectorPointContainer.Add(connectorPoint);
+                    m_connectorPoints.Add(connectorPoint);
+
+                    container.Add(connectorPointContainer);
+
+                    i++;
+                }
             }
-            
+
             var addButton = new Button(AddConnectorElement);
             addButton.text = "+";
             container.Add(addButton);
