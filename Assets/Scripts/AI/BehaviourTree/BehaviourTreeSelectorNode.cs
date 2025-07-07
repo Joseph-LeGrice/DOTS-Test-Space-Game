@@ -2,7 +2,7 @@ using System.Collections.Generic;
 using UnityEngine;
 
 [System.Serializable]
-public class BehaviourTreeSequentialNode : BehaviourTreeNodeImplementation
+public class BehaviourTreeSelectorNode : BehaviourTreeNodeImplementation
 {
     [SerializeField]
     [BehaviourNodeReference]
@@ -14,18 +14,17 @@ public class BehaviourTreeSequentialNode : BehaviourTreeNodeImplementation
         {
             var result = behaviourTree.GetNode(m_actionNodes[i]).DoAction(behaviourTree);
             
+            if (result == BehaviourActionResult.Success)
+            {
+                return BehaviourActionResult.Success;
+            }
+            
             if (result == BehaviourActionResult.InProgress)
             {
                 return BehaviourActionResult.InProgress;
             }
-            
-            if (result == BehaviourActionResult.Failure)
-            {
-                return BehaviourActionResult.Failure;
-            }
         }
-
-        return BehaviourActionResult.Success;
+        return BehaviourActionResult.Failure;
     }
 
     public override BurstableBehaviourTreeNode GetBurstable()
@@ -35,6 +34,6 @@ public class BehaviourTreeSequentialNode : BehaviourTreeNodeImplementation
 
     public override string GetNodeName()
     {
-        return "Sequential Node";
+        return "Selector Node";
     }
 }

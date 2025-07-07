@@ -14,10 +14,9 @@ public class BehaviourTree : BlobAssetScriptableObject<BurstableBehaviourTree>
     [SerializeField]
     internal int m_nextNodeReference = 1;
 
-    public int Execute(int i)
+    public BehaviourActionResult Execute()
     {
-        return -1;
-        // return GetNode(i).DoAction(this);
+        return GetNode(m_initialNode.m_nodeReference).DoAction(this);
     }
     
     public BehaviourTreeNode GetNode(int nodeReference)
