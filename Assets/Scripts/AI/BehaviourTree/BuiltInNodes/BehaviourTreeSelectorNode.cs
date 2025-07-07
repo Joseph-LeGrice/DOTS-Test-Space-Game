@@ -7,6 +7,11 @@ public class BehaviourTreeSelectorNode : BehaviourTreeNodeImplementation
     [SerializeField]
     [BehaviourNodeReference]
     private List<int> m_actionNodes;
+
+    public override string GetNodeName()
+    {
+        return "Selector Node";
+    }
     
     public override BehaviourActionResult DoAction(BehaviourTree behaviourTree)
     {
@@ -25,15 +30,5 @@ public class BehaviourTreeSelectorNode : BehaviourTreeNodeImplementation
             }
         }
         return BehaviourActionResult.Failure;
-    }
-
-    public override BurstableBehaviourTreeNode GetBurstable()
-    {
-        return new BurstableBehaviourTreeNode();
-    }
-
-    public override string GetNodeName()
-    {
-        return "Selector Node";
     }
 }

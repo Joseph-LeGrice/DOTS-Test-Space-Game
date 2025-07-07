@@ -28,9 +28,4 @@ public class BehaviourTreeConditionalNode : BehaviourTreeNodeImplementation
             return BehaviourActionResult.Failure;
         }
     }
-
-    public override BurstableBehaviourTreeNode GetBurstable()
-    {
-        return new BurstableBehaviourTreeNode();
-    }
 }

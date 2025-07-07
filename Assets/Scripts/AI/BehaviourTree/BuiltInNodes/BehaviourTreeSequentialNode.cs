@@ -7,6 +7,11 @@ public class BehaviourTreeSequentialNode : BehaviourTreeNodeImplementation
     [SerializeField]
     [BehaviourNodeReference]
     private List<int> m_actionNodes;
+
+    public override string GetNodeName()
+    {
+        return "Sequential Node";
+    }
     
     public override BehaviourActionResult DoAction(BehaviourTree behaviourTree)
     {
@@ -26,15 +31,5 @@ public class BehaviourTreeSequentialNode : BehaviourTreeNodeImplementation
         }
 
         return BehaviourActionResult.Success;
-    }
-
-    public override BurstableBehaviourTreeNode GetBurstable()
-    {
-        return new BurstableBehaviourTreeNode();
-    }
-
-    public override string GetNodeName()
-    {
-        return "Sequential Node";
     }
 }

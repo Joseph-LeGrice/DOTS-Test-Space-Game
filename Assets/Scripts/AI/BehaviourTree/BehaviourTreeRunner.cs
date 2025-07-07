@@ -7,7 +7,6 @@ public class BehaviourTreeRunner : MonoBehaviour
     
     private void Update()
     {
-        Debug.Log("Frame Start");
         m_behaviourTree.Execute();
     }
 }

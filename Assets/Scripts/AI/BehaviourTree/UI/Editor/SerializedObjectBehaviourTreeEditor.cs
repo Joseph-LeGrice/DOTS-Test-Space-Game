@@ -1,15 +1,5 @@
 using UnityEditor;
 
-public interface IBehaviourTreeEditor
-{
-    public int GetNodeCount();
-    public BehaviourTreeNode GetNode(int index);
-    public void AddNode(BehaviourTreeNode node);
-    public int IndexOf(BehaviourTreeNode node);
-    public void DeleteNode(int nodeIndex);
-    BehaviourTreeValueReference GetInitialNode();
-}
-
 public class SerializedObjectBehaviourTreeEditor : IBehaviourTreeEditor
 {
     private readonly SerializedObject m_behaviourTree;

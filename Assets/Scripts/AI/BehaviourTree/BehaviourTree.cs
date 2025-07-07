@@ -2,6 +2,16 @@ using System.Collections.Generic;
 using Unity.Entities;
 using UnityEngine;
 
+public interface IBehaviourTreeEditor
+{
+    public int GetNodeCount();
+    public BehaviourTreeNode GetNode(int index);
+    public void AddNode(BehaviourTreeNode node);
+    public int IndexOf(BehaviourTreeNode node);
+    public void DeleteNode(int nodeIndex);
+    BehaviourTreeValueReference GetInitialNode();
+}
+
 [CreateAssetMenu(menuName = "BehaviourTree Asset")]
 public class BehaviourTree : BlobAssetScriptableObject<BurstableBehaviourTree>
 {
