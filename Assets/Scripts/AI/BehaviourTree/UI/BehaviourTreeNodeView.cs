@@ -87,7 +87,7 @@ public class BehaviourTreeNodeView : VisualElement
                     case "Int32":
                         InitField(new IntegerField(), childProperty);
                         break;
-                    case "string":
+                    case "String":
                         InitField(new TextField(), childProperty);
                         break;
                     case "Vector2":

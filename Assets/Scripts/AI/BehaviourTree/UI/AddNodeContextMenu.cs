@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Reflection;
 using UnityEngine;
 using UnityEngine.UIElements;
 
@@ -10,12 +11,12 @@ public static class NodeTypes
         public string NodeName;
         public Type NodeType;
 
-        public static BehaviourNodeTypeData Create<T>() where T : BehaviourTreeNode
+        public static BehaviourNodeTypeData Create(Type nodeType)
         {
             return new BehaviourNodeTypeData()
             {
-                NodeName = typeof(T).Name,
-                NodeType = typeof(T)
+                NodeName = nodeType.Name,
+                NodeType = nodeType
             };
         }
     }
@@ -26,9 +27,16 @@ public static class NodeTypes
     static NodeTypes()
     {
         s_allNodeTypes = new List<BehaviourNodeTypeData>();
-        //TODO: Use reflection to get all types
-        s_allNodeTypes.Add(BehaviourNodeTypeData.Create<BehaviourTreeSequentialNode>());
-        s_allNodeTypes.Add(BehaviourNodeTypeData.Create<BehaviourTreeConditionalNode>());
+        foreach (var assembly in AppDomain.CurrentDomain.GetAssemblies())
+        {
+            foreach (Type type in assembly.GetTypes())
+            {
+                if (type.IsSubclassOf(typeof(BehaviourTreeNode)) && !type.IsAbstract)
+                {
+                    s_allNodeTypes.Add(BehaviourNodeTypeData.Create(type));
+                }
+            }
+        }
     }
 }
 
