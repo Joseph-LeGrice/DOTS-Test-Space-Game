@@ -110,13 +110,13 @@ public class BehaviourTreeWindow : VisualElement
         {
             BehaviourTreeNode sourceNode = m_behaviourTree.GetNode(i);
             
-            FieldInfo[] sourceNodeFields = sourceNode.GetType().GetFields(BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public);
+            FieldInfo[] sourceNodeFields = sourceNode.m_nodeImplementation.GetType().GetFields(BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public);
             foreach (FieldInfo sourceField in sourceNodeFields)
             {
                 BehaviourNodeReferenceAttribute nodeReference = (BehaviourNodeReferenceAttribute)Attribute.GetCustomAttribute(sourceField, typeof(BehaviourNodeReferenceAttribute));
                 if (nodeReference != null && !nodeReference.ConnectsIn)
                 {
-                    var targetValue = sourceField.GetValue(sourceNode);
+                    var targetValue = sourceField.GetValue(sourceNode.m_nodeImplementation);
                     if (targetValue is int)
                     {
                         CreateConnector(sourceNode.m_nodeReference, (int)targetValue, sourceField.Name, 0);

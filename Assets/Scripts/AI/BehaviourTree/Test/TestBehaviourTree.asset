@@ -13,52 +13,25 @@ MonoBehaviour:
   m_Name: TestBehaviourTree
   m_EditorClassIdentifier: 
   m_allNodes:
-  - rid: 1607397105879744604
-  - rid: 1607397105879744605
-  - rid: 1607397105879744612
-  - rid: 1607397105879744615
-  - rid: 1607397105879744616
-  - rid: 1607397105879744617
-  m_nextNodeReference: 15
+  - rid: 1607397105879744630
+  - rid: 1607397105879744631
+  - rid: 1607397105879744632
+  m_nextNodeReference: 5
   references:
     version: 2
     RefIds:
-    - rid: 1607397105879744604
-      type: {class: BehaviourTreeConditionalNode, ns: , asm: behaviourtree}
+    - rid: 1607397105879744630
+      type: {class: BehaviourTreeNode, ns: , asm: behaviourtree}
       data:
-        m_nodeReference: 5
-        m_nodePosition: {x: 552, y: 245}
-        m_conditionalNode: 11
-        m_actionNode: 12
-    - rid: 1607397105879744605
-      type: {class: BehaviourTreeConditionalNode, ns: , asm: behaviourtree}
+        m_nodeReference: 2
+        m_nodePosition: {x: 193, y: 148}
+    - rid: 1607397105879744631
+      type: {class: BehaviourTreeNode, ns: , asm: behaviourtree}
       data:
-        m_nodeReference: 6
-        m_nodePosition: {x: 561, y: 69}
-        m_conditionalNode: 10
-        m_actionNode: 9
-    - rid: 1607397105879744612
-      type: {class: BehaviourTreeDebugLogNode, ns: , asm: behaviourtree}
+        m_nodeReference: 3
+        m_nodePosition: {x: 583, y: 214}
+    - rid: 1607397105879744632
+      type: {class: BehaviourTreeNode, ns: , asm: behaviourtree}
       data:
-        m_nodeReference: 9
-        m_nodePosition: {x: 871, y: 122}
-        m_message: Action 1
-    - rid: 1607397105879744615
-      type: {class: BehaviourTreeDebugLogNode, ns: , asm: behaviourtree}
-      data:
-        m_nodeReference: 12
-        m_nodePosition: {x: 853, y: 302}
-        m_message: Action 2
-    - rid: 1607397105879744616
-      type: {class: BehaviourTreeDebugLogNode, ns: , asm: behaviourtree}
-      data:
-        m_nodeReference: 13
-        m_nodePosition: {x: 556, y: 393}
-        m_message: Action 3
-    - rid: 1607397105879744617
-      type: {class: BehaviourTreeSequentialNode, ns: , asm: behaviourtree}
-      data:
-        m_nodeReference: 14
-        m_nodePosition: {x: 176, y: 112}
-        m_actionNodes: 06000000050000000d000000
-        m_currentActionIndex: 0
+        m_nodeReference: 4
+        m_nodePosition: {x: 232, y: 318}

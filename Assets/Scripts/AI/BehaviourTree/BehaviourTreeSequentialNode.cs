@@ -2,7 +2,7 @@ using System.Collections.Generic;
 using UnityEngine;
 
 [System.Serializable]
-public class BehaviourTreeSequentialNode : BehaviourTreeNode
+public class BehaviourTreeSequentialNode : BehaviourTreeNodeImplementation
 {
     [SerializeField]
     [BehaviourNodeReference]

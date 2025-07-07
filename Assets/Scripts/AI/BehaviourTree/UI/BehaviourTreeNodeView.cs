@@ -41,7 +41,7 @@ public class BehaviourTreeNodeView : VisualElement
         headerElement.Add(m_connectionInElement);
         
         m_title = new Label();
-        m_title.text = node.GetNodeName();
+        m_title.text = node.m_nodeImplementation.GetNodeName();
         m_title.style.color = Color.black;
         m_title.style.flexGrow = 0.0f;
         headerElement.Add(m_title);
@@ -58,14 +58,14 @@ public class BehaviourTreeNodeView : VisualElement
         
         hierarchy.Add(m_contentElement);
         
-        FieldInfo[] nodeFields = node.GetType().GetFields(BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public);
+        FieldInfo[] nodeFields = node.m_nodeImplementation.GetType().GetFields(BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public);
         foreach (FieldInfo childProperty in nodeFields)
         {
             var nodeReference = (BehaviourNodeReferenceAttribute)Attribute.GetCustomAttribute(childProperty, typeof(BehaviourNodeReferenceAttribute));
             if (nodeReference != null && !nodeReference.ConnectsIn)
             {
                 var field = new ConnectorPointField(m_behaviourTreeWindow.GetConnectorStateHandler(), childProperty);
-                field.dataSource = node;
+                field.dataSource = node.m_nodeImplementation;
                 field.dataSourcePath = PropertyPath.FromName(childProperty.Name);
                 m_contentElement.Add(field);
                 m_fieldElementLookup[childProperty.Name] = field;
@@ -115,7 +115,7 @@ public class BehaviourTreeNodeView : VisualElement
         field.style.color = Color.black;
         field.SetBinding(nameof(field.value), new DataBinding
         {
-            dataSource = GetNode(),
+            dataSource = GetNode().m_nodeImplementation,
             dataSourcePath = PropertyPath.FromName(childProperty.Name)
         });
         field.label = childProperty.Name;

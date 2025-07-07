@@ -31,7 +31,7 @@ public static class NodeTypes
         {
             foreach (Type type in assembly.GetTypes())
             {
-                if (type.IsSubclassOf(typeof(BehaviourTreeNode)) && !type.IsAbstract)
+                if (type.IsSubclassOf(typeof(BehaviourTreeNodeImplementation)) && !type.IsAbstract)
                 {
                     s_allNodeTypes.Add(BehaviourNodeTypeData.Create(type));
                 }
@@ -95,8 +95,9 @@ public class AddNodeContextMenu : VisualElement
     private void AddNew(ClickEvent evt, VisualElement source)
     {
         int i = (int)source.userData;
-        var instance = (BehaviourTreeNode)Activator.CreateInstance(NodeTypes.AllNodeTypes[i].NodeType);
+        BehaviourTreeNode instance = new BehaviourTreeNode();
         instance.m_nodePosition = new Vector2(style.left.value.value, style.top.value.value);
+        instance.m_nodeImplementation = (BehaviourTreeNodeImplementation)Activator.CreateInstance(NodeTypes.AllNodeTypes[i].NodeType);
         m_rootWindow.GetSerializedBehaviourTree().AddNode(instance);
         m_rootWindow.CloseContextMenu();
         evt.StopPropagation();

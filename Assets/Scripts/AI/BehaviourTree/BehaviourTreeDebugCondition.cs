@@ -1,6 +1,6 @@
 using UnityEngine;
 
-public class BehaviourTreeDebugCondition : BehaviourTreeNode
+public class BehaviourTreeDebugCondition : BehaviourTreeNodeImplementation
 {
     [SerializeField]
     private bool m_condition;

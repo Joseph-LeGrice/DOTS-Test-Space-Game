@@ -1,6 +1,6 @@
 using UnityEngine;
 
-public class BehaviourTreeDebugLogNode : BehaviourTreeNode
+public class BehaviourTreeDebugLogNode : BehaviourTreeNodeImplementation
 {
     [SerializeField]
     private string m_message;

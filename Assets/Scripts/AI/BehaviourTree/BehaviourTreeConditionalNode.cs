@@ -1,7 +1,7 @@
 using UnityEngine;
 
 [System.Serializable]
-public class BehaviourTreeConditionalNode : BehaviourTreeNode
+public class BehaviourTreeConditionalNode : BehaviourTreeNodeImplementation
 {
     [SerializeField]
     [BehaviourNodeReference]
