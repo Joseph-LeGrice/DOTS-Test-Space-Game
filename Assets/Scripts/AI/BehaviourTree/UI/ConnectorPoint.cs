@@ -1,4 +1,5 @@
 using Unity.Properties;
+using UnityEditor.Graphs;
 using UnityEngine;
 using UnityEngine.UIElements;
 
@@ -10,21 +11,7 @@ public class ConnectorPoint : VisualElement
     {
         m_connectsIn = connectsIn;
         
-        float size = 8.0f;
-        float lineThickness = 2.0f;
-        
-        style.flexGrow = 0.0f;
-        style.flexShrink = 0.0f;
-        style.marginLeft = 8.0f;
-        style.marginRight = 8.0f;
-        style.alignSelf = Align.Center;
-        style.width = style.height = size;
-        style.borderTopColor = style.borderBottomColor =
-            style.borderRightColor = style.borderLeftColor = Color.grey;
-        style.borderTopWidth = style.borderBottomWidth =
-            style.borderLeftWidth = style.borderRightWidth = lineThickness;
-        style.borderTopLeftRadius = style.borderTopRightRadius =
-            style.borderBottomLeftRadius = style.borderBottomRightRadius = size;
+        AddToClassList(BehaviourTreeStyleSelectors.ConnectorPoint);
         
         this.AddManipulator(new ConnectorManipulator(connectorStateHandler, this));
     }

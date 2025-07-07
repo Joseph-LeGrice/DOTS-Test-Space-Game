@@ -9,6 +9,9 @@ public class BehaviourTree : BlobAssetScriptableObject<BurstableBehaviourTree>
     [SerializeReference]
     internal List<BehaviourTreeNode> m_allNodes = new List<BehaviourTreeNode>();
     [SerializeField]
+    [SerializeReference]
+    internal BehaviourTreeValueReference m_initialNode = new BehaviourTreeValueReference();
+    [SerializeField]
     internal int m_nextNodeReference = 1;
 
     public int Execute(int i)

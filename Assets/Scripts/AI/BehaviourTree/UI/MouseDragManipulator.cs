@@ -37,7 +37,7 @@ public class MouseDragManipulator : MouseManipulator
             target.ReleaseMouse();
             evt.StopPropagation();
             
-            ((BehaviourTreeNodeView)target).SetPosition(target.transform.position);
+            ((IMovableElement)target).SetPosition(target.transform.position);
         }
     }
     
@@ -49,7 +49,7 @@ public class MouseDragManipulator : MouseManipulator
             target.transform.position = newPosition;
             evt.StopPropagation();
             
-            ((BehaviourTreeNodeView)target).GetBehaviourTreeWindow().RepaintConnectors();
+            ((IMovableElement)target).GetBehaviourTreeWindow().RepaintConnectors();
         }
     }
 }

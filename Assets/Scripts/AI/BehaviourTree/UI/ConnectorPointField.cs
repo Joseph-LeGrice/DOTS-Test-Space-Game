@@ -12,19 +12,19 @@ public class ConnectorPointField : VisualElement
     private ConnectorStateHandler m_connectorStateHandler;
     private bool m_isList;
     
-    public ConnectorPointField(ConnectorStateHandler connectorStateHandler, FieldInfo field)
+    public ConnectorPointField(ConnectorStateHandler connectorStateHandler, string label, bool isList)
     {
         style.flexDirection = FlexDirection.Row;
         
         var nameLabel = new Label();
-        nameLabel.text = field.Name;
+        nameLabel.text = label;
         nameLabel.style.color = Color.black;
         nameLabel.style.flexGrow = 1.0f;
         nameLabel.style.flexShrink= 1.0f;
         Add(nameLabel);
 
         m_connectorStateHandler = connectorStateHandler;
-        m_isList = typeof(IEnumerable<System.Int32>).IsAssignableFrom(field.FieldType);
+        m_isList = isList;
         
         RegisterCallback<AttachToPanelEvent>(OnAttachToPanel);
     }

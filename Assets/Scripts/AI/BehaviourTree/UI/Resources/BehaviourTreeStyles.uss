@@ -1,0 +1,26 @@
+
+.bt-node-view {
+    position: absolute;
+    background-color: aquamarine;
+    border-color: black;
+    border-width: 2px;
+    flex: 1 0 auto;
+    flex-grow: 1;
+    flex-shrink: 0;
+    width: 256px;
+}
+
+.bt-connector-point {
+    --size: 8px;
+    --line-thickness: 2px;
+
+    flex: 0 0 auto;
+    margin-left: 8px;
+    margin-right: 8px;
+    align-self: center;
+    width: var(--size); 
+    height: var(--size);
+    border-color: grey;
+    border-width: var(--line-thickness);
+    border-radius:var(--size);
+}

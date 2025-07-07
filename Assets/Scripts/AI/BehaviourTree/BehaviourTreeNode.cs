@@ -18,6 +18,7 @@ public sealed class BehaviourTreeNode : INotifyBindablePropertyChanged
     [SerializeField]
     [HideInInspector]
     internal Vector2 m_nodePosition;
+    [SerializeField]
     [SerializeReference]
     internal BehaviourTreeNodeImplementation m_nodeImplementation;
     
@@ -51,4 +52,16 @@ public abstract class BehaviourTreeNodeImplementation
         Debug.LogWarning("Node not currently burstable");
         return default(BurstableBehaviourTreeNode);
     }
+}
+
+[System.Serializable]
+public sealed class BehaviourTreeValueReference
+{
+    [SerializeField]
+    [HideInInspector]
+    internal Vector2 m_nodePosition;
+    [SerializeField]
+    [HideInInspector]
+    [BehaviourNodeReference()]
+    internal int m_nodeReference = -1;
 }

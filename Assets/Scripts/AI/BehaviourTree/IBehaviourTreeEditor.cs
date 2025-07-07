@@ -7,6 +7,7 @@ public interface IBehaviourTreeEditor
     public void AddNode(BehaviourTreeNode node);
     public int IndexOf(BehaviourTreeNode node);
     public void DeleteNode(int nodeIndex);
+    BehaviourTreeValueReference GetInitialNode();
 }
 
 public class SerializedObjectBehaviourTreeEditor : IBehaviourTreeEditor
@@ -16,6 +17,12 @@ public class SerializedObjectBehaviourTreeEditor : IBehaviourTreeEditor
     public SerializedObjectBehaviourTreeEditor(SerializedObject behaviourTree)
     {
         m_behaviourTree = behaviourTree;
+    }
+    
+    public BehaviourTreeValueReference GetInitialNode()
+    {
+        m_behaviourTree.Update();
+        return (BehaviourTreeValueReference)m_behaviourTree.FindProperty(nameof(BehaviourTree.m_initialNode)).managedReferenceValue;
     }
     
     public BehaviourTreeNode GetNode(int index)

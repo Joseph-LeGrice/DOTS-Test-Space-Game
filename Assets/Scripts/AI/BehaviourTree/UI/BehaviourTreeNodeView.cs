@@ -1,11 +1,16 @@
-using System;
 using System.Collections.Generic;
 using System.Reflection;
 using Unity.Properties;
 using UnityEngine;
 using UnityEngine.UIElements;
 
-public class BehaviourTreeNodeView : VisualElement
+public interface IMovableElement
+{
+    public BehaviourTreeWindow GetBehaviourTreeWindow();
+    public void SetPosition(Vector2 newPosition);
+}
+
+public class BehaviourTreeNodeView : VisualElement, IMovableElement
 {
     private BehaviourTreeWindow m_behaviourTreeWindow;
     private int m_nodeIndex;
@@ -21,13 +26,7 @@ public class BehaviourTreeNodeView : VisualElement
         m_behaviourTreeWindow = window;
         m_nodeIndex = nodeArrayIndex;
         
-        style.position = Position.Absolute;
-        style.backgroundColor = Color.aquamarine;
-        style.borderTopColor = style.borderBottomColor = style.borderLeftColor = style.borderRightColor = Color.black;
-        style.borderTopWidth = style.borderBottomWidth = style.borderLeftWidth = style.borderRightWidth = 2.0f;
-        style.flexGrow = 1.0f;
-        style.flexShrink = 0.0f;
-        style.width = new Length(256.0f, LengthUnit.Pixel);
+        AddToClassList(BehaviourTreeStyleSelectors.NodeView);
 
         VisualElement headerElement = new VisualElement();
         headerElement.style.flexDirection = FlexDirection.Row;
@@ -73,12 +72,14 @@ public class BehaviourTreeNodeView : VisualElement
             foreach (FieldInfo childProperty in nodeFields)
             {
                 var nodeReference =
-                    (BehaviourNodeReferenceAttribute)Attribute.GetCustomAttribute(childProperty,
+                    (BehaviourNodeReferenceAttribute)System.Attribute.GetCustomAttribute(childProperty,
                         typeof(BehaviourNodeReferenceAttribute));
                 if (nodeReference != null && !nodeReference.ConnectsIn)
                 {
                     var field = new ConnectorPointField(m_behaviourTreeWindow.GetConnectorStateHandler(),
-                        childProperty);
+                        childProperty.Name,
+                        typeof(IEnumerable<System.Int32>).IsAssignableFrom(childProperty.FieldType)
+                    );
                     field.dataSource = node;
                     field.dataSourcePath = PropertyPath.AppendName(PropertyPath.FromName("m_nodeImplementation"), childProperty.Name);
                     m_contentElement.Add(field);
@@ -86,7 +87,7 @@ public class BehaviourTreeNodeView : VisualElement
                 }
                 else
                 {
-                    if (Attribute.GetCustomAttribute(childProperty, typeof(HideInInspector)) != null)
+                    if (System.Attribute.GetCustomAttribute(childProperty, typeof(HideInInspector)) != null)
                     {
                         continue;
                     }
@@ -142,6 +143,15 @@ public class BehaviourTreeNodeView : VisualElement
         return m_behaviourTreeWindow;
     }
 
+    public void SetPosition(Vector2 newPosition)
+    {
+        BehaviourTreeNode node = GetNode();
+        if (node != null)
+        {
+            node.m_nodePosition = newPosition;
+        }
+    }
+
     public VisualElement GetConnectionInElement()
     {
         return m_connectionInElement;
@@ -155,14 +165,5 @@ public class BehaviourTreeNodeView : VisualElement
     private BehaviourTreeNode GetNode()
     {
         return m_behaviourTreeWindow.GetSerializedBehaviourTree().GetNode(m_nodeIndex);
-    }
-
-    public void SetPosition(Vector2 newPosition)
-    {
-        BehaviourTreeNode node = GetNode();
-        if (node != null)
-        {
-            node.m_nodePosition = newPosition;
-        }
     }
 }

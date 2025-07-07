@@ -1,23 +1,30 @@
 using System;
 using System.Collections.Generic;
 using System.Reflection;
+using Unity.Properties;
 using UnityEngine;
 using UnityEngine.UIElements;
 
 public class BehaviourTreeWindow : VisualElement
 {
     private IBehaviourTreeEditor m_behaviourTree;
-    private ConnectorStateHandler m_connectorStateHandler;
-    private Dictionary<int, BehaviourTreeNodeView> m_nodeViewLookup = new Dictionary<int, BehaviourTreeNodeView>();
-    private List<ConnectorLine> m_allConnectors = new List<ConnectorLine>();
+    
     private AddNodeContextMenu m_contextMenu;
+    private BehaviourTreeValueReferenceView m_initialNodeValueReference;
+    
+    private Dictionary<int, BehaviourTreeNodeView> m_nodeViewLookup = new Dictionary<int, BehaviourTreeNodeView>();
+    
+    private ConnectorStateHandler m_connectorStateHandler;
+    private List<ConnectorLine> m_allConnectors = new List<ConnectorLine>();
+    
 
     public BehaviourTreeWindow(IBehaviourTreeEditor behaviourTree)
     {
         m_behaviourTree = behaviourTree;
         
+        styleSheets.Add(Resources.Load<StyleSheet>("BehaviourTreeStyles"));
         style.height = new Length(100.0f, LengthUnit.Percent);
-        
+
         VisualTreeAsset visualTree = Resources.Load<VisualTreeAsset>("BehaviourTreeEditor");
         visualTree.CloneTree(this);
 
@@ -42,6 +49,16 @@ public class BehaviourTreeWindow : VisualElement
 
     public void RefreshAll()
     {
+        if (m_initialNodeValueReference != null)
+        {
+            m_initialNodeValueReference.RemoveFromHierarchy();
+        }
+        
+        m_initialNodeValueReference = new BehaviourTreeValueReferenceView(this);
+        m_initialNodeValueReference.dataSource = m_behaviourTree.GetInitialNode();
+        m_initialNodeValueReference.Bind(m_connectorStateHandler);
+        Add(m_initialNodeValueReference);
+        
         foreach (var nodeView in m_nodeViewLookup.Values)
         {
             nodeView.RemoveFromHierarchy();
@@ -104,6 +121,8 @@ public class BehaviourTreeWindow : VisualElement
             connectorLine.RemoveFromHierarchy();
         }
         m_allConnectors.Clear();
+
+        CreateConnector(m_initialNodeValueReference);
         
         int nodeCount = m_behaviourTree.GetNodeCount();
         for (int i=0; i<nodeCount; i++)
@@ -164,6 +183,20 @@ public class BehaviourTreeWindow : VisualElement
             VisualElement connectorLineRoot = this.Q<VisualElement>("NodeConnectorLines");
             ConnectorLine newConnection = new ConnectorLine(
                 sourceNodeView.GetConnectionOutElement(connectionOutId, connectionOutIndex),
+                targetNodeView.GetConnectionInElement()
+            );
+            connectorLineRoot.Add(newConnection);
+            m_allConnectors.Add(newConnection);
+        }
+    }
+
+    private void CreateConnector(BehaviourTreeValueReferenceView valueReferenceView)
+    {
+        if (m_nodeViewLookup.TryGetValue(valueReferenceView.GetTarget(), out BehaviourTreeNodeView targetNodeView))
+        {
+            VisualElement connectorLineRoot = this.Q<VisualElement>("NodeConnectorLines");
+            ConnectorLine newConnection = new ConnectorLine(
+                valueReferenceView.GetConnectionOutElement(),
                 targetNodeView.GetConnectionInElement()
             );
             connectorLineRoot.Add(newConnection);
