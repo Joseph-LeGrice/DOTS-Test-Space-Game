@@ -18,7 +18,7 @@ public sealed class BehaviourTreeNode : INotifyBindablePropertyChanged
     [SerializeField]
     [HideInInspector]
     internal Vector2 m_nodePosition;
-    [SerializeField]
+    [SerializeReference]
     internal BehaviourTreeNodeImplementation m_nodeImplementation;
     
     public event System.EventHandler<BindablePropertyChangedEventArgs> propertyChanged;

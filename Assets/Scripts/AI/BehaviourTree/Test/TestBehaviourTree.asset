@@ -13,25 +13,69 @@ MonoBehaviour:
   m_Name: TestBehaviourTree
   m_EditorClassIdentifier: 
   m_allNodes:
-  - rid: 1607397105879744630
-  - rid: 1607397105879744631
-  - rid: 1607397105879744632
-  m_nextNodeReference: 5
+  - rid: 1607397105879744651
+  - rid: 1607397105879744653
+  - rid: 1607397105879744655
+  - rid: 1607397105879744657
+  - rid: 1607397105879744660
+  m_nextNodeReference: 17
   references:
     version: 2
     RefIds:
-    - rid: 1607397105879744630
+    - rid: 1607397105879744651
       type: {class: BehaviourTreeNode, ns: , asm: behaviourtree}
       data:
-        m_nodeReference: 2
-        m_nodePosition: {x: 193, y: 148}
-    - rid: 1607397105879744631
+        m_nodeReference: 12
+        m_nodePosition: {x: 800, y: 178}
+        m_nodeImplementation:
+          rid: 1607397105879744652
+    - rid: 1607397105879744652
+      type: {class: BehaviourTreeDebugLogNode, ns: , asm: behaviourtree}
+      data:
+        m_message: Hello
+    - rid: 1607397105879744653
       type: {class: BehaviourTreeNode, ns: , asm: behaviourtree}
       data:
-        m_nodeReference: 3
-        m_nodePosition: {x: 583, y: 214}
-    - rid: 1607397105879744632
+        m_nodeReference: 13
+        m_nodePosition: {x: 835, y: 111}
+        m_nodeImplementation:
+          rid: 1607397105879744654
+    - rid: 1607397105879744654
+      type: {class: BehaviourTreeDebugCondition, ns: , asm: behaviourtree}
+      data:
+        m_condition: 0
+    - rid: 1607397105879744655
       type: {class: BehaviourTreeNode, ns: , asm: behaviourtree}
       data:
-        m_nodeReference: 4
-        m_nodePosition: {x: 232, y: 318}
+        m_nodeReference: 14
+        m_nodePosition: {x: 521, y: 123}
+        m_nodeImplementation:
+          rid: 1607397105879744656
+    - rid: 1607397105879744656
+      type: {class: BehaviourTreeConditionalNode, ns: , asm: behaviourtree}
+      data:
+        m_conditionalNode: 13
+        m_actionNode: 12
+    - rid: 1607397105879744657
+      type: {class: BehaviourTreeNode, ns: , asm: behaviourtree}
+      data:
+        m_nodeReference: 15
+        m_nodePosition: {x: 175, y: 127}
+        m_nodeImplementation:
+          rid: 1607397105879744658
+    - rid: 1607397105879744658
+      type: {class: BehaviourTreeSequentialNode, ns: , asm: behaviourtree}
+      data:
+        m_actionNodes: 0e00000010000000
+        m_currentActionIndex: 0
+    - rid: 1607397105879744660
+      type: {class: BehaviourTreeNode, ns: , asm: behaviourtree}
+      data:
+        m_nodeReference: 16
+        m_nodePosition: {x: 802, y: 313}
+        m_nodeImplementation:
+          rid: 1607397105879744661
+    - rid: 1607397105879744661
+      type: {class: BehaviourTreeDebugLogNode, ns: , asm: behaviourtree}
+      data:
+        m_message: World

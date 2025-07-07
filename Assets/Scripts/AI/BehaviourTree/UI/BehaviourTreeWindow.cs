@@ -109,25 +109,28 @@ public class BehaviourTreeWindow : VisualElement
         for (int i=0; i<nodeCount; i++)
         {
             BehaviourTreeNode sourceNode = m_behaviourTree.GetNode(i);
-            
-            FieldInfo[] sourceNodeFields = sourceNode.m_nodeImplementation.GetType().GetFields(BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public);
-            foreach (FieldInfo sourceField in sourceNodeFields)
+
+            if (sourceNode.m_nodeImplementation != null)
             {
-                BehaviourNodeReferenceAttribute nodeReference = (BehaviourNodeReferenceAttribute)Attribute.GetCustomAttribute(sourceField, typeof(BehaviourNodeReferenceAttribute));
-                if (nodeReference != null && !nodeReference.ConnectsIn)
+                FieldInfo[] sourceNodeFields = sourceNode.m_nodeImplementation.GetType().GetFields(BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public);
+                foreach (FieldInfo sourceField in sourceNodeFields)
                 {
-                    var targetValue = sourceField.GetValue(sourceNode.m_nodeImplementation);
-                    if (targetValue is int)
+                    BehaviourNodeReferenceAttribute nodeReference = (BehaviourNodeReferenceAttribute)Attribute.GetCustomAttribute(sourceField, typeof(BehaviourNodeReferenceAttribute));
+                    if (nodeReference != null && !nodeReference.ConnectsIn)
                     {
-                        CreateConnector(sourceNode.m_nodeReference, (int)targetValue, sourceField.Name, 0);
-                    }
-                    else if (targetValue is IEnumerable<int>)
-                    {
-                        int connectionOutIndex = 0;
-                        foreach (int targetValueReference in (IEnumerable<int>)targetValue)
+                        var targetValue = sourceField.GetValue(sourceNode.m_nodeImplementation);
+                        if (targetValue is int)
                         {
-                            CreateConnector(sourceNode.m_nodeReference, targetValueReference, sourceField.Name, connectionOutIndex);
-                            connectionOutIndex++;
+                            CreateConnector(sourceNode.m_nodeReference, (int)targetValue, sourceField.Name, 0);
+                        }
+                        else if (targetValue is IEnumerable<int>)
+                        {
+                            int connectionOutIndex = 0;
+                            foreach (int targetValueReference in (IEnumerable<int>)targetValue)
+                            {
+                                CreateConnector(sourceNode.m_nodeReference, targetValueReference, sourceField.Name, connectionOutIndex);
+                                connectionOutIndex++;
+                            }
                         }
                     }
                 }

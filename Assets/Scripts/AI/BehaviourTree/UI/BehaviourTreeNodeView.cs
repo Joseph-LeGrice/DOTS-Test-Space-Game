@@ -41,8 +41,16 @@ public class BehaviourTreeNodeView : VisualElement
         headerElement.Add(m_connectionInElement);
         
         m_title = new Label();
-        m_title.text = node.m_nodeImplementation.GetNodeName();
-        m_title.style.color = Color.black;
+        if (node.m_nodeImplementation != null)
+        {
+            m_title.text = node.m_nodeImplementation.GetNodeName();
+            m_title.style.color = Color.black;
+        }
+        else
+        {
+            m_title.text = "MISSING REFERENCE";
+            m_title.style.color = Color.red;
+        }
         m_title.style.flexGrow = 0.0f;
         headerElement.Add(m_title);
         
@@ -57,50 +65,57 @@ public class BehaviourTreeNodeView : VisualElement
         m_contentElement.style.flexGrow = 1.0f;
         
         hierarchy.Add(m_contentElement);
-        
-        FieldInfo[] nodeFields = node.m_nodeImplementation.GetType().GetFields(BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public);
-        foreach (FieldInfo childProperty in nodeFields)
+
+        if (node.m_nodeImplementation != null)
         {
-            var nodeReference = (BehaviourNodeReferenceAttribute)Attribute.GetCustomAttribute(childProperty, typeof(BehaviourNodeReferenceAttribute));
-            if (nodeReference != null && !nodeReference.ConnectsIn)
+            FieldInfo[] nodeFields = node.m_nodeImplementation.GetType()
+                .GetFields(BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public);
+            foreach (FieldInfo childProperty in nodeFields)
             {
-                var field = new ConnectorPointField(m_behaviourTreeWindow.GetConnectorStateHandler(), childProperty);
-                field.dataSource = node.m_nodeImplementation;
-                field.dataSourcePath = PropertyPath.FromName(childProperty.Name);
-                m_contentElement.Add(field);
-                m_fieldElementLookup[childProperty.Name] = field;
-            }
-            else
-            {
-                if (Attribute.GetCustomAttribute(childProperty, typeof(HideInInspector)) != null)
+                var nodeReference =
+                    (BehaviourNodeReferenceAttribute)Attribute.GetCustomAttribute(childProperty,
+                        typeof(BehaviourNodeReferenceAttribute));
+                if (nodeReference != null && !nodeReference.ConnectsIn)
                 {
-                    continue;
+                    var field = new ConnectorPointField(m_behaviourTreeWindow.GetConnectorStateHandler(),
+                        childProperty);
+                    field.dataSource = node;
+                    field.dataSourcePath = PropertyPath.AppendName(PropertyPath.FromName("m_nodeImplementation"), childProperty.Name);
+                    m_contentElement.Add(field);
+                    m_fieldElementLookup[childProperty.Name] = field;
                 }
-                
-                switch (childProperty.FieldType.Name)
+                else
                 {
-                    default:
-                        Debug.LogError("Property type \"" + childProperty.FieldType.Name + "\" not yet supported!");
-                        break;
-                    case "Int32":
-                        InitField(new IntegerField(), childProperty);
-                        break;
-                    case "String":
-                        InitField(new TextField(), childProperty);
-                        break;
-                    case "Vector2":
-                        InitField(new Vector2Field(), childProperty);
-                        break;
-                    case "Single":
-                        InitField(new FloatField(), childProperty);
-                        break;
-                    case "Boolean":
-                        InitField(new Toggle(), childProperty);
-                        break;
+                    if (Attribute.GetCustomAttribute(childProperty, typeof(HideInInspector)) != null)
+                    {
+                        continue;
+                    }
+
+                    switch (childProperty.FieldType.Name)
+                    {
+                        default:
+                            Debug.LogError("Property type \"" + childProperty.FieldType.Name + "\" not yet supported!");
+                            break;
+                        case "Int32":
+                            InitField(new IntegerField(), childProperty);
+                            break;
+                        case "String":
+                            InitField(new TextField(), childProperty);
+                            break;
+                        case "Vector2":
+                            InitField(new Vector2Field(), childProperty);
+                            break;
+                        case "Single":
+                            InitField(new FloatField(), childProperty);
+                            break;
+                        case "Boolean":
+                            InitField(new Toggle(), childProperty);
+                            break;
+                    }
                 }
             }
         }
-        
+
         this.AddManipulator(new MouseDragManipulator());
     }
 
