@@ -48,6 +48,10 @@ public class BehaviourTreeNodeView : VisualElement
         m_title.style.flexGrow = 0.0f;
         headerElement.Add(m_title);
         
+        Button deleteButton = new Button(DeleteSelf);
+        deleteButton.text = "X";
+        headerElement.Add(deleteButton);
+        
         hierarchy.Add(headerElement);
 
         m_contentElement = new VisualElement();
@@ -99,6 +103,12 @@ public class BehaviourTreeNodeView : VisualElement
         this.AddManipulator(new MouseDragManipulator());
     }
 
+    private void DeleteSelf()
+    {
+        m_behaviourTreeWindow.GetSerializedBehaviourTree().DeleteNode(m_nodeIndex);
+        m_behaviourTreeWindow.RefreshAll();
+    }
+
     private void InitField<T>(BaseField<T> field, FieldInfo childProperty)
     {
         field.style.color = Color.black;
@@ -128,7 +138,7 @@ public class BehaviourTreeNodeView : VisualElement
 
     private BehaviourTreeNode GetNode()
     {
-        return m_behaviourTreeWindow.GetSerializedBehaviourTree().GetNodes()[m_nodeIndex];
+        return m_behaviourTreeWindow.GetSerializedBehaviourTree().GetNode(m_nodeIndex);
     }
 
     public void SetPosition(Vector2 newPosition)

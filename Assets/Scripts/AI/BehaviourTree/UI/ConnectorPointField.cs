@@ -39,7 +39,7 @@ public class ConnectorPointField : VisualElement
             
             DataSourceContext thisDataSource = GetHierarchicalDataSourceContext();
             if (PropertyContainer.TryGetValue(thisDataSource.dataSource, thisDataSource.dataSourcePath,
-                    out IEnumerable<int> idList))
+                    out IEnumerable<int> idList) && idList != null)
             {
                 int i = 0;
                 foreach (var _ in idList)

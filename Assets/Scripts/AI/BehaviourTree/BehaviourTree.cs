@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using Unity.Entities;
+using UnityEditor;
 using UnityEngine;
 using UnityEngine.UIElements;
 
@@ -53,9 +54,9 @@ public class BehaviourTree : BlobAssetScriptableObject<BurstableBehaviourTree>
 {
     [SerializeField]
     [SerializeReference]
-    private List<BehaviourTreeNode> m_allNodes;
+    internal List<BehaviourTreeNode> m_allNodes = new List<BehaviourTreeNode>();
     [SerializeField]
-    private int m_nextNodeReference = 1;
+    internal int m_nextNodeReference = 1;
 
     public int Execute(int i)
     {
@@ -75,18 +76,6 @@ public class BehaviourTree : BlobAssetScriptableObject<BurstableBehaviourTree>
         return null;
     }
     
-    public IList<BehaviourTreeNode> GetNodes()
-    {
-        return m_allNodes;
-    }
-
-    public void AddNode(BehaviourTreeNode node)
-    {
-        node.m_nodeReference = m_nextNodeReference;
-        m_nextNodeReference++;
-        m_allNodes.Add(node);
-    }
-
     protected override void PopulateBlob(IBaker baker, BlobBuilder builder, ref BurstableBehaviourTree blobData)
     {
     }

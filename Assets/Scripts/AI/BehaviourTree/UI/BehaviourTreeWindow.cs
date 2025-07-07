@@ -6,14 +6,13 @@ using UnityEngine.UIElements;
 
 public class BehaviourTreeWindow : VisualElement
 {
-    
-    private BehaviourTree m_behaviourTree;
+    private IBehaviourTreeEditor m_behaviourTree;
     private ConnectorStateHandler m_connectorStateHandler;
     private Dictionary<int, BehaviourTreeNodeView> m_nodeViewLookup = new Dictionary<int, BehaviourTreeNodeView>();
     private List<ConnectorLine> m_allConnectors = new List<ConnectorLine>();
     private AddNodeContextMenu m_contextMenu;
 
-    public BehaviourTreeWindow(BehaviourTree behaviourTree)
+    public BehaviourTreeWindow(IBehaviourTreeEditor behaviourTree)
     {
         m_behaviourTree = behaviourTree;
         
@@ -36,7 +35,7 @@ public class BehaviourTreeWindow : VisualElement
         return m_connectorStateHandler;
     }
 
-    public BehaviourTree GetSerializedBehaviourTree()
+    public IBehaviourTreeEditor GetSerializedBehaviourTree()
     {
         return m_behaviourTree;
     }
@@ -51,10 +50,10 @@ public class BehaviourTreeWindow : VisualElement
         
         VisualElement nodeRoot = this.Q<VisualElement>("NodeInstanceRoot");
         
-        var allNodes = m_behaviourTree.GetNodes();
-        for (int i = 0; i < allNodes.Count; i++)
+        int nodeCount = m_behaviourTree.GetNodeCount();
+        for (int i = 0; i < nodeCount; i++)
         {
-            BehaviourTreeNode node = allNodes[i];
+            BehaviourTreeNode node = m_behaviourTree.GetNode(i);
             BehaviourTreeNodeView treeNodeViewInstance = new BehaviourTreeNodeView(this, i);
             nodeRoot.Add(treeNodeViewInstance);
             m_nodeViewLookup[node.m_nodeReference] = treeNodeViewInstance;
@@ -89,7 +88,7 @@ public class BehaviourTreeWindow : VisualElement
     {
         m_nodeViewLookup[node.m_nodeReference].RemoveFromHierarchy();
         
-        int i = m_behaviourTree.GetNodes().IndexOf(node);
+        int i = m_behaviourTree.IndexOf(node);
         BehaviourTreeNodeView treeNodeViewInstance = new BehaviourTreeNodeView(this, i);
         VisualElement nodeRoot = this.Q<VisualElement>("NodeInstanceRoot");
         nodeRoot.Add(treeNodeViewInstance);
@@ -106,9 +105,12 @@ public class BehaviourTreeWindow : VisualElement
         }
         m_allConnectors.Clear();
         
-        foreach (var sourceNode in m_behaviourTree.GetNodes())
+        int nodeCount = m_behaviourTree.GetNodeCount();
+        for (int i=0; i<nodeCount; i++)
         {
-            var sourceNodeFields = sourceNode.GetType().GetFields(BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public);
+            BehaviourTreeNode sourceNode = m_behaviourTree.GetNode(i);
+            
+            FieldInfo[] sourceNodeFields = sourceNode.GetType().GetFields(BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public);
             foreach (FieldInfo sourceField in sourceNodeFields)
             {
                 BehaviourNodeReferenceAttribute nodeReference = (BehaviourNodeReferenceAttribute)Attribute.GetCustomAttribute(sourceField, typeof(BehaviourNodeReferenceAttribute));
