@@ -33,14 +33,4 @@ public class BehaviourTreeConditionalNode : BehaviourTreeNode
     {
         return new BurstableBehaviourTreeNode();
     }
-
-    public override bool AcceptsConnectionIn()
-    {
-        return true;
-    }
-
-    public override bool AcceptsConnectionOut()
-    {
-        return true;
-    }
 }

@@ -2,7 +2,6 @@ using System;
 using System.Collections.Generic;
 using System.Reflection;
 using Unity.Properties;
-using UnityEditor.UIElements;
 using UnityEngine;
 using UnityEngine.UIElements;
 
@@ -39,7 +38,6 @@ public class BehaviourTreeNodeView : VisualElement
         m_connectionInElement = new ConnectorPoint(m_behaviourTreeWindow.GetConnectorStateHandler(), true);
         m_connectionInElement.dataSource = node;
         m_connectionInElement.dataSourcePath = PropertyPath.FromName(nameof(BehaviourTreeNode.m_nodeReference));
-        m_connectionInElement.visible = node.AcceptsConnectionIn();
         headerElement.Add(m_connectionInElement);
         
         m_title = new Label();
@@ -95,6 +93,9 @@ public class BehaviourTreeNodeView : VisualElement
                         break;
                     case "Single":
                         InitField(new FloatField(), childProperty);
+                        break;
+                    case "Boolean":
+                        InitField(new Toggle(), childProperty);
                         break;
                 }
             }

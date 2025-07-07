@@ -43,14 +43,4 @@ public class BehaviourTreeSequentialNode : BehaviourTreeNode
     {
         return "Sequential Node";
     }
-
-    public override bool AcceptsConnectionIn()
-    {
-        return true;
-    }
-
-    public override bool AcceptsConnectionOut()
-    {
-        return true;
-    }
 }
