@@ -3,7 +3,7 @@ using Unity.Entities;
 
 public struct BurstableBehaviourTreeNode
 {
-    public delegate int DoActionDelegate(ref ECSBehaviourTreeBlackboard blackboard);
+    public delegate int DoActionDelegate(ref BurstableBehaviourTree behaviourTree, ref ECSBehaviourTreeBlackboard blackboard);
     
     public int NodeReferenceIndex;
     public BlobArray<byte> NodeData;
@@ -12,18 +12,24 @@ public struct BurstableBehaviourTreeNode
 
 public struct BurstableBehaviourTree
 {
+    public int InitialNodeReferenceIndex;
     public BlobArray<BurstableBehaviourTreeNode> m_allNodes;
 
-    public int ExecuteNode(int i, ref ECSBehaviourTreeBlackboard blackboard)
+    public void Execute(ref ECSBehaviourTreeBlackboard blackboard)
     {
-        foreach (BurstableBehaviourTreeNode n in m_allNodes.ToArray())
+        m_allNodes[InitialNodeReferenceIndex].DoAction.Invoke(ref this, ref blackboard);
+    }
+
+    public /* ref */ BurstableBehaviourTreeNode GetNode(int nodeReference)
+    {
+        foreach (var node in m_allNodes.ToArray()) // Probably pretty slow
         {
-            if (n.NodeReferenceIndex == i)
+            if (node.NodeReferenceIndex == nodeReference)
             {
-                return n.DoAction.Invoke(ref blackboard);
+                return node;
             }
         }
-        return 0;
+        return default(BurstableBehaviourTreeNode);
     }
 }
 
@@ -34,8 +40,15 @@ public struct ECSBehaviourTreeBlackboard : IComponentData
 
 public struct ECSBehaviourTree : IComponentData
 {
-    public int m_currentActionIndex;
-    public BlobAssetReference<BurstableBehaviourTree> BehaviourTree; // Shared Component?
+    public BlobAssetReference<BurstableBehaviourTree> BehaviourTree;
+
+    public static ECSBehaviourTree From(BlobAssetReference<BurstableBehaviourTree> behaviourTreeBlobReference)
+    {
+        return new ECSBehaviourTree()
+        {
+            BehaviourTree = behaviourTreeBlobReference
+        };
+    }
 }
 
 public partial struct BehaviourTreeUpdateSystem : ISystem
@@ -45,7 +58,7 @@ public partial struct BehaviourTreeUpdateSystem : ISystem
         foreach (var (ecsBehaviourTree, blackboard) in SystemAPI.Query<RefRW<ECSBehaviourTree>, RefRW<ECSBehaviourTreeBlackboard>>())
         {
             ref BurstableBehaviourTree behaviourTree = ref ecsBehaviourTree.ValueRO.BehaviourTree.Value;
-            ecsBehaviourTree.ValueRW.m_currentActionIndex = behaviourTree.ExecuteNode(ecsBehaviourTree.ValueRO.m_currentActionIndex, ref blackboard.ValueRW);
+            behaviourTree.Execute(ref blackboard.ValueRW);
         }
     }
 }

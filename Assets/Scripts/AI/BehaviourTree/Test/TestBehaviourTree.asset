@@ -13,7 +13,6 @@ MonoBehaviour:
   m_Name: TestBehaviourTree
   m_EditorClassIdentifier: 
   m_allNodes:
-  - rid: 1607397105879744708
   - rid: 1607397128459518052
   - rid: 1607397128459518055
   - rid: 1607397128459518057
@@ -28,17 +27,6 @@ MonoBehaviour:
       data:
         m_nodePosition: {x: 20, y: 155}
         m_nodeReference: 28
-    - rid: 1607397105879744708
-      type: {class: BehaviourTreeNode, ns: , asm: behaviourtree}
-      data:
-        m_nodeReference: 21
-        m_nodePosition: {x: 209, y: 302}
-        m_nodeImplementation:
-          rid: 1607397105879744709
-    - rid: 1607397105879744709
-      type: {class: BehaviourTreeSelectorNode, ns: , asm: behaviourtree}
-      data:
-        m_actionNodes: 1b000000ffffffff
     - rid: 1607397128459518052
       type: {class: BehaviourTreeNode, ns: , asm: behaviourtree}
       data:
@@ -54,7 +42,7 @@ MonoBehaviour:
       type: {class: BehaviourTreeNode, ns: , asm: behaviourtree}
       data:
         m_nodeReference: 28
-        m_nodePosition: {x: 367, y: 113}
+        m_nodePosition: {x: 340, y: 221}
         m_nodeImplementation:
           rid: 1607397128459518056
     - rid: 1607397128459518056
