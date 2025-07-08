@@ -104,7 +104,7 @@ public partial struct ShipHardpointGimbalingSystem : ISystem
                     Gimbal hardpointGimbal = gimbalLookup[hardpoint.WeaponInstanceEntity];
                     LocalTransform ltGimbal = localTransformLookup[hardpointGimbal.GimbalEntity];
                     
-                    quaternion fromToRotation = PhysicsHelpers.GetFromToRotation(ltGimbal.Forward(), hardpoint.TargetLocalForward);
+                    quaternion fromToRotation = MathHelpers.GetFromToRotation(ltGimbal.Forward(), hardpoint.TargetLocalForward);
                     // fromToRotation.value.w = math.min(fromToRotation.value.w, adjustSpeed * SystemAPI.Time.DeltaTime);
                     float3 newForward = math.rotate(fromToRotation, ltGimbal.Forward());
                     // ltGimbal.Rotation = quaternion.LookRotation(newForward, new float3(0, 1, 0));

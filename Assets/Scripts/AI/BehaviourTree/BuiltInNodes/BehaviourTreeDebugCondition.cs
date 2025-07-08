@@ -11,7 +11,7 @@ public class BehaviourTreeDebugCondition : BehaviourTreeNodeImplementation
         return "Debug Condition Node";
     }
     
-    public override BehaviourActionResult DoAction(BehaviourTree behaviourTree)
+    public override BehaviourActionResult DoAction(BehaviourTree behaviourTree, ref BehaviourTreeBlackboard blackboard)
     {
         if (m_condition)
         {

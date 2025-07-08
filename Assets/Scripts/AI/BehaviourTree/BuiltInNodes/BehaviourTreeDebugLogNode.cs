@@ -11,7 +11,7 @@ public class BehaviourTreeDebugLogNode : BehaviourTreeNodeImplementation
         return "Debug Log Node";
     }
     
-    public override BehaviourActionResult DoAction(BehaviourTree behaviourTree)
+    public override BehaviourActionResult DoAction(BehaviourTree behaviourTree, ref BehaviourTreeBlackboard blackboard)
     {
         Debug.Log(m_message);
         return BehaviourActionResult.Success;

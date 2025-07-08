@@ -29,9 +29,9 @@ public sealed class BehaviourTreeNode : INotifyBindablePropertyChanged
         propertyChanged?.Invoke(this, new BindablePropertyChangedEventArgs(property));
     }
 
-    public BehaviourActionResult DoAction(BehaviourTree behaviourTree)
+    public BehaviourActionResult DoAction(BehaviourTree behaviourTree, ref BehaviourTreeBlackboard blackboard)
     {
-        return m_nodeImplementation.DoAction(behaviourTree);
+        return m_nodeImplementation.DoAction(behaviourTree, ref blackboard);
     }
 
     public BurstableBehaviourTreeNode GetBurstable()
@@ -45,7 +45,7 @@ public sealed class BehaviourTreeNode : INotifyBindablePropertyChanged
 public abstract class BehaviourTreeNodeImplementation
 {
     public abstract string GetNodeName();
-    public abstract BehaviourActionResult DoAction(BehaviourTree behaviourTree);
+    public abstract BehaviourActionResult DoAction(BehaviourTree behaviourTree, ref BehaviourTreeBlackboard blackboard);
 
     public virtual BurstableBehaviourTreeNode GetBurstable()
     {

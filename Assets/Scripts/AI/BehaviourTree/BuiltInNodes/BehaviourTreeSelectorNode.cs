@@ -13,22 +13,23 @@ public class BehaviourTreeSelectorNode : BehaviourTreeNodeImplementation
         return "Selector Node";
     }
     
-    public override BehaviourActionResult DoAction(BehaviourTree behaviourTree)
+    public override BehaviourActionResult DoAction(BehaviourTree behaviourTree, ref BehaviourTreeBlackboard blackboard)
     {
         for (int i = 0; i < m_actionNodes.Count; i++)
         {
-            var result = behaviourTree.GetNode(m_actionNodes[i]).DoAction(behaviourTree);
-            
-            if (result == BehaviourActionResult.Success)
-            {
-                return BehaviourActionResult.Success;
-            }
+            var result = behaviourTree.GetNode(m_actionNodes[i]).DoAction(behaviourTree, ref blackboard);
             
             if (result == BehaviourActionResult.InProgress)
             {
                 return BehaviourActionResult.InProgress;
             }
+            
+            if (result == BehaviourActionResult.Success)
+            {
+                return BehaviourActionResult.Success;
+            }
         }
+        
         return BehaviourActionResult.Failure;
     }
 }

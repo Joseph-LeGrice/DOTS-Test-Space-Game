@@ -15,13 +15,13 @@ public class BehaviourTreeConditionalNode : BehaviourTreeNodeImplementation
         return "Conditional Node";
     }
     
-    public override BehaviourActionResult DoAction(BehaviourTree behaviourTree)
+    public override BehaviourActionResult DoAction(BehaviourTree behaviourTree, ref BehaviourTreeBlackboard blackboard)
     {
-        var result = behaviourTree.GetNode(m_conditionalNode).DoAction(behaviourTree);
+        var result = behaviourTree.GetNode(m_conditionalNode).DoAction(behaviourTree, ref blackboard);
         
         if (result == BehaviourActionResult.Success)
         {
-            return behaviourTree.GetNode(m_actionNode).DoAction(behaviourTree);
+            return behaviourTree.GetNode(m_actionNode).DoAction(behaviourTree, ref blackboard);
         }
         else
         {

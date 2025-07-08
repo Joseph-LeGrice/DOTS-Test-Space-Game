@@ -13,11 +13,11 @@ public class BehaviourTreeSequentialNode : BehaviourTreeNodeImplementation
         return "Sequential Node";
     }
     
-    public override BehaviourActionResult DoAction(BehaviourTree behaviourTree)
+    public override BehaviourActionResult DoAction(BehaviourTree behaviourTree, ref BehaviourTreeBlackboard blackboard)
     {
         for (int i = 0; i < m_actionNodes.Count; i++)
         {
-            var result = behaviourTree.GetNode(m_actionNodes[i]).DoAction(behaviourTree);
+            var result = behaviourTree.GetNode(m_actionNodes[i]).DoAction(behaviourTree, ref blackboard);
             
             if (result == BehaviourActionResult.InProgress)
             {
