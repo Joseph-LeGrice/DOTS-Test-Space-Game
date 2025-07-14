@@ -1,3 +1,5 @@
+using System;
+using Unity.Entities;
 using UnityEngine;
 using UnityEngine.UIElements;
 
@@ -31,13 +33,18 @@ public sealed class BehaviourTreeNode : INotifyBindablePropertyChanged
 
     public BehaviourActionResult DoAction(BehaviourTree behaviourTree, ref BehaviourTreeBlackboard blackboard)
     {
-        return m_nodeImplementation.DoAction(behaviourTree, ref blackboard);
+        return m_nodeImplementation.DoActionManaged(behaviourTree, ref blackboard);
     }
 
-    public BurstableBehaviourTreeNode GetBurstable()
+    public void PopulateBurstable(ref BlobBuilder builder, ref BurstableBehaviourTreeNode node)
     {
-        Debug.LogWarning("Node not currently burstable");
-        return default(BurstableBehaviourTreeNode);
+        node.NodeReferenceIndex = m_nodeReference;
+        m_nodeImplementation.PopulateBurstable(ref builder, ref node);
+        
+        if (node.DoActionBurstable.Value == IntPtr.Zero)
+        {
+            Debug.LogError(m_nodeImplementation.GetType().Name + ".DoActionBurstable is null!");
+        }
     }
 }
 
@@ -45,12 +52,17 @@ public sealed class BehaviourTreeNode : INotifyBindablePropertyChanged
 public abstract class BehaviourTreeNodeImplementation
 {
     public abstract string GetNodeName();
-    public abstract BehaviourActionResult DoAction(BehaviourTree behaviourTree, ref BehaviourTreeBlackboard blackboard);
+    public abstract BehaviourActionResult DoActionManaged(BehaviourTree behaviourTree, ref BehaviourTreeBlackboard blackboard);
 
-    public virtual BurstableBehaviourTreeNode GetBurstable()
+    protected unsafe ref T AllocateNodeData<T>(ref BlobBuilder builder, ref BurstableBehaviourTreeNode node) where T : unmanaged
+    {
+        var arrayAllocation = builder.Allocate(ref node.NodeData, sizeof(T));
+        return ref *(T*)arrayAllocation.GetUnsafePtr();
+    }
+    
+    public virtual void PopulateBurstable(ref BlobBuilder builder, ref BurstableBehaviourTreeNode node)
     {
         Debug.LogWarning("Node not currently burstable");
-        return default(BurstableBehaviourTreeNode);
     }
 }
 

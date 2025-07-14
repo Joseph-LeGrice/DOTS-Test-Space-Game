@@ -1,0 +1,135 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 096c1e823e35079429fa4fd155547e9c, type: 3}
+  m_Name: TestBehaviourTreeLogger
+  m_EditorClassIdentifier: 
+  m_allNodes:
+  - rid: 1607397128459518057
+  - rid: 1607397266693030005
+  - rid: 1607397266693030007
+  - rid: 1607397266693030009
+  - rid: 1607397266693030011
+  - rid: 1607397266693030013
+  - rid: 1607397266693030015
+  - rid: 1607397266693030017
+  - rid: 1607397266693030039
+  m_initialNode:
+    rid: 1607397105879744695
+  m_nextNodeReference: 38
+  references:
+    version: 2
+    RefIds:
+    - rid: 1607397105879744695
+      type: {class: BehaviourTreeValueReference, ns: , asm: behaviourtree}
+      data:
+        m_nodePosition: {x: 20, y: 155}
+        m_nodeReference: 37
+    - rid: 1607397128459518057
+      type: {class: BehaviourTreeNode, ns: , asm: behaviourtree}
+      data:
+        m_nodeReference: 29
+        m_nodePosition: {x: 578, y: 438}
+        m_nodeImplementation:
+          rid: 1607397128459518058
+    - rid: 1607397128459518058
+      type: {class: BehaviourTreeDebugLogNode, ns: , asm: behaviourtree}
+      data:
+        m_message: Fallback Message
+    - rid: 1607397266693030005
+      type: {class: BehaviourTreeNode, ns: , asm: behaviourtree}
+      data:
+        m_nodeReference: 30
+        m_nodePosition: {x: 567, y: 139}
+        m_nodeImplementation:
+          rid: 1607397266693030006
+    - rid: 1607397266693030006
+      type: {class: BehaviourTreeConditionalNode, ns: , asm: behaviourtree}
+      data:
+        m_conditionalNode: 32
+        m_actionNode: 31
+    - rid: 1607397266693030007
+      type: {class: BehaviourTreeNode, ns: , asm: behaviourtree}
+      data:
+        m_nodeReference: 31
+        m_nodePosition: {x: 845, y: 180}
+        m_nodeImplementation:
+          rid: 1607397266693030008
+    - rid: 1607397266693030008
+      type: {class: BehaviourTreeDebugLogNode, ns: , asm: behaviourtree}
+      data:
+        m_message: Condition!
+    - rid: 1607397266693030009
+      type: {class: BehaviourTreeNode, ns: , asm: behaviourtree}
+      data:
+        m_nodeReference: 32
+        m_nodePosition: {x: 847, y: 106}
+        m_nodeImplementation:
+          rid: 1607397266693030010
+    - rid: 1607397266693030010
+      type: {class: BehaviourTreeDebugCondition, ns: , asm: behaviourtree}
+      data:
+        m_condition: 0
+    - rid: 1607397266693030011
+      type: {class: BehaviourTreeNode, ns: , asm: behaviourtree}
+      data:
+        m_nodeReference: 33
+        m_nodePosition: {x: 572, y: 254}
+        m_nodeImplementation:
+          rid: 1607397266693030012
+    - rid: 1607397266693030012
+      type: {class: BehaviourTreeSequentialNode, ns: , asm: behaviourtree}
+      data:
+        m_actionNodes: 240000002200000023000000
+    - rid: 1607397266693030013
+      type: {class: BehaviourTreeNode, ns: , asm: behaviourtree}
+      data:
+        m_nodeReference: 34
+        m_nodePosition: {x: 872, y: 327}
+        m_nodeImplementation:
+          rid: 1607397266693030014
+    - rid: 1607397266693030014
+      type: {class: BehaviourTreeDebugLogNode, ns: , asm: behaviourtree}
+      data:
+        m_message: Hello
+    - rid: 1607397266693030015
+      type: {class: BehaviourTreeNode, ns: , asm: behaviourtree}
+      data:
+        m_nodeReference: 35
+        m_nodePosition: {x: 869, y: 378}
+        m_nodeImplementation:
+          rid: 1607397266693030016
+    - rid: 1607397266693030016
+      type: {class: BehaviourTreeDebugLogNode, ns: , asm: behaviourtree}
+      data:
+        m_message: World
+    - rid: 1607397266693030017
+      type: {class: BehaviourTreeNode, ns: , asm: behaviourtree}
+      data:
+        m_nodeReference: 36
+        m_nodePosition: {x: 874, y: 268}
+        m_nodeImplementation:
+          rid: 1607397266693030018
+    - rid: 1607397266693030018
+      type: {class: BehaviourTreeDebugCondition, ns: , asm: behaviourtree}
+      data:
+        m_condition: 0
+    - rid: 1607397266693030039
+      type: {class: BehaviourTreeNode, ns: , asm: behaviourtree}
+      data:
+        m_nodeReference: 37
+        m_nodePosition: {x: 267, y: 214}
+        m_nodeImplementation:
+          rid: 1607397266693030040
+    - rid: 1607397266693030040
+      type: {class: BehaviourTreeSelectorNode, ns: , asm: behaviourtree}
+      data:
+        m_actionNodes: 1e000000210000001d000000

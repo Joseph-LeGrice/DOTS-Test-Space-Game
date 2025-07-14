@@ -1,13 +1,25 @@
+using System;
 using Unity.Burst;
+using Unity.Collections.LowLevel.Unsafe;
 using Unity.Entities;
 
 public struct BurstableBehaviourTreeNode
 {
-    public delegate int DoActionDelegate(ref BurstableBehaviourTree behaviourTree, ref ECSBehaviourTreeBlackboard blackboard);
+    public delegate BehaviourActionResult DoActionDelegate(ref BurstableBehaviourTree behaviourTree, ref BurstableBehaviourTreeNode node, ref ECSBehaviourTreeBlackboard blackboard);
     
     public int NodeReferenceIndex;
     public BlobArray<byte> NodeData;
-    public FunctionPointer<DoActionDelegate> DoAction;
+    public FunctionPointer<DoActionDelegate> DoActionBurstable;
+
+    public BehaviourActionResult Execute(ref BurstableBehaviourTree behaviourTree, ref ECSBehaviourTreeBlackboard blackboard)
+    {
+        return DoActionBurstable.Invoke(ref behaviourTree, ref this, ref blackboard);
+    }
+
+    public unsafe ref T GetNodeDataReference<T>() where T : unmanaged
+    {
+        return ref UnsafeUtility.AsRef<T>((byte*)NodeData.GetUnsafePtr());
+    }
 }
 
 public struct BurstableBehaviourTree
@@ -15,21 +27,21 @@ public struct BurstableBehaviourTree
     public int InitialNodeReferenceIndex;
     public BlobArray<BurstableBehaviourTreeNode> m_allNodes;
 
-    public void Execute(ref ECSBehaviourTreeBlackboard blackboard)
+    public BehaviourActionResult Execute(ref ECSBehaviourTreeBlackboard blackboard)
     {
-        m_allNodes[InitialNodeReferenceIndex].DoAction.Invoke(ref this, ref blackboard);
+        return GetNode(InitialNodeReferenceIndex).Execute(ref this, ref blackboard);
     }
 
-    public /* ref */ BurstableBehaviourTreeNode GetNode(int nodeReference)
+    public ref BurstableBehaviourTreeNode GetNode(int nodeReference)
     {
-        foreach (var node in m_allNodes.ToArray()) // Probably pretty slow
+        for (int i=0; i<m_allNodes.Length; i++)
         {
-            if (node.NodeReferenceIndex == nodeReference)
+            if (m_allNodes[i].NodeReferenceIndex == nodeReference)
             {
-                return node;
+                return ref m_allNodes[i];
             }
         }
-        return default(BurstableBehaviourTreeNode);
+        throw new System.Exception("Node not found");
     }
 }
 

@@ -9,7 +9,7 @@ public class LookAtNode : BehaviourTreeNodeImplementation
         return "Look at";
     }
 
-    public override BehaviourActionResult DoAction(BehaviourTree behaviourTree, ref BehaviourTreeBlackboard blackboard)
+    public override BehaviourActionResult DoActionManaged(BehaviourTree behaviourTree, ref BehaviourTreeBlackboard blackboard)
     {
         Vector3 targetDirection = blackboard.GetVector3("TargetDirection");
         ShipAspect shipAspect = blackboard.GetReference<ShipAspect>("ShipAspect");

@@ -10,7 +10,7 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 096c1e823e35079429fa4fd155547e9c, type: 3}
-  m_Name: TestBehaviourTree
+  m_Name: TestBehaviourTreeRotation
   m_EditorClassIdentifier: 
   m_allNodes:
   - rid: 1607397128459518052

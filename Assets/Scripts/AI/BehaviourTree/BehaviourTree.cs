@@ -41,14 +41,14 @@ public class BehaviourTree : BlobAssetScriptableObject<BurstableBehaviourTree>
         return null;
     }
     
-    protected override void PopulateBlob(IBaker baker, BlobBuilder builder, ref BurstableBehaviourTree blobData)
+    protected override void PopulateBlob(IBaker baker, ref BlobBuilder builder, ref BurstableBehaviourTree blobData)
     {
         blobData.InitialNodeReferenceIndex = m_initialNode.m_nodeReference;
 
         var nodeArrayBuilder = builder.Allocate(ref blobData.m_allNodes, m_allNodes.Count);
         for (int i=0; i<m_allNodes.Count; i++)
         {
-            nodeArrayBuilder[i] = m_allNodes[i].GetBurstable();
+            m_allNodes[i].PopulateBurstable(ref builder, ref nodeArrayBuilder[i]);
         }
     }
 }
