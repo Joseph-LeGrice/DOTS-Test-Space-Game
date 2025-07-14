@@ -2,6 +2,7 @@ using System;
 using Unity.Burst;
 using Unity.Collections.LowLevel.Unsafe;
 using Unity.Entities;
+using Unity.Mathematics;
 
 public struct BurstableBehaviourTreeNode
 {
@@ -47,7 +48,25 @@ public struct BurstableBehaviourTree
 
 public struct ECSBehaviourTreeBlackboard : IComponentData
 {
+    public float GetDeltaTime()
+    {
+        throw new NotImplementedException();
+    }
     
+    public float3 GetFloat3(string identifier)
+    {
+        throw new NotImplementedException();
+    }
+
+    public RefRW<T> GetRefRW<T>(string identifier) where T : struct, IComponentData
+    {
+        throw new NotImplementedException();
+    }
+
+    public RefRO<T> GetRefRO<T>(string identifier) where T : struct, IComponentData
+    {
+        throw new NotImplementedException();
+    }
 }
 
 public struct ECSBehaviourTree : IComponentData

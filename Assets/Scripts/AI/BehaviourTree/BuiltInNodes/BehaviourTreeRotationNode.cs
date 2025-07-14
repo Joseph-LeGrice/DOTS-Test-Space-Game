@@ -1,5 +1,7 @@
 using Unity.Burst;
 using Unity.Entities;
+using Unity.Mathematics;
+using Unity.Transforms;
 using UnityEngine;
 
 [BurstCompile]
@@ -12,18 +14,23 @@ public struct BehaviourTreeRotationNodeBurstable
     public static BehaviourActionResult BurstableDoAction(ref BurstableBehaviourTree behaviourTree,
         ref BurstableBehaviourTreeNode node, ref ECSBehaviourTreeBlackboard blackboard)
     {
-        // Vector3 targetDirection = blackboard.GetVector3("TargetDirection");
-        // Transform transform = blackboard.GetReference<Transform>("Transform");
-        //
-        // Vector3 currentForward = transform.forward;
-        // float forwardAngleDegrees = Vector3.Angle(currentForward, targetDirection);
-        //
-        // if (forwardAngleDegrees < 0.1f)
-        // {
-        //     return BehaviourActionResult.Success;
-        // }
-        //
-        // transform.rotation = Quaternion.RotateTowards(transform.rotation, Quaternion.LookRotation(targetDirection), m_rotationSpeedDegrees * Time.deltaTime);
+        float3 targetDirection = math.normalize(blackboard.GetFloat3("TargetDirection"));
+        RefRO<LocalToWorld> l2w = blackboard.GetRefRO<LocalToWorld>("LocalToWorld");
+        
+        float3 currentForward = l2w.ValueRO.Value.Forward();
+        float forwardAngleDegrees = math.degrees(math.acos(math.dot(currentForward, targetDirection)));
+        
+        if (forwardAngleDegrees < 0.1f)
+        {
+            return BehaviourActionResult.Success;
+        }
+
+        RefRW<LocalTransform> lt = blackboard.GetRefRW<LocalTransform>("LocalTransform");
+        
+        float dt = blackboard.GetDeltaTime();
+        ref BehaviourTreeRotationNodeBurstable data = ref node.GetNodeDataReference<BehaviourTreeRotationNodeBurstable>();
+        quaternion rotation = MathHelpers.RotateTowards(currentForward, targetDirection, data.m_rotationSpeedDegrees * dt);
+        lt.ValueRW.Rotate(rotation.value);
         
         return BehaviourActionResult.InProgress;
     }
