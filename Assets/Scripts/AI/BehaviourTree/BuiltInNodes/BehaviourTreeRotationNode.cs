@@ -33,12 +33,14 @@ public class BehaviourTreeRotationNode : BehaviourTreeNodeImplementation
         return BehaviourActionResult.InProgress;
     }
 
-    public override void PopulateBurstable(ref BlobBuilder builder, ref BurstableBehaviourTreeNode node)
+    public override void PopulateBurstable(ref BlobBuilder builder, ECSTypeRegister ecsTypeRegister, ref BurstableBehaviourTreeNode node)
     {
         ref BehaviourTreeRotationNodeBurstable data =
             ref AllocateNodeData<BehaviourTreeRotationNodeBurstable>(ref builder, ref node);
         data.m_rotationSpeedDegrees = m_rotationSpeedDegrees;
         node.DoActionBurstable = BurstCompiler.CompileFunctionPointer<BurstableBehaviourTreeNode.DoActionDelegate>(BehaviourTreeRotationNodeBurstable.BurstableDoAction);
+        ecsTypeRegister.RegisterAccess<LocalToWorld>(ComponentType.AccessMode.ReadOnly);
+        ecsTypeRegister.RegisterAccess<LocalTransform>(ComponentType.AccessMode.ReadWrite);
     }
 }
 
@@ -52,8 +54,8 @@ public struct BehaviourTreeRotationNodeBurstable
     public static BehaviourActionResult BurstableDoAction(ref BurstableBehaviourTree behaviourTree,
         ref BurstableBehaviourTreeNode node, ref ECSDataAccessor ecsDataAccessor, ref DynamicBuffer<ECSBehaviourTreeBlackboardValue> blackboardValueBuffer)
     {
-        NativeArray<LocalToWorld> m_localToWorldLookup = ecsDataAccessor.GetComponentData<LocalToWorld>("LocalToWorld");
-        NativeArray<LocalTransform> m_localTransformLookup = ecsDataAccessor.GetComponentData<LocalTransform>("LocalTransform");
+        NativeArray<LocalToWorld> m_localToWorldLookup = ecsDataAccessor.GetComponentData<LocalToWorld>();
+        NativeArray<LocalTransform> m_localTransformLookup = ecsDataAccessor.GetComponentData<LocalTransform>();
         
         float3 targetDirection = math.normalize(blackboardValueBuffer.GetFloat3("TargetDirection"));
         Entity e = blackboardValueBuffer.GetEntity("TargetEntity");

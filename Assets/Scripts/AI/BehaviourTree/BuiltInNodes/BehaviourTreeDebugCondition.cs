@@ -48,7 +48,7 @@ public class BehaviourTreeDebugCondition : BehaviourTreeNodeImplementation
         }
     }
 
-    public override void PopulateBurstable(ref BlobBuilder builder, ref BurstableBehaviourTreeNode node)
+    public override void PopulateBurstable(ref BlobBuilder builder, ECSTypeRegister ecsTypeRegister, ref BurstableBehaviourTreeNode node)
     {
         ref BehaviourTreeDebugConditionBurstable data =
             ref AllocateNodeData<BehaviourTreeDebugConditionBurstable>(ref builder, ref node);

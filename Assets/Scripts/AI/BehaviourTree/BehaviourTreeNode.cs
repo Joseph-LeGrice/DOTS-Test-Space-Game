@@ -36,10 +36,10 @@ public sealed class BehaviourTreeNode : INotifyBindablePropertyChanged
         return m_nodeImplementation.DoActionManaged(behaviourTree, ref blackboard);
     }
 
-    public void PopulateBurstable(ref BlobBuilder builder, ref BurstableBehaviourTreeNode node)
+    public void PopulateBurstable(ref BlobBuilder builder, ECSTypeRegister ecsTypeRegister, ref BurstableBehaviourTreeNode node)
     {
         node.NodeReferenceIndex = m_nodeReference;
-        m_nodeImplementation.PopulateBurstable(ref builder, ref node);
+        m_nodeImplementation.PopulateBurstable(ref builder, ecsTypeRegister, ref node);
         
         if (node.DoActionBurstable.Value == IntPtr.Zero)
         {
@@ -60,7 +60,7 @@ public abstract class BehaviourTreeNodeImplementation
         return ref *(T*)arrayAllocation.GetUnsafePtr();
     }
     
-    public virtual void PopulateBurstable(ref BlobBuilder builder, ref BurstableBehaviourTreeNode node)
+    public virtual void PopulateBurstable(ref BlobBuilder builder, ECSTypeRegister ecsTypeRegister, ref BurstableBehaviourTreeNode node)
     {
         Debug.LogWarning("Node not currently burstable");
     }

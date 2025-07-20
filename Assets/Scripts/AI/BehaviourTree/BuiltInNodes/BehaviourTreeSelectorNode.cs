@@ -67,7 +67,7 @@ public class BehaviourTreeSelectorNode : BehaviourTreeNodeImplementation
         return BehaviourActionResult.Failure;
     }
 
-    public override void PopulateBurstable(ref BlobBuilder builder, ref BurstableBehaviourTreeNode node)
+    public override void PopulateBurstable(ref BlobBuilder builder, ECSTypeRegister ecsTypeRegister, ref BurstableBehaviourTreeNode node)
     {
         ref BehaviourTreeSelectorNodeBurstable data = ref AllocateNodeData<BehaviourTreeSelectorNodeBurstable>(ref builder, ref node);
         BlobBuilderArray<int> actionNodes = builder.Allocate(ref data.m_actionNodes, m_actionNodes.Count);

@@ -65,7 +65,7 @@ public class BehaviourTreeSequentialNode : BehaviourTreeNodeImplementation
         return BehaviourActionResult.Success;
     }
     
-    public override void PopulateBurstable(ref BlobBuilder builder, ref BurstableBehaviourTreeNode node)
+    public override void PopulateBurstable(ref BlobBuilder builder, ECSTypeRegister ecsTypeRegister, ref BurstableBehaviourTreeNode node)
     {
         ref BurstableSequentialNodeData nodeDataRef = ref AllocateNodeData<BurstableSequentialNodeData>(ref builder, ref node);
         BlobBuilderArray<int> actionNodes = builder.Allocate(ref nodeDataRef.ActionNodes, m_actionNodes.Count);

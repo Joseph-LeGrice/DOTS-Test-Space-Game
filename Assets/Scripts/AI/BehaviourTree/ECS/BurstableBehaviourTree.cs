@@ -1,3 +1,4 @@
+using System;
 using Unity.Burst;
 using Unity.Collections;
 using Unity.Collections.LowLevel.Unsafe;
@@ -24,8 +25,14 @@ public struct BurstableBehaviourTreeNode
 
 public struct ECSTypeInfo
 {
-    public FixedString128Bytes Identifier;
-    public ComponentType ComponentDataType;
+    public readonly FixedString128Bytes Identifier;
+    public readonly ComponentType ComponentDataType;
+
+    public ECSTypeInfo(Type t, ComponentType.AccessMode accessMode)
+    {
+        Identifier = t.Name;
+        ComponentDataType = new ComponentType(t, accessMode);
+    }
 }
 
 public struct BurstableBehaviourTree

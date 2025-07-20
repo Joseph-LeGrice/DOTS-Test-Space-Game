@@ -57,8 +57,9 @@ public struct ECSDataAccessor
         m_componentHandleLookup = componentHandleLookup
     };
     
-    public NativeArray<T> GetComponentData<T>(string identifier) where T : unmanaged, IComponentData
+    public NativeArray<T> GetComponentData<T>() where T : unmanaged, IComponentData
     {
+        string identifier = ";"; // TODO: Fix 'identifier'
         unsafe
         {
             if (m_componentHandleLookup.TryGetValue(identifier, out DynamicComponentTypeHandle handle))
@@ -105,19 +106,27 @@ public partial struct BehaviourTreeUpdateSystem : ISystem // TODO: Code generati
 
     public void OnCreate(ref SystemState state)
     {
-        // ECSBehaviourTree chunkBehaviourTree = new ECSBehaviourTree();// chunk.GetSharedComponent(m_behaviourTree);
-        // ref var behaviourTree = ref chunkBehaviourTree.BehaviourTree.Value;
-        //
-        // m_componentHandleLookup = new NativeHashMap<FixedString128Bytes, DynamicComponentTypeHandle>();
-        // for (int i = 0; i < behaviourTree.m_ecsTypeInfo.Length; i++)
-        // {
-        //     ref var t = ref behaviourTree.m_ecsTypeInfo[i];
-        //     m_componentHandleLookup[t.Identifier] = state.GetDynamicComponentTypeHandle(t.ComponentDataType);
-        // }
+        m_componentHandleLookup = new NativeHashMap<FixedString128Bytes, DynamicComponentTypeHandle>();
+    }
+
+    public void OnDestroy(ref SystemState state)
+    {
+        m_componentHandleLookup.Dispose();
     }
     
     public void OnUpdate(ref SystemState state)
     {
+        state.EntityManager.GetAllUniqueSharedComponents(out NativeList<ECSBehaviourTree> allBehaviourTrees, Allocator.Temp);
+        foreach (var btRef in allBehaviourTrees)
+        {
+            ref var behaviourTree = ref btRef.BehaviourTree.Value;
+            for (int i = 0; i < behaviourTree.m_ecsTypeInfo.Length; i++)
+            {
+                ref var t = ref behaviourTree.m_ecsTypeInfo[i];
+                m_componentHandleLookup[t.Identifier] = state.GetDynamicComponentTypeHandle(t.ComponentDataType);
+            }
+        }
+        
         BehaviourTreeUpdateJob job = new BehaviourTreeUpdateJob();
         job.m_behaviourTree = SystemAPI.GetSharedComponentTypeHandle<ECSBehaviourTree>();
         job.m_componentHandleLookup = m_componentHandleLookup;

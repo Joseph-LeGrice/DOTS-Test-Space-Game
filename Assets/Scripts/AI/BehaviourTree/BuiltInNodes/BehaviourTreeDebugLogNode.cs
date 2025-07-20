@@ -13,7 +13,7 @@ public struct BehaviourTreeDebugLogNodeBurstable
         ref BurstableBehaviourTreeNode node, ref ECSDataAccessor ecsDataAccessor, ref DynamicBuffer<ECSBehaviourTreeBlackboardValue> blackboardValueBuffer)
     {
         ref BehaviourTreeDebugLogNodeBurstable data = ref node.GetNodeDataReference<BehaviourTreeDebugLogNodeBurstable>();
-        Debug.Log(data.m_message.ToString());
+        Debug.Log("???"); //data.m_message.ToString());
         return BehaviourActionResult.Success;
     }
 }
@@ -35,7 +35,7 @@ public class BehaviourTreeDebugLogNode : BehaviourTreeNodeImplementation
         return BehaviourActionResult.Success;
     }
 
-    public override void PopulateBurstable(ref BlobBuilder builder, ref BurstableBehaviourTreeNode node)
+    public override void PopulateBurstable(ref BlobBuilder builder, ECSTypeRegister ecsTypeRegister, ref BurstableBehaviourTreeNode node)
     {
         ref BehaviourTreeDebugLogNodeBurstable data = ref AllocateNodeData<BehaviourTreeDebugLogNodeBurstable>(ref builder, ref node);
         builder.AllocateString(ref data.m_message, m_message);
