@@ -28,8 +28,8 @@ public class BehaviourTreeRunner : MonoBehaviour
         public override void Bake(BehaviourTreeRunner authoring)
         {
             Entity e = GetEntity(TransformUsageFlags.None);
-            AddComponent(e, ECSBehaviourTree.From(authoring.m_behaviourTree.GetBlobDataReference(this)));
-            AddComponent(e, new ECSBehaviourTreeBlackboard());
+            AddSharedComponent(e, ECSBehaviourTree.From(authoring.m_behaviourTree.GetBlobDataReference(this)));
+            AddBuffer<ECSBehaviourTreeBlackboardValue>(e);
         }
     }
 }

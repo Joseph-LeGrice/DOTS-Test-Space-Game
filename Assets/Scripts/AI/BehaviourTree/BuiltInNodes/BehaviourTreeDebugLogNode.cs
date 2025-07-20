@@ -10,7 +10,7 @@ public struct BehaviourTreeDebugLogNodeBurstable
     [BurstCompile]
     [AOT.MonoPInvokeCallback(typeof(BurstableBehaviourTreeNode.DoActionDelegate))]
     public static BehaviourActionResult BurstableDoAction(ref BurstableBehaviourTree behaviourTree,
-        ref BurstableBehaviourTreeNode node, ref ECSBehaviourTreeBlackboard blackboard)
+        ref BurstableBehaviourTreeNode node, ref ECSDataAccessor ecsDataAccessor, ref DynamicBuffer<ECSBehaviourTreeBlackboardValue> blackboardValueBuffer)
     {
         ref BehaviourTreeDebugLogNodeBurstable data = ref node.GetNodeDataReference<BehaviourTreeDebugLogNodeBurstable>();
         Debug.Log(data.m_message.ToString());

@@ -11,14 +11,14 @@ public struct BehaviourTreeSelectorNodeBurstable
     [BurstCompile]
     [AOT.MonoPInvokeCallback(typeof(BurstableBehaviourTreeNode.DoActionDelegate))]
     public static BehaviourActionResult BurstableDoAction(ref BurstableBehaviourTree behaviourTree,
-        ref BurstableBehaviourTreeNode node, ref ECSBehaviourTreeBlackboard blackboard)
+        ref BurstableBehaviourTreeNode node, ref ECSDataAccessor ecsDataAccessor, ref DynamicBuffer<ECSBehaviourTreeBlackboardValue> blackboardValueBuffer)
     {
         ref BehaviourTreeSelectorNodeBurstable data =
             ref node.GetNodeDataReference<BehaviourTreeSelectorNodeBurstable>();
         
         for (int i = 0; i < data.m_actionNodes.Length; i++)
         {
-            var result = behaviourTree.GetNode(data.m_actionNodes[i]).Execute(ref behaviourTree, ref blackboard);
+            var result = behaviourTree.GetNode(data.m_actionNodes[i]).Execute(ref behaviourTree, ref ecsDataAccessor, ref blackboardValueBuffer);
             
             if (result == BehaviourActionResult.InProgress)
             {
